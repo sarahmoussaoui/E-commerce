@@ -1,0 +1,61 @@
+/** @format */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h1 {
+  color: #333;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 10px 0;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.product-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Espace entre les produits */
+}
+
+.product-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 200px; /* Largeur fixe pour chaque produit */
+  text-align: center;
+}
+
+.product-card img {
+  width: 100%; /* L'image prend toute la largeur de la carte */
+  height: auto;
+}
+
+/* Style pour le lien "Voir le panier" */
+.cart-link {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.cart-link:hover {
+  background-color: #0056b3;
+}

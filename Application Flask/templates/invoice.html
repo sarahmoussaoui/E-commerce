@@ -1,0 +1,19 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Facture</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <h1>Merci pour votre achat !</h1>
+    <p>
+      Votre facture a été générée.
+      <a href="{{ url_for('index') }}">Retour à l'accueil</a>
+    </p>
+  </body>
+</html>

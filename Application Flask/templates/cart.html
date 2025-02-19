@@ -1,0 +1,31 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Panier</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <h1>Votre panier</h1>
+    <ul>
+      {% for product in products %}
+      <li>{{ product.name }} - {{ product.price }} EUR</li>
+      {% endfor %}
+    </ul>
+    <p>Total : {{ total }} EUR</p>
+    <form action="{{ url_for('checkout') }}" method="POST">
+      <script
+        src="https://checkout.stripe.com/checkout.js"
+        class="stripe-button"
+        data-key="pk_test_51QuKI7P07IJnX3s3r6FjzVnKPcVpF5qYMmTZKT4r4iB62hIrNPJhqALHpGhR5JsGQb7UFj5l8D1OVdKMPZJFlkTx00w8kOB1Oq"
+        data-amount="{{ total * 100 }}"
+        data-name="Mon Site"
+        data-description="Paiement"
+        data-currency="EUR"></script>
+    </form>
+  </body>
+</html>
