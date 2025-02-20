@@ -39,7 +39,14 @@ Creating a venv:
   Ajoute le chemin du dossier SQLite (par exemple, C:\sqlite).
   Ouvre un nouveau terminal et exécute sqlite3 pour vérifier que l'installation a réussi.
   access sqllite terminal:
-    sqlite3 inventory.db
+    check version installed correctly:
+      python -c "import sqlite3; print(sqlite3.sqlite_version)"
+      enter terminal with database: sqlite3 inventory.db
+      quit terminal : .quit or .exit or force with cltr+C
+      show tables: .tables
+      describe table : .schema products
+      for more commands : .help
+
 
 Obtiens ta clé API Stripe :
   Connecte-toi à ton tableau de bord Stripe (https://dashboard.stripe.com).
