@@ -30,7 +30,8 @@ Creating a venv:
 
 2. Installer SQLite (si nécessaire)
   Sur Windows : 
-  Télécharge SQLite depuis le site officiel : https://sqlite.org/download.html.
+  Télécharge SQLite depuis le site officiel : https://sqlite.org/download.html, precisely : sqlite-tools-win-x64-3490100.zip
+    (6.12 MiB)	
   Télécharge le fichier sqlite-tools-win32-x86-*.zip (ou sqlite-tools-win32-x64-*.zip pour une version 64 bits).
   Extrais le fichier ZIP et place le dossier dans un répertoire facile d'accès (par exemple, C:\sqlite).
   Ajoute le chemin du dossier à ton PATH système :
