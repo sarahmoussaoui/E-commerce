@@ -67,3 +67,12 @@ Accède à l'interface admin pour ajouter des produits
 On genere des produits aleatoires avec faker, les images aleatoires  du site Lorem Picsum:
   https://picsum.photos/200/300
   et on ajoute un code qui permet de generer pour chaque produit son image
+
+
+
+Activer la tokenisation pour votre clé
+Accédez à votre tableau de bord Stripe :
+👉 Paramètres d'intégration Stripe
+Activez la tokenisation côté client pour votre clé publiable.
+Pour activer cette interface, veuillez accéder à votre tableau de bord https://dashboard.stripe.com/settings/integration .
+Si l'option n'est pas disponible, votre compte pourrait ne pas être éligible à la tokenisation côté client. Dans ce cas, vous devez utiliser Stripe Elements pour des paiements sécurisés.
