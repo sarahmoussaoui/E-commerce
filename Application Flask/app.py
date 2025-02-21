@@ -6,12 +6,17 @@ from io import BytesIO
 import os
 from faker import Faker
 from random import randint
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env
 
 app = Flask(__name__)
-app.secret_key = 'sk_test_51QuKI7P07IJnX3s3nUOsoS8pou7lncFP1mdSaW058LuBN0U6yDkTsgRVZtVecZK41rSQOV3WwvBKwqiblSkduNwa00KY9JKef4'  # Nécessaire pour les sessions
+app.secret_key = os.getenv("STRIPE_SECRET_KEY")  # Nécessaire pour les sessions
+stripe_public_key = os.getenv("STRIPE_PUBLIC_KEY")  # Remplace par ta clé publique Stripe
 
 # Configuration Stripe
-stripe.api_key = 'sk_test_51QuKI7P07IJnX3s3nUOsoS8pou7lncFP1mdSaW058LuBN0U6yDkTsgRVZtVecZK41rSQOV3WwvBKwqiblSkduNwa00KY9JKef4'  # Remplace par ta clé secrète Stripe
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")  # Remplace par ta clé secrète Stripe
 
 # Chemin vers la base de données SQLite
 DATABASE = 'inventory.db'
@@ -84,7 +89,7 @@ def view_cart():
             products.append(product)
             total += product['price']
     conn.close()
-    return render_template('cart.html', products=products, total=total)
+    return render_template('cart.html', products=products, total=total, stripe_public_key=stripe_public_key)
 
 # Paiement avec Stripe
 @app.route('/checkout', methods=['POST'])
