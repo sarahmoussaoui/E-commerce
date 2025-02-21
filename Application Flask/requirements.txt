@@ -2,3 +2,4 @@ Flask==2.3.2
 stripe==5.4.0
 reportlab==4.0.4
 Faker==19.6.1
+python-dotenv
