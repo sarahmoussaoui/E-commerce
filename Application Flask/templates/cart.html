@@ -18,6 +18,9 @@
     </ul>
     <p>Total : {{ total }} EUR</p>
     <form action="{{ url_for('checkout') }}" method="POST">
+      <!-- Hidden input to send the total amount -->
+      <input type="hidden" name="total" value="{{ total }}" />
+    
       <script
         src="https://checkout.stripe.com/checkout.js"
         class="stripe-button"
@@ -27,5 +30,6 @@
         data-description="Paiement"
         data-currency="EUR"></script>
     </form>
+    
   </body>
 </html>

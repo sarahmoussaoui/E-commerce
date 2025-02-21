@@ -11,7 +11,7 @@ Application Flask/
 ├── static/                 # Dossier pour les fichiers statiques (CSS, images, etc.)
 │   └── style.css           # Fichier CSS pour le style de l'application
 └── invoices/               # Dossier pour stocker les factures PDF générées
-
+└── .env
 
 Fonctionnalités de l'application:
   Panier d'achat : Un panier d'achat où les utilisateurs peuvent ajouter des produits. ( done)
