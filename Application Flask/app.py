@@ -23,7 +23,7 @@ class Product:
         self.name = name
         self.price = price
         self.stock = stock
-        # self.image_url =  self.generate_image_url()  # Générer une URL d'image fixe
+        self.image_url =  self.generate_image_url()  # Générer une URL d'image fixe
     
     def generate_image_url(self):
         """Génère une URL d'image fixe basée sur l'ID du produit."""

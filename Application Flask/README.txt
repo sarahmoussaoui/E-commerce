@@ -14,10 +14,12 @@ Application Flask/
 
 
 Fonctionnalités de l'application:
-  Panier d'achat : Un panier d'achat où les utilisateurs peuvent ajouter des produits.
-  Paiement avec Stripe : Intégrer Stripe pour gérer les paiements en ligne.
-  Gestion d'inventaire avec SQLite : Utiliser une base de données SQLite pour gérer les stocks de produits.
-  Gestion des factures en PDF avec ReportLab : Générer des factures en PDF après un achat.
+  Panier d'achat : Un panier d'achat où les utilisateurs peuvent ajouter des produits. ( done)
+  Paiement avec Stripe : Intégrer Stripe pour gérer les paiements en ligne. (proceed to payment not done --> search to active smthg, panier doit se vider)
+  Gestion d'inventaire avec SQLite : Utiliser une base de données SQLite pour gérer les stocks de produits. (done)
+  Gestion des factures en PDF avec ReportLab : Générer des factures en PDF après un achat. (not done)
+  Gestion du panier (done)
+  régler le probleme d'image ( not done)
 
 
 Creating a venv:
