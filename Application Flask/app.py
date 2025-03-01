@@ -150,10 +150,21 @@ def download_facture():
     invoice_data = session.get("invoice")
     if not invoice_data:
         return "Aucune facture disponible.", 400
-    buffer = BytesIO(invoice_data)
-    buffer.seek(0)
+
+    # Ensure "invoices" directory exists
+    invoices_dir = os.path.join(os.getcwd(), "invoices")
+    os.makedirs(invoices_dir, exist_ok=True)
+
+    # Define file path
+    file_path = os.path.join(invoices_dir, "invoice.pdf")
+
+    # Save invoice to file
+    with open(file_path, "wb") as f:
+        f.write(invoice_data)
+
+    # Send the file
     return send_file(
-        buffer,
+        file_path,
         mimetype="application/pdf",
         as_attachment=True,
         download_name="invoice.pdf",
