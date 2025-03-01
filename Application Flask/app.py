@@ -1,93 +1,191 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    send_file,
+    flash,
+)
 import sqlite3
 import stripe
 from reportlab.pdfgen import canvas
 from io import BytesIO
 import os
-from faker import Faker
-from random import randint
-import os
 from dotenv import load_dotenv
+from flask_bcrypt import Bcrypt
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    logout_user,
+    login_required,
+    current_user,
+)
 
-load_dotenv()  # Load environment variables from .env
+load_dotenv()  # Load environment variables
 
 app = Flask(__name__)
-app.secret_key = os.getenv("STRIPE_SECRET_KEY")  # Nécessaire pour les sessions
-stripe_public_key = os.getenv(
-    "STRIPE_PUBLIC_KEY"
-)  # Remplace par ta clé publique Stripe
+app.secret_key = os.getenv("FLASK_SECRET_KEY")  # Necessary for sessions
+bcrypt = Bcrypt(app)
 
-# Configuration Stripe
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")  # Remplace par ta clé secrète Stripe
+# Flask-Login Setup
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
 
-# Chemin vers la base de données SQLite
+# Stripe Configuration
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+stripe_public_key = os.getenv("STRIPE_PUBLIC_KEY")
+
+# SQLite Database Path
 DATABASE = "inventory.db"
 
 
-#  classe product
-class Product:
-    def __init__(self, id, name, price, stock):
+# User Model
+class User(UserMixin):
+    def __init__(self, id, username, password):
         self.id = id
-        self.name = name
-        self.price = price
-        self.stock = stock
-        self.image_url = self.generate_image_url()  # Générer une URL d'image fixe
+        self.username = username
+        self.password = password
 
-    def generate_image_url(self):
-        """Génère une URL d'image fixe basée sur l'ID du produit."""
-        return f"https://picsum.photos/200/300?random={self.id}"
+    def get_id(self):
+        return str(self.id)
 
 
-# Fonction pour se connecter à la base de données
+# Load User for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    conn = get_db()
+    user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    conn.close()
+    if user:
+        return User(user["id"], user["username"], user["password"])
+    return None  # Explicitly return None if the user is not found
+
+
+# Function to get database connection
 def get_db():
     conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row  # Permet d'accéder aux colonnes par nom
+    conn.row_factory = sqlite3.Row  # Access columns by name
     return conn
 
 
-# Créer la table des produits si elle n'existe pas
+# Initialize Database
 def init_db():
     conn = get_db()
-    conn.execute(
+    cursor = conn.cursor()
+
+    # Create products table
+    cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             price REAL NOT NULL,
-            stock INTEGER NOT NULL,
-            image_url TEXT
+            stock INTEGER NOT NULL
         )
-    """
+        """
     )
+
+    # Create users table
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+        """
+    )
+
     conn.commit()
     conn.close()
 
 
-# Page d'accueil : afficher les produits
+# Route: Register
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = bcrypt.generate_password_hash(request.form["password"]).decode(
+            "utf-8"
+        )
+
+        conn = get_db()
+        try:
+            conn.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                (username, password),
+            )
+            conn.commit()
+            flash("Account created! Please login.", "success")
+            return redirect(url_for("login"))
+        except sqlite3.IntegrityError:
+            flash("Username already exists.", "danger")
+        finally:
+            conn.close()
+
+    return render_template("register.html")
+
+
+# Route: Login
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        conn = get_db()
+        user = conn.execute(
+            "SELECT * FROM users WHERE username = ?", (username,)
+        ).fetchone()
+        conn.close()
+
+        if user and bcrypt.check_password_hash(user["password"], password):
+            login_user(User(user["id"], user["username"], user["password"]))
+            flash("Login successful!", "success")
+            return redirect(url_for("index"))
+
+        flash("Invalid credentials", "danger")
+    return render_template("login.html")
+
+
+# Route: Logout
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("Logged out successfully!", "info")
+    return redirect(url_for("login"))
+
+
+# Home Page: Display Products
 @app.route("/")
+@login_required
 def index():
     conn = get_db()
     products = conn.execute("SELECT * FROM products").fetchall()
     conn.close()
-
-    # Convertir chaque sqlite3.Row en dictionnaire
     products = [dict(product) for product in products]
-
     return render_template("index.html", products=products)
 
 
-# Ajouter un produit au panier
+# Add Product to Cart
 @app.route("/add_to_cart/<int:product_id>")
+@login_required
 def add_to_cart(product_id):
     if "cart" not in session:
         session["cart"] = []
-    session["cart"].append(product_id)
-    session.modified = True  # Assure-toi que la session est marquée comme modifiée
+    if product_id not in session["cart"]:  # Prevent duplicate items
+        session["cart"].append(product_id)
+        session.modified = True
     return redirect(url_for("index"))
 
 
-# Afficher le panier
+# View Cart
 @app.route("/cart")
+@login_required
 def view_cart():
     cart = session.get("cart", [])
     conn = get_db()
@@ -98,7 +196,7 @@ def view_cart():
             "SELECT * FROM products WHERE id = ?", (product_id,)
         ).fetchone()
         if product:
-            products.append(product)
+            products.append(dict(product))
             total += product["price"]
     conn.close()
     return render_template(
@@ -106,65 +204,49 @@ def view_cart():
     )
 
 
-# Paiement avec Stripe
+# Stripe Checkout
 @app.route("/checkout", methods=["POST"])
+@login_required
 def checkout():
     try:
-        total = request.form.get("total", "0")  # Get total safely
+        total = request.form.get("total", "0")
         total = float(total) * 100  # Convert to cents
 
         if total < 1:
-            return "Erreur: Le montant doit être supérieur à 0.", 400
+            return "Error: Amount must be greater than 0.", 400
 
-        charge = stripe.Charge.create(
+        stripe.Charge.create(
             amount=int(total),
             currency="eur",
-            description="Paiement",
+            description="Payment",
             source=request.form.get("stripeToken"),
         )
 
-        cart = session.get("cart", [])  # Retrieve cart from session
-        session["cart"] = []  # Clear cart after payment
-
-        # Generate the invoice
-        invoice_pdf = generate_invoice(cart, total / 100)
-
-        # Store invoice in session for download on facture page
-        session["invoice"] = invoice_pdf.getvalue()
-
+        session["invoice"] = generate_invoice(session["cart"], total).getvalue()
+        session["cart"] = []  # Clear cart
         return redirect(url_for("facture"))
 
     except stripe.error.StripeError as e:
         return str(e), 400
     except ValueError:
-        return "Erreur: Montant invalide.", 400
+        return "Error: Invalid amount.", 400
 
 
 @app.route("/invoice")
+@login_required
 def facture():
     return render_template("invoice.html")
 
 
 @app.route("/download_invoice")
+@login_required
 def download_facture():
     invoice_data = session.get("invoice")
     if not invoice_data:
-        return "Aucune facture disponible.", 400
+        return "No invoice available.", 400
 
-    # Ensure "invoices" directory exists
-    invoices_dir = os.path.join(os.getcwd(), "invoices")
-    os.makedirs(invoices_dir, exist_ok=True)
-
-    # Define file path
-    file_path = os.path.join(invoices_dir, "invoice.pdf")
-
-    # Save invoice to file
-    with open(file_path, "wb") as f:
-        f.write(invoice_data)
-
-    # Send the file
     return send_file(
-        file_path,
+        BytesIO(invoice_data),
         mimetype="application/pdf",
         as_attachment=True,
         download_name="invoice.pdf",
@@ -174,21 +256,20 @@ def download_facture():
 def generate_invoice(cart, total):
     buffer = BytesIO()
     p = canvas.Canvas(buffer)
-    p.drawString(100, 750, "Facture")
-    p.drawString(100, 730, f"Total: {total} EUR")
-    p.drawString(100, 710, "Articles achetés :")
+    p.drawString(100, 750, "Invoice")
+    p.drawString(100, 730, f"Total: {total / 100:.2f} EUR")
+    p.drawString(100, 710, "Purchased Items:")
 
     y = 690
+    conn = get_db()
     for product_id in cart:
-        conn = get_db()
         product = conn.execute(
             "SELECT * FROM products WHERE id = ?", (product_id,)
         ).fetchone()
-        conn.close()
-
         if product:
             p.drawString(100, y, f"{product['name']} - {product['price']} EUR")
             y -= 20
+    conn.close()
 
     p.showPage()
     p.save()
@@ -196,79 +277,8 @@ def generate_invoice(cart, total):
     return buffer
 
 
-# Ajouter une route pour ajouter des produits via une interface admin flask --> template add_product.html
-@app.route("/admin/add_product", methods=["GET", "POST"])
-def add_product():
-    if request.method == "POST":
-        name = request.form["name"]
-        price = float(request.form["price"])
-        stock = int(request.form["stock"])
-        conn = get_db()
-        cursor = conn.cursor()
-
-        # Insérer le produit dans la base de données
-        cursor.execute(
-            "INSERT INTO products (name, price, stock) VALUES (?, ?, ?)",
-            (name, price, stock),
-        )
-
-        # Récupérer l'ID du produit nouvellement inséré
-        product_id = cursor.lastrowid
-
-        # Créer un objet Product
-        product = Product(product_id, name, price, stock)
-
-        # Mettre à jour le produit avec l'URL d'image
-        cursor.execute(
-            "UPDATE products SET image_url = ? WHERE id = ?",
-            (product.image_url, product_id),
-        )
-
-        conn.commit()
-        conn.close()
-        return redirect(url_for("index"))
-    return render_template("add_product.html")
-
-
-# ajouter des produits manuellement generated randomly by Faker
-def add_sample_products():
-    conn = get_db()
-    fake = Faker()  # Initialise Faker
-    cursor = conn.cursor()
-
-    # Générer 50 produits aléatoires
-    for _ in range(20):
-        name = (
-            fake.word().capitalize() + " " + fake.word().capitalize()
-        )  # Exemple : "Super T-shirt"
-        price = round(fake.random_number(digits=2)) + 0.99  # Exemple : 19.99
-        stock = fake.random_int(min=10, max=200)  # Exemple : 100
-        # Insérer le produit dans la base de données
-        cursor.execute(
-            "INSERT INTO products (name, price, stock) VALUES (?, ?, ?)",
-            (name, price, stock),
-        )
-
-        # Récupérer l'ID du produit nouvellement inséré
-        product_id = cursor.lastrowid
-
-        # Générer une URL d'image fixe basée sur l'ID
-        image_url = f"https://picsum.photos/200/300?random={product_id}"
-
-        # Mettre à jour le produit avec l'URL d'image
-        cursor.execute(
-            "UPDATE products SET image_url = ? WHERE id = ?", (image_url, product_id)
-        )
-
-    conn.commit()
-    conn.close()
-
-
-# Initialiser la base de données au démarrage
+# Initialize Database
 init_db()
-
-# Ajouter des produits de test (appeler cette fonction une seule fois)
-add_sample_products()
 
 if __name__ == "__main__":
     app.run(debug=True)
