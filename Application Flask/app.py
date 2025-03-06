@@ -242,7 +242,6 @@ def view_cart():
     )
 
 
-# Stripe Checkout
 @app.route("/checkout", methods=["POST"])
 @login_required
 def checkout():
@@ -253,16 +252,35 @@ def checkout():
         if total < 1:
             return "Error: Amount must be greater than 0.", 400
 
-        stripe.Charge.create(
+        # Process payment
+        charge = stripe.Charge.create(
             amount=int(total),
             currency="eur",
             description="Payment",
             source=request.form.get("stripeToken"),
         )
 
-        session["invoice"] = generate_invoice(session["cart"], total)  # Store file path
-        session["cart"] = []  # Clear cart
-        return redirect(url_for("facture"))
+        if charge["paid"]:  # Payment successful
+            conn = get_db()
+            cart = session.get("cart", [])
+
+            # Update stock for each product in the cart
+            for product_id in cart:
+                conn.execute(
+                    "UPDATE products SET stock = stock - 1 WHERE id = ? AND stock > 0",
+                    (product_id,),
+                )
+
+            conn.commit()
+            conn.close()
+
+            # Generate invoice and clear cart
+            session["invoice"] = generate_invoice(cart, total)
+            session["cart"] = []
+
+            return redirect(url_for("facture"))
+
+        return "Error: Payment failed.", 400
 
     except stripe.error.StripeError as e:
         return str(e), 400
