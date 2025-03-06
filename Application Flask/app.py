@@ -15,9 +15,8 @@ from faker import Faker
 from reportlab.pdfgen import canvas
 from io import BytesIO
 import os
-from werkzeug.security import generate_password_hash  # Secure password hashing
-from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -26,7 +25,6 @@ from flask_login import (
     login_required,
     current_user,
 )
-from werkzeug.security import check_password_hash
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -55,13 +53,14 @@ DATABASE = "inventory.db"
 
 # User Model
 class User(UserMixin):
-    def __init__(self, id, FirstName, LastName, Email, phoneNum, password):
+    def __init__(self, id, FirstName, LastName, Email, phoneNum, password, is_admin):
         self.id = id
         self.FirstName = FirstName
         self.LastName = LastName
         self.Email = Email
         self.phoneNum = phoneNum
         self.password = password
+        self.is_admin = is_admin
 
     def get_id(self):
         return str(self.id)
@@ -81,6 +80,7 @@ def load_user(user_id):
             user["Email"],
             user["phoneNum"],
             user["password"],
+            user["is_admin"],
         )
     return None  # Explicitly return None if the user is not found
 
@@ -93,39 +93,6 @@ def get_db():
 
 
 # Initialize Database
-def init_db():
-    conn = get_db()
-    cursor = conn.cursor()
-
-    # Create products table
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL,
-            price REAL NOT NULL,
-            stock INTEGER NOT NULL,
-            image_url TEXT
-        )
-        """
-    )
-
-    # Create users table
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            FirstName TEXT NOT NULL,
-            LastName TEXT NOT NULL,
-            Email TEXT UNIQUE NOT NULL,
-            phoneNum TEXT NOT NULL,
-            password TEXT NOT NULL
-        )
-        """
-    )
-
-    conn.commit()
-    conn.close()
 
 
 # Route: Register
@@ -198,11 +165,17 @@ def login():
                 user["Email"],
                 user["phoneNum"],
                 user["password"],
+                user["is_admin"],
             )
             login_user(user_obj, remember=True)
             session["email"] = email
             flash("Login successful!", "success")
-            return redirect(url_for("index"))
+
+            # Redirect admin (id = 0) to index_admin, others to index
+            if user["is_admin"] == 1:
+                return redirect(url_for("index_admin"))
+            else:
+                return redirect(url_for("index"))
 
         flash("Invalid email or password", "danger")
 
@@ -407,42 +380,83 @@ def generate_invoice(cart, total):
     return invoice_path  # Return the saved file path
 
 
-# ajouter des produits manuellement generated randomly by Faker
-def add_sample_products():
+# Home Page: Display Products
+@app.route("/home_admin")
+@login_required
+def index_admin():
     conn = get_db()
-    fake = Faker()  # Initialise Faker
-    cursor = conn.cursor()
+    products = conn.execute("SELECT * FROM products").fetchall()
+    conn.close()
+    return render_template("home_admin.html", products=products)
 
-    # Générer 50 produits aléatoires
-    for _ in range(20):
-        name = (
-            fake.word().capitalize() + " " + fake.word().capitalize()
-        )  # Exemple : "Super T-shirt"
-        price = round(fake.random_number(digits=2)) + 0.99  # Exemple : 19.99
-        stock = fake.random_int(min=10, max=200)  # Exemple : 100
-        # Insérer le produit dans la base de données
-        cursor.execute(
-            "INSERT INTO products (name, price, stock) VALUES (?, ?, ?)",
-            (name, price, stock),
+
+# Add Product Page
+@app.route("/add_product", methods=["GET", "POST"])
+@login_required
+def add_product():
+    if request.method == "POST":
+        name = request.form["name"]
+        price = float(request.form["price"])
+        stock = int(request.form["stock"])
+        image_url = request.form["image_url"]
+
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO products (name, price, stock, image_url) VALUES (?, ?, ?, ?)",
+            (name, price, stock, image_url),
         )
+        conn.commit()
+        conn.close()
 
-        # Récupérer l'ID du produit nouvellement inséré
-        product_id = cursor.lastrowid
+        flash("Product added successfully!", "success")
+        return redirect(url_for("index_admin"))
 
-        # Générer une URL d'image fixe basée sur l'ID
-        image_url = f"https://picsum.photos/200/300?random={product_id}"
+    return render_template("add_product.html")
 
-        # Mettre à jour le produit avec l'URL d'image
-        cursor.execute(
-            "UPDATE products SET image_url = ? WHERE id = ?", (image_url, product_id)
+
+# Update Product Page
+@app.route("/update_product/<int:product_id>", methods=["GET", "POST"])
+@login_required
+def update_product(product_id):
+    conn = get_db()
+    product = conn.execute(
+        "SELECT * FROM products WHERE id = ?", (product_id,)
+    ).fetchone()
+
+    if request.method == "POST":
+        name = request.form["name"]
+        price = float(request.form["price"])
+        stock = int(request.form["stock"])
+        image_url = request.form["image_url"]
+
+        conn.execute(
+            "UPDATE products SET name=?, price=?, stock=?, image_url=? WHERE id=?",
+            (name, price, stock, image_url, product_id),
         )
+        conn.commit()
+        conn.close()
 
+        flash("Product updated successfully!", "success")
+        return redirect(url_for("index_admin"))
+
+    return render_template("update_product.html", product=product)
+
+
+# Delete Product Page
+@app.route("/delete_product/<int:product_id>", methods=["POST"])
+@login_required
+def delete_product(product_id):
+    conn = get_db()
+    conn.execute("DELETE FROM products WHERE id = ?", (product_id,))
     conn.commit()
     conn.close()
 
+    flash("Product deleted successfully!", "danger")
+    return redirect(url_for("index_admin"))
+
 
 # Initialize Database
-init_db()
+
 # add_sample_products()
 
 if __name__ == "__main__":
