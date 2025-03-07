@@ -242,6 +242,19 @@ def view_cart():
     )
 
 
+@app.route("/product/<int:product_id>")
+def product_detail(product_id):
+    db = get_db()
+    product = db.execute(
+        "SELECT * FROM products WHERE id = ?", (product_id,)
+    ).fetchone()
+
+    if not product:
+        return "Produit non trouvé", 404  # Handle missing product gracefully
+
+    return render_template("product_detail.html", product=product)
+
+
 @app.route("/checkout", methods=["POST"])
 @login_required
 def checkout():

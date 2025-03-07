@@ -1,32 +1,30 @@
-<!-- @format -->
-
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>Produits</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}" />
-  </head>
-  <body>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
     <h1>Nos produits</h1>
+
     <!-- Lien "Voir le panier" en haut -->
-    <div style="margin-bottom: 20px">
-      <a href="{{ url_for('view_cart') }}" class="cart-link">Voir le panier</a>
+    <div class="cart-container">
+        <a href="{{ url_for('view_cart') }}" class="cart-link">Voir le panier</a>
     </div>
-    <div class="product-grid">
-      {% for product in products %}
-      <div class="product-card">
-        <img src="{{ product.image_url }}" alt="{{ product.name }}" />
-        <h3>{{ product.name }}</h3>
-        <p>{{ product.price }} EUR</p>
-        <p>Stock : {{ product.stock }}</p>
-        <a href="{{ url_for('add_to_cart', product_id=product.id) }}"
-          >Ajouter au panier</a
-        >
-      </div>
-      {% endfor %}
+
+    <div class="product-container">
+
+        {% for product in products %}
+        <div class="product-card">       
+          <a href="{{ url_for('product_detail', product_id=product.id) }}">
+            <img src="{{ product.image_url }}" alt="{{ product.name }}" />
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.price }} EUR</p>
+          </a>
+        </div>
+        {% endfor %}
     </div>
-  </body>
+</body>
 </html>
+
