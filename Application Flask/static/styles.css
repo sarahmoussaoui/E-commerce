@@ -1,19 +1,26 @@
 /* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
+    font-family: 'Poppins', sans-serif; /* Modern and aesthetic font */
+    background-color: #FFFFFF; /* White background */
     margin: 0;
     padding: 20px;
     text-align: center;
+    color: #9D8189; /* Dark muted pink for text */
 }
 
 h1, h2 {
-    color: #333;
+    color: #9D8189; /* Dark muted pink for headings */
+    font-weight: 600; /* Semi-bold for headings */
 }
 
 a {
     text-decoration: none;
-    color: white;
+    color: #F4ACB7; /* Soft pink for links */
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #FFCAD4; /* Lighter pink on hover */
 }
 
 /* Product Collection Styles */
@@ -30,164 +37,155 @@ a {
 .product-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px; /* Space between cards */
-    justify-content: center; /* Centers the items */
+    gap: 20px;
+    justify-content: center;
 }
 
 .product-card {
-    width: 250px; /* Adjust card width */
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    padding: 20px;
+    border: 1px solid #D8E2DC; /* Soft green border */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     text-align: center;
+    background-color: #FFFFFF; /* White card background */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
 }
 
 .product-card img {
     width: 100%;
     height: auto;
-    border-radius: 5px;
-}
-
-.cart-link {
-    display: block !important;
-    visibility: visible !important;
-    color: #007bff; /* To make it noticeable */
-}
-
-.product-card:hover {
-    transform: scale(1.05);
+    border-radius: 8px; /* Rounded image corners */
 }
 
 .product-card h3 {
-    margin: 10px 0;
+    margin: 15px 0 10px;
     font-size: 18px;
-    color: #333;
+    color: #9D8189; /* Dark muted pink for product names */
 }
 
 .product-card p {
     margin: 5px 0;
-    color: #666;
+    color: #9D8189; /* Dark muted pink for text */
     font-size: 14px;
 }
 
 /* Button Styles */
 button {
-    background-color: #007bff;
-    color: white;
+    background-color: #F4ACB7; /* Soft pink for buttons */
+    color: #FFFFFF; /* White text */
     border: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     margin: 5px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
+    border-radius: 25px; /* Pill-shaped buttons */
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #FFCAD4; /* Lighter pink on hover */
 }
 
 /* Form Styles */
 form {
     width: 40%;
     margin: 20px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    background: #FFFFFF; /* White background */
+    padding: 25px;
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     text-align: left;
 }
 
 label {
     display: block;
     margin: 10px 0 5px;
-    font-weight: bold;
+    font-weight: 500;
+    color: #9D8189; /* Dark muted pink for labels */
 }
 
 input[type="text"],
 input[type="number"] {
     width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #D8E2DC; /* Soft green border */
+    border-radius: 8px; /* Rounded corners */
+    font-size: 14px;
+    color: #9D8189; /* Dark muted pink for input text */
 }
 
 /* Back to Home Link */
 .back-link {
     display: inline-block;
-    margin-top: 10px;
-    padding: 8px 16px;
-    background-color: #28a745;
-    color: white;
-    border-radius: 5px;
-    transition: 0.3s;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #F4ACB7; /* Soft pink */
+    color: #FFFFFF; /* White text */
+    border-radius: 25px; /* Pill-shaped */
+    transition: background-color 0.3s ease;
 }
 
 .back-link:hover {
-    background-color: #218838;
+    background-color: #FFCAD4; /* Lighter pink on hover */
 }
 
-/* Ensure the product actions (Update & Delete) are in the same row */
+/* Product Actions */
 .product-actions {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
-/* Fully reset the form */
-.delete-form {
-    display: inline; /* Makes the form behave like text */
-    margin: 0;
-    padding: 0;
-    border: none;
-    background: none;
-}
-
-/* Ensure the button styles match */
 .update-btn, .delete-btn {
-    background-color: #007bff;
-    color: white;
+    background-color: #F4ACB7; /* Soft pink */
+    color: #FFFFFF; /* White text */
     border: none;
-    padding: 8px 12px;
+    padding: 8px 16px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
+    border-radius: 25px; /* Pill-shaped */
+    transition: background-color 0.3s ease;
     font-size: 14px;
-    display: inline-block; /* Prevents block-level button behavior */
+    font-weight: 500;
 }
 
-/* Hover effects */
 .update-btn:hover {
-    background-color: #0056b3;
+    background-color: #FFCAD4; /* Lighter pink on hover */
 }
 
 .delete-btn {
-    background-color: #dc3545;
+    background-color: #9D8189; /* Dark muted pink */
 }
 
 .delete-btn:hover {
-    background-color: #c82333;
+    background-color: #7A6A70; /* Darker shade on hover */
 }
 
 /* Cart Styles */
 .cart-container {
     max-width: 800px;
     margin: 0 auto;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #FFFFFF; /* White background */
+    padding: 25px;
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .cart-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+    border-bottom: 1px solid #D8E2DC; /* Soft green border */
 }
 
 .cart-item:last-child {
@@ -197,7 +195,7 @@ input[type="number"] {
 .cart-item img {
     max-width: 80px;
     height: auto;
-    border-radius: 5px;
+    border-radius: 8px; /* Rounded corners */
 }
 
 .cart-item-details {
@@ -207,26 +205,29 @@ input[type="number"] {
 
 .cart-item-name {
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: 500;
+    color: #9D8189; /* Dark muted pink */
 }
 
 .cart-item-price {
-    color: #555;
+    color: #9D8189; /* Dark muted pink */
 }
 
 .cart-item-quantity {
-    color: #777;
+    color: #9D8189; /* Dark muted pink */
 }
 
 .cart-item-total {
     font-weight: bold;
+    color: #9D8189; /* Dark muted pink */
 }
 
 .total {
     text-align: right;
     font-size: 1.5em;
-    font-weight: bold;
+    font-weight: 600;
     margin-top: 20px;
+    color: #9D8189; /* Dark muted pink */
 }
 
 .stripe-button {
@@ -235,18 +236,18 @@ input[type="number"] {
 }
 
 .stripe-button button {
-    background-color: #007bff;
-    color: #fff;
+    background-color: #F4ACB7; /* Soft pink */
+    color: #FFFFFF; /* White text */
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 12px 24px;
+    border-radius: 25px; /* Pill-shaped */
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.3s ease;
 }
 
 .stripe-button button:hover {
-    background-color: #0056b3;
+    background-color: #FFCAD4; /* Lighter pink on hover */
 }
 
 /* Invoice Confirmation Page */
@@ -257,61 +258,54 @@ body.invoice-confirmation {
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
+    background-color: #FFFFFF; /* White background */
 }
 
 .invoice-confirmation .c {
     text-align: center;
-    background-color: #fff;
+    background-color: #FFFFFF; /* White background */
     padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     max-width: 500px;
     width: 100%;
 }
 
 .invoice-confirmation h1 {
-    color: #333;
+    color: #9D8189; /* Dark muted pink */
     font-size: 2em;
     margin-bottom: 20px;
 }
 
 .invoice-confirmation p {
-    color: #555;
+    color: #9D8189; /* Dark muted pink */
     font-size: 1.2em;
     margin-bottom: 30px;
 }
 
 .invoice-confirmation .btn {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 12px 24px;
     font-size: 1em;
-    color: #fff;
-    background-color: #007bff;
+    color: #FFFFFF; /* White text */
+    background-color: #F4ACB7; /* Soft pink */
     border: none;
-    border-radius: 5px;
+    border-radius: 25px; /* Pill-shaped */
     text-decoration: none;
     transition: background-color 0.3s ease;
     margin: 5px;
 }
 
 .invoice-confirmation .btn:hover {
-    background-color: #0056b3;
+    background-color: #FFCAD4; /* Lighter pink on hover */
 }
 
-.invoice-confirmation .btn[style*="background-color: #6c757d"]:hover {
-    background-color: #5a6268;
-}
-
-
-
-
+/* Out of Stock Styles */
 .out-of-stock img {
-    filter: blur(2px); /* Light blur for the image only */
-    opacity: 0.7; /* Slightly reduce opacity for the image */
+    filter: blur(2px); /* Light blur */
+    opacity: 0.7; /* Reduced opacity */
 }
 
-/* Stylish "Out of Stock" message */
 .out-of-stock::after {
     content: "Out of Stock";
     position: absolute;
@@ -319,39 +313,26 @@ body.invoice-confirmation {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(255, 255, 255, 0.9); /* Light white background */
-    color: #333; /* Darker text for contrast */
+    color: #9D8189; /* Dark muted pink */
     padding: 8px 16px;
-    border-radius: 20px; /* Rounded corners */
+    border-radius: 25px; /* Pill-shaped */
     font-size: 14px;
     font-weight: 500;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     border: 1px solid rgba(0, 0, 0, 0.1); /* Light border */
 }
 
-
-.blurred_button {
-    filter: blur(0.8px);
-    opacity: 0.8;
-}
-
-
-
-.blurred {
-    filter: blur(0.8px);
-    opacity: 0.8;
-}
-
-/* Custom modal styles */
+/* Modal Styles */
 .modal {
     display: none; /* Hidden by default */
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #FFFFFF; /* White background */
+    padding: 25px;
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow */
     z-index: 1000;
     text-align: center;
 }
@@ -363,20 +344,21 @@ body.invoice-confirmation {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
     z-index: 999;
 }
 
 .modal button {
     margin-top: 15px;
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
+    padding: 10px 20px;
+    background-color: #F4ACB7; /* Soft pink */
+    color: #FFFFFF; /* White text */
     border: none;
-    border-radius: 5px;
+    border-radius: 25px; /* Pill-shaped */
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .modal button:hover {
-    background-color: #0056b3;
+    background-color: #FFCAD4; /* Lighter pink on hover */
 }
