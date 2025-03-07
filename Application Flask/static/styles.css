@@ -42,7 +42,7 @@ a:hover {
 }
 
 .product-card {
-    width: 250px;
+    width: 250px; /* Keep the card width the same */
     padding: 20px;
     border: 1px solid #D8E2DC; /* Soft green border */
     border-radius: 12px; /* Rounded corners */
@@ -59,7 +59,8 @@ a:hover {
 
 .product-card img {
     width: 100%;
-    height: auto;
+    height: 300px; /* Increased height for bigger images */
+    object-fit: cover; /* Ensures the image covers the area without distortion */
     border-radius: 8px; /* Rounded image corners */
 }
 
@@ -74,7 +75,6 @@ a:hover {
     color: #9D8189; /* Dark muted pink for text */
     font-size: 14px;
 }
-
 /* Button Styles */
 button {
     background-color: #F4ACB7; /* Soft pink for buttons */
@@ -361,4 +361,17 @@ body.invoice-confirmation {
 
 .modal button:hover {
     background-color: #FFCAD4; /* Lighter pink on hover */
+}
+
+
+@media (max-width: 768px) {
+    .product-card img {
+        height: 250px; /* Slightly smaller for tablets */
+    }
+}
+
+@media (max-width: 480px) {
+    .product-card img {
+        height: 200px; /* Smaller for mobile */
+    }
 }
