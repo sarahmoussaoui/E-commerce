@@ -14,9 +14,8 @@
     </div>
 
     <div class="product-container">
-
         {% for product in products %}
-        <div class="product-card">       
+        <div class="product-card {% if product.stock == 0 %}out-of-stock{% endif %}">       
           <a href="{{ url_for('product_detail', product_id=product.id) }}">
             <img src="{{ product.image_url }}" alt="{{ product.name }}" />
             <h3>{{ product.name }}</h3>
@@ -27,4 +26,3 @@
     </div>
 </body>
 </html>
-

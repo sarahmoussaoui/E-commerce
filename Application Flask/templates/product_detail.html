@@ -1,4 +1,3 @@
-<!-- Product Detail Page -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,28 +13,82 @@
 
     <form onsubmit="addToCart(event)">
         <label for="quantity">Quantité:</label>
-        <input type="number" id="quantity" name="quantity" min="1" max="{{ product.stock }}" value="1" required>
-        <button type="submit">Ajouter au panier</button>
+        <input type="number" id="quantity" name="quantity" min="1" max="{{ product.stock }}" value="1" required oninput="checkQuantity()">
+        <button type="submit" id="add-to-cart-btn">Ajouter au panier</button>
     </form>
 
     <a href="{{ url_for('index_user') }}" class="back-link">Retour aux produits</a>
 
+    <!-- Custom Modal -->
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="custom-modal" class="modal">
+        <p id="modal-message"></p>
+        <button onclick="closeModal()">Fermer</button>
+    </div>
+
     <script>
         function addToCart(event) {
-            event.preventDefault(); // Prevent the default form submission
-    
-            // Get the quantity value
+            event.preventDefault(); // Prevent default form submission
+
             const quantity = document.getElementById('quantity').value;
-    
-            // Get the product ID from the template variable
+            const productStock = parseInt("{{ product.stock }}");
+
+            // Check if quantity exceeds stock
+            if (parseInt(quantity) > productStock) {
+                showModal(`Quantité non disponible! La quantité maximale que vous pouvez commander est ${productStock}.`);
+                return;
+            }
+
+            // Proceed with form submission if quantity is valid
             const productId = "{{ product.id }}";
-    
-            // Construct the URL
             const url = "{{ url_for('add_to_cart', product_id=product.id, quantity=0) }}".replace("0", quantity);
-    
-            // Redirect to the constructed URL
             window.location.href = url;
         }
+
+        function checkQuantity() {
+            const quantityInput = document.getElementById('quantity');
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            const productStock = parseInt("{{ product.stock }}");
+
+            // Disable the button only if stock is 0
+            if (productStock === 0) {
+                addToCartBtn.disabled = true;
+                addToCartBtn.classList.add('blurred');
+                addToCartBtn.title = "Ce produit est en rupture de stock."; // Tooltip for disabled button
+            } else {
+                addToCartBtn.disabled = false;
+
+                // Add blur effect if quantity exceeds stock
+                if (parseInt(quantityInput.value) > productStock) {
+                    addToCartBtn.classList.add('blurred');
+                } else {
+                    addToCartBtn.classList.remove('blurred');
+                }
+            }
+        }
+
+        // Show custom modal
+        function showModal(message) {
+            const modal = document.getElementById('custom-modal');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalMessage = document.getElementById('modal-message');
+
+            modalMessage.textContent = message; // Set the message
+            modal.style.display = 'block'; // Show the modal
+            modalOverlay.style.display = 'block'; // Show the overlay
+        }
+
+        // Close custom modal
+        function closeModal() {
+            const modal = document.getElementById('custom-modal');
+            const modalOverlay = document.getElementById('modal-overlay');
+
+            modal.style.display = 'none'; // Hide the modal
+            modalOverlay.style.display = 'none'; // Hide the overlay
+        }
+
+        // Initial check when the page loads
+        document.addEventListener('DOMContentLoaded', checkQuantity);
     </script>
 </body>
 </html>
