@@ -1,5 +1,8 @@
 import sqlite3
 from flask_bcrypt import Bcrypt
+import random
+import posixpath
+import os
 
 bcrypt = (
     Bcrypt()
@@ -51,6 +54,39 @@ def init_db():
 """ CREATE ADMIN USER """
 
 
+def insert_products():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Directory containing product images
+    image_dir = "./static/products_img/"
+
+    # Get all image filenames
+    image_files = [
+        f for f in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, f))
+    ]
+
+    for image in image_files:
+        name = os.path.splitext(image)[
+            0
+        ]  # Use the filename (without extension) as the product name
+        price = random.randint(10, 50)  # Random price between 10 and 50
+        stock = random.randint(0, 15)  # Random stock between 0 and 15
+        image_url = posixpath.join("products_img", image)
+        # Store relative path only
+
+        cursor.execute(
+            """
+            INSERT INTO products (name, price, stock, image_url)
+            VALUES (?, ?, ?, ?)
+            """,
+            (name, price, stock, image_url),
+        )
+
+    conn.commit()
+    conn.close()
+
+
 def create_admin():
     conn = get_db()
     cursor = conn.cursor()
@@ -72,4 +108,5 @@ def create_admin():
 
 
 init_db()
+insert_products()
 create_admin()
