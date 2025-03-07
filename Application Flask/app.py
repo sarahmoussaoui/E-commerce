@@ -12,7 +12,6 @@ import time
 import sqlite3
 import stripe
 from faker import Faker
-from reportlab.pdfgen import canvas
 from io import BytesIO
 import os
 from flask_bcrypt import Bcrypt
@@ -26,8 +25,11 @@ from flask_login import (
     current_user,
 )
 from io import BytesIO
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+
 
 load_dotenv()  # Load environment variables
 
@@ -151,7 +153,7 @@ def login():
 
         if user is None:  # Handle missing user
             flash("User not found. Please register.", "danger")
-            return render_template("login.html")
+            # return render_template("login.html")
 
         print("Stored Hashed Password:", user["password"])
         print("Entered Password:", password)
@@ -210,35 +212,57 @@ def index_user():
 
 
 # Add Product to Cart
-@app.route("/add_to_cart/<int:product_id>")
+@app.route("/add_to_cart/<int:product_id>/<int:quantity>")
 @login_required
-def add_to_cart(product_id):
+def add_to_cart(product_id, quantity):
     if "cart" not in session:
         session["cart"] = []
-    if product_id not in session["cart"]:  # Prevent duplicate items
-        session["cart"].append(product_id)
-        session.modified = True
+
+    # Check if the product is already in the cart
+    for item in session["cart"]:
+        if item["product_id"] == product_id:
+            item["quantity"] += quantity  # Update quantity if product exists
+            session.modified = True
+            return redirect(url_for("index_user"))
+
+    # If the product is not in the cart, add it
+    session["cart"].append({"product_id": product_id, "quantity": quantity})
+    session.modified = True
     return redirect(url_for("index_user"))
 
 
-# View Cart
 @app.route("/cart")
 @login_required
 def view_cart():
-    cart = session.get("cart", [])
-    conn = get_db()
-    products = []
-    total = 0
-    for product_id in cart:
+    cart = session.get("cart", [])  # Retrieve the cart from the session
+    conn = get_db()  # Get the database connection
+    products = []  # List to store product details
+    total = 0  # Variable to store the total price
+
+    for item in cart:
+        # Fetch product details from the database
         product = conn.execute(
-            "SELECT * FROM products WHERE id = ?", (product_id,)
+            "SELECT * FROM products WHERE id = ?", (item["product_id"],)
         ).fetchone()
+
         if product:
-            products.append(dict(product))
-            total += product["price"]
-    conn.close()
+            # Convert the SQLite row to a dictionary
+            product_dict = dict(product)
+            # Add the quantity from the cart to the product dictionary
+            product_dict["quantity"] = item["quantity"]
+            # Add the product to the products list
+            products.append(product_dict)
+            # Update the total price
+            total += product["price"] * item["quantity"]
+
+    conn.close()  # Close the database connection
+
+    # Render the cart template with the products and total price
     return render_template(
-        "cart.html", products=products, total=total, stripe_public_key=stripe_public_key
+        "cart.html",
+        products=products,
+        total=total,
+        stripe_public_key=stripe_public_key,
     )
 
 
@@ -278,10 +302,10 @@ def checkout():
             cart = session.get("cart", [])
 
             # Update stock for each product in the cart
-            for product_id in cart:
+            for item in cart:
                 conn.execute(
-                    "UPDATE products SET stock = stock - 1 WHERE id = ? AND stock > 0",
-                    (product_id,),
+                    "UPDATE products SET stock = stock - ? WHERE id = ? AND stock > ?",
+                    (item["quantity"], item["product_id"], item["quantity"] - 1),
                 )
 
             conn.commit()
@@ -301,32 +325,6 @@ def checkout():
         return "Error: Invalid amount.", 400
 
 
-@app.route("/invoice")
-@login_required
-def facture():
-    return render_template("invoice.html")
-
-
-@app.route("/download_invoice")
-@login_required
-def download_facture():
-    if not session.get("invoice"):
-        return "No invoice available.", 400
-
-    invoice_path = session["invoice"]
-
-    # Read the file as bytes
-    with open(invoice_path, "rb") as f:
-        invoice_data = f.read()
-
-    return send_file(
-        BytesIO(invoice_data),  # Convert bytes to a file-like object
-        mimetype="application/pdf",
-        as_attachment=True,
-        download_name="invoice.pdf",
-    )
-
-
 def generate_invoice(cart, total):
     # Ensure 'invoices' folder exists
     invoices_folder = "invoices"
@@ -338,11 +336,9 @@ def generate_invoice(cart, total):
     invoice_path = os.path.join(invoices_folder, invoice_filename)
 
     # Create PDF
-    p = canvas.Canvas(invoice_path, pagesize=A4)
-    page_width, page_height = A4
-    left_margin = 50
-    right_margin = page_width - 50
-    center_x = page_width / 2
+    doc = SimpleDocTemplate(invoice_path, pagesize=A4)
+    styles = getSampleStyleSheet()
+    story = []
 
     # Company Information
     company_name = "Tech Solutions Inc."
@@ -350,16 +346,15 @@ def generate_invoice(cart, total):
     company_phone = "+1 (555) 123-4567"
     company_email = "support@techsolutions.com"
 
-    p.setFont("Helvetica-Bold", 16)
-    p.drawCentredString(center_x, page_height - 80, company_name)
-    p.setFont("Helvetica", 10)
-    p.drawCentredString(center_x, page_height - 95, company_address)
-    p.drawCentredString(center_x, page_height - 110, f"Phone: {company_phone}")
-    p.drawCentredString(center_x, page_height - 125, f"Email: {company_email}")
+    story.append(Paragraph(company_name, styles["Title"]))
+    story.append(Paragraph(company_address, styles["Normal"]))
+    story.append(Paragraph(f"Phone: {company_phone}", styles["Normal"]))
+    story.append(Paragraph(f"Email: {company_email}", styles["Normal"]))
+    story.append(Spacer(1, 20))
 
     # Invoice Title
-    p.setFont("Helvetica-Bold", 14)
-    p.drawCentredString(center_x, page_height - 160, "INVOICE")
+    story.append(Paragraph("INVOICE", styles["Heading1"]))
+    story.append(Spacer(1, 20))
 
     # Fetch User Details
     user_id = current_user.get_id()
@@ -375,37 +370,55 @@ def generate_invoice(cart, total):
     user_phone = user["phoneNum"]
 
     # User Information
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(left_margin, page_height - 200, "Bill To:")
-    p.setFont("Helvetica", 10)
-    p.drawString(left_margin, page_height - 215, f"Name: {user_name}")
-    p.drawString(left_margin, page_height - 230, f"Email: {user_email}")
-    p.drawString(left_margin, page_height - 245, f"Phone: {user_phone}")
+    story.append(Paragraph("Bill To:", styles["Heading2"]))
+    story.append(Paragraph(f"Name: {user_name}", styles["Normal"]))
+    story.append(Paragraph(f"Email: {user_email}", styles["Normal"]))
+    story.append(Paragraph(f"Phone: {user_phone}", styles["Normal"]))
+    story.append(Spacer(1, 20))
 
-    # Purchased Items
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(left_margin, page_height - 280, "Purchased Items:")
-    y_position = page_height - 300
-
+    # Purchased Items Table
+    data = [["Product", "Quantity", "Unit Price", "Total"]]
     conn = get_db()
-    for product_id in cart:
+    for item in cart:
         product = conn.execute(
-            "SELECT * FROM products WHERE id = ?", (product_id,)
+            "SELECT * FROM products WHERE id = ?", (item["product_id"],)
         ).fetchone()
         if product:
-            p.setFont("Helvetica", 10)
-            p.drawString(
-                left_margin, y_position, f"{product['name']} - {product['price']} EUR"
+            data.append(
+                [
+                    product["name"],
+                    str(item["quantity"]),
+                    f"{product['price']} EUR",
+                    f"{product['price'] * item['quantity']} EUR",
+                ]
             )
-            y_position -= 20
     conn.close()
 
-    # Total Amount
-    p.setFont("Helvetica-Bold", 12)
-    p.drawRightString(right_margin, y_position - 20, f"Total: {total / 100:.2f} EUR")
+    # Create the table
+    table = Table(data)
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            ]
+        )
+    )
 
-    p.showPage()
-    p.save()
+    story.append(table)
+    story.append(Spacer(1, 20))
+
+    # Total Amount
+    story.append(Paragraph(f"Total: {total / 100:.2f} EUR", styles["Heading2"]))
+    story.append(Spacer(1, 40))
+
+    # Build the PDF
+    doc.build(story)
 
     print(f"Invoice saved at: {invoice_path}")
     return invoice_path  # Return the saved file path

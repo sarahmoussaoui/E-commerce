@@ -1,35 +1,113 @@
-<!-- @format -->
-
 <!DOCTYPE html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <title>Panier</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .cart-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+      }
+      .cart-item:last-child {
+        border-bottom: none;
+      }
+      .cart-item img {
+        max-width: 80px;
+        height: auto;
+        border-radius: 5px;
+      }
+      .cart-item-details {
+        flex-grow: 1;
+        margin-left: 20px;
+      }
+      .cart-item-name {
+        font-size: 1.2em;
+        font-weight: bold;
+      }
+      .cart-item-price {
+        color: #555;
+      }
+      .cart-item-quantity {
+        color: #777;
+      }
+      .cart-item-total {
+        font-weight: bold;
+      }
+      .total {
+        text-align: right;
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+      .stripe-button {
+        text-align: center;
+        margin-top: 30px;
+      }
+      .stripe-button button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+      }
+      .stripe-button button:hover {
+        background-color: #0056b3;
+      }
+    </style>
   </head>
   <body>
-    <h1>Votre panier</h1>
-    <ul>
+    <div class="cart-container">
+      <h1>Votre Panier</h1>
       {% for product in products %}
-      <li>{{ product.name }} - {{ product.price }} EUR</li>
+      <div class="cart-item">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}" />
+        <div class="cart-item-details">
+          <div class="cart-item-name">{{ product.name }}</div>
+          <div class="cart-item-price">{{ product.price }} EUR (unité)</div>
+          <div class="cart-item-quantity">Quantité: {{ product.quantity }}</div>
+        </div>
+        <div class="cart-item-total">{{ product.price * product.quantity }} EUR</div>
+      </div>
       {% endfor %}
-    </ul>
-    <p>Total : {{ total }} EUR</p>
-    <form action="{{ url_for('checkout') }}" method="POST">
-      <!-- Hidden input to send the total amount -->
-      <input type="hidden" name="total" value="{{ total }}" />
-    
-      <script
-        src="https://checkout.stripe.com/checkout.js"
-        class="stripe-button"
-        data-key="{{ stripe_public_key }}"
-        data-amount="{{ total * 100 }}"
-        data-name="Mon Site"
-        data-description="Paiement"
-        data-currency="EUR"></script>
-    </form>
-    
+      <div class="total">Total : {{ total }} EUR</div>
+      <div class="stripe-button">
+        <form action="{{ url_for('checkout') }}" method="POST">
+          <input type="hidden" name="total" value="{{ total }}" />
+          <script
+            src="https://checkout.stripe.com/checkout.js"
+            class="stripe-button"
+            data-key="{{ stripe_public_key }}"
+            data-amount="{{ total * 100 }}"
+            data-name="Mon Site"
+            data-description="Paiement"
+            data-currency="EUR"></script>
+        </form>
+      </div>
+    </div>
   </body>
 </html>

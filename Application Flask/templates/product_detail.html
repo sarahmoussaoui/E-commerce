@@ -12,12 +12,30 @@
     <p>Prix: {{ product.price }} EUR</p>
     <p>Stock: {{ product.stock }}</p>
 
-    <form action="" method="POST">
+    <form onsubmit="addToCart(event)">
         <label for="quantity">Quantité:</label>
         <input type="number" id="quantity" name="quantity" min="1" max="{{ product.stock }}" value="1" required>
-        <button type="submit"><a href="{{ url_for('add_to_cart', product_id=product.id) }}" > Ajouter au panier</a></button>
+        <button type="submit">Ajouter au panier</button>
     </form>
 
     <a href="{{ url_for('index_user') }}" class="back-link">Retour aux produits</a>
+
+    <script>
+        function addToCart(event) {
+            event.preventDefault(); // Prevent the default form submission
+    
+            // Get the quantity value
+            const quantity = document.getElementById('quantity').value;
+    
+            // Get the product ID from the template variable
+            const productId = "{{ product.id }}";
+    
+            // Construct the URL
+            const url = "{{ url_for('add_to_cart', product_id=product.id, quantity=0) }}".replace("0", quantity);
+    
+            // Redirect to the constructed URL
+            window.location.href = url;
+        }
+    </script>
 </body>
 </html>

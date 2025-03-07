@@ -25,7 +25,6 @@ a {
     padding: 20px;
 }
 
-
 .product-grid {
     display: flex;
     flex-wrap: wrap;
@@ -54,12 +53,9 @@ a {
     color: #007bff; /* To make it noticeable */
 }
 
-
 .product-card:hover {
     transform: scale(1.05);
 }
-
-
 
 .product-card h3 {
     margin: 10px 0;
@@ -130,7 +126,6 @@ input[type="number"] {
     background-color: #218838;
 }
 
-
 /* Ensure the product actions (Update & Delete) are in the same row */
 .product-actions {
     display: flex;
@@ -173,4 +168,81 @@ input[type="number"] {
 
 .delete-btn:hover {
     background-color: #c82333;
+}
+
+/* Cart Styles */
+.cart-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item img {
+    max-width: 80px;
+    height: auto;
+    border-radius: 5px;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+    margin-left: 20px;
+}
+
+.cart-item-name {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.cart-item-price {
+    color: #555;
+}
+
+.cart-item-quantity {
+    color: #777;
+}
+
+.cart-item-total {
+    font-weight: bold;
+}
+
+.total {
+    text-align: right;
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.stripe-button {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.stripe-button button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.stripe-button button:hover {
+    background-color: #0056b3;
 }
