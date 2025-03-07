@@ -136,7 +136,7 @@ def register():
     return render_template("register.html")
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form.get("Email")
@@ -175,7 +175,7 @@ def login():
             if user["is_admin"] == 1:
                 return redirect(url_for("index_admin"))
             else:
-                return redirect(url_for("index"))
+                return redirect(url_for("index_user"))
 
         flash("Invalid email or password", "danger")
 
@@ -193,9 +193,9 @@ def logout():
 
 
 # Home Page: Display Products
-@app.route("/")
+@app.route("/home_user")
 @login_required
-def index():
+def index_user():
     print("User authenticated:", current_user.is_authenticated)
     print("Session Data:", session)  # Debug session contents
     print(
@@ -218,7 +218,7 @@ def add_to_cart(product_id):
     if product_id not in session["cart"]:  # Prevent duplicate items
         session["cart"].append(product_id)
         session.modified = True
-    return redirect(url_for("index"))
+    return redirect(url_for("index_user"))
 
 
 # View Cart
