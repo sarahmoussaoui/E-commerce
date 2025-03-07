@@ -375,3 +375,127 @@ body.invoice-confirmation {
         height: 200px; /* Smaller for mobile */
     }
 }
+
+/* Login Container */
+.login-container {
+    background-color: #FFFFFF; /* White background */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto; /* Center the container */
+}
+
+.login-container h2 {
+    color: #9D8189; /* Dark muted pink for headings */
+    font-weight: 600; /* Semi-bold for headings */
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+/* Flash Messages */
+.flash {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.flash.success {
+    background-color: #D4EDDA; /* Light green for success messages */
+    color: #155724; /* Dark green text */
+}
+
+.flash.error {
+    background-color: #F8D7DA; /* Light red for error messages */
+    color: #721C24; /* Dark red text */
+}
+
+/* Input Fields */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #F4ACB7; /* Soft pink border */
+    border-radius: 8px;
+    font-size: 14px;
+    color: #9D8189; /* Dark muted pink for text */
+    background-color: #FFFFFF; /* White background */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: #FFCAD4; /* Lighter pink on focus */
+    outline: none;
+    box-shadow: 0 0 5px rgba(244, 172, 183, 0.5); /* Soft glow effect */
+}
+
+/* Welcome Section */
+/* Navigation Bar */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #582900;
+    padding: 10px 20px;
+}
+
+.logo img {
+    height: 50px; /* Adjust logo size */
+}
+
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.nav-links li {
+    margin-left: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: #ddd;
+}
+/* Welcome Section with Background Image */
+.welcome-section {
+    background-image: url("../static/welcome.jpg");
+    background-size: cover;
+    background-position: center;
+    height: 300px; /* Adjust height as needed */
+    display: flex;
+    align-items: flex-end; /* Align slogan at the bottom */
+    justify-content: center;
+    text-align: center;
+    padding-bottom: 40px; /* Space for slogan */
+}
+
+.slogan {
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.slogan p {
+    font-size: 2em; /* Large slogan text */
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.cart-link:hover {
+    color: #555;
+}
