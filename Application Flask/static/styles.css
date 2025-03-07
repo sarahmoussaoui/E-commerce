@@ -246,3 +246,57 @@ input[type="number"] {
 .stripe-button button:hover {
     background-color: #0056b3;
 }
+
+/* Invoice Confirmation Page */
+body.invoice-confirmation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+.invoice-confirmation .c {
+    text-align: center;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+}
+
+.invoice-confirmation h1 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.invoice-confirmation p {
+    color: #555;
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+.invoice-confirmation .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1em;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    margin: 5px;
+}
+
+.invoice-confirmation .btn:hover {
+    background-color: #0056b3;
+}
+
+.invoice-confirmation .btn[style*="background-color: #6c757d"]:hover {
+    background-color: #5a6268;
+}

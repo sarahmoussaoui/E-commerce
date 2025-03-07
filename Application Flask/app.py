@@ -315,7 +315,7 @@ def checkout():
             session["invoice"] = generate_invoice(cart, total)
             session["cart"] = []
 
-            return redirect(url_for("facture"))
+            return redirect(url_for("invoice"))
 
         return "Error: Payment failed.", 400
 
@@ -323,6 +323,32 @@ def checkout():
         return str(e), 400
     except ValueError:
         return "Error: Invalid amount.", 400
+
+
+@app.route("/invoice")
+@login_required
+def invoice():
+    return render_template("invoice.html")
+
+
+@app.route("/download_invoice")
+@login_required
+def download_invoice():
+    if not session.get("invoice"):
+        return "No invoice available.", 400
+
+    invoice_path = session["invoice"]
+
+    # Read the file as bytes
+    with open(invoice_path, "rb") as f:
+        invoice_data = f.read()
+
+    return send_file(
+        BytesIO(invoice_data),  # Convert bytes to a file-like object
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="invoice.pdf",
+    )
 
 
 def generate_invoice(cart, total):

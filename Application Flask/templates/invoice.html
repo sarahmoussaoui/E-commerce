@@ -7,14 +7,12 @@
     rel="stylesheet"
     href="{{ url_for('static', filename='styles.css') }}" />
     <title>Facture</title>
-</head>
-<body>
-    <div class="c">
-        <h1>Merci pour votre achat !</h1>
-        <p>Votre paiement a été traité avec succès.</p>
-        <a href="/download_invoice" class="btn">Télécharger votre facture</a>
-        <br>
-        <a href="/home_user" class="btn" style="background-color: #6c757d;">Retour à l'accueil</a>
-    </div>
-</body>
-</html>
+    <body class="invoice-confirmation">
+        <div class="c">
+            <h1>Merci pour votre achat !</h1>
+            <p>Votre paiement a été traité avec succès.</p>
+            <a href="/download_invoice" class="btn">Télécharger votre facture</a>
+            <br>
+            <a href="/home_user" class="btn" style="background-color: #6c757d;">Retour à l'accueil</a>
+        </div>
+    </body>
