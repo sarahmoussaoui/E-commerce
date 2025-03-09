@@ -525,6 +525,11 @@ def delete_product(product_id):
     return redirect(url_for("index_admin"))
 
 
+@app.route("/aboutus")
+def about_us():
+    return render_template("about_us.html")
+
+
 # Initialize Database
 
 # add_sample_products()

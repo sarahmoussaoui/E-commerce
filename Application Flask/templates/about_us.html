@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Handmade Decorations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Menu with Logo -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
+        </div>
+        <ul class="nav-links">
+            <li><a href="">Accueil</a></li>
+            <li><a href="">Produits</a></li>
+            <li><a href="{{ url_for('about_us') }}">À propos</a></li>
+            <li><a href="">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="about-container">
+        <h1>About Us</h1>
+
+        <!-- Vision and Mission Section -->
+        <div class="section vision-mission">
+            <div class="vision-mission-content">
+                <img src="{{ url_for('static', filename='img/handmade3.jpg' ) }}" alt="Vision and Mission">
+                <div class="vision-mission-text">
+                    <h2>Our Vision & Mission</h2>
+                    <p>
+                        At <strong>Handmade Decorations</strong>, our vision is to bring artistry and creativity into every home. We believe that every space deserves a touch of uniqueness, and our mission is to provide beautifully crafted handmade products that inspire and delight. From painted mirrors to crochet key holders, each item is made with love and care to add charm to your everyday life.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Story (History) Section -->
+        <div class="section our-story">
+            <div class="our-story-content">
+                <div class="our-story-text">
+                    <h2>Our Story</h2>
+                    <p>
+                        It all started in a small workshop where our founder, a passionate artist, began creating handmade decorations as a hobby. What began as a personal project soon turned into a thriving business as friends and family fell in love with the unique designs. Today, we are proud to offer a wide range of handmade products, including painted mugs, decorative plates, and more, all crafted by skilled artisans who share our passion for creativity.
+                    </p>
+                </div>
+                <img src="{{ url_for('static', filename='img/handmade6.jpg' ) }}" alt="Our Story">
+            </div>
+        </div>
+        <div class="section">
+            <h2>Our Team</h2>
+            <div class="team-members">
+                <!-- Member 1 -->
+                <div class="team-member">
+                    <img src="{{ url_for('static', filename='img/team2.jpg' ) }}" alt="Team Member 1">
+                    <h3>Alice Johnson</h3>
+                    <p class="role">Founder & Creative Director</p>
+                    <p class="description">Alice is the heart and soul of Handmade Decorations. With a passion for art and design, she ensures every product reflects creativity and quality.</p>
+                </div>
+        
+                <!-- Member 2 -->
+                <div class="team-member">
+                    <img src="{{ url_for('static', filename='img/team1.jpg' ) }}" alt="Team Member 2">
+                    <h3>Michael Smith</h3>
+                    <p class="role">Lead Artisan</p>
+                    <p class="description">Michael brings years of experience in crafting handmade items. His attention to detail ensures every piece is a masterpiece.</p>
+                </div>
+        
+                <!-- Member 3 -->
+                <div class="team-member">
+                    <img src="{{ url_for('static', filename='img/team4.jpg' ) }}" alt="Team Member 3">
+                    <h3>Emily Davis</h3>
+                    <p class="role">Marketing Manager</p>
+                    <p class="description">Emily is the voice of our brand. She connects with our customers and spreads the word about our unique creations.</p>
+                </div>
+                <!-- Member 4 -->
+                <div class="team-member">
+                    <img src="{{ url_for('static', filename='img/team3.jpg' ) }}" alt="Team Member 5">
+                    <h3>Sophia Lee</h3>
+                    <p class="role">Product Designer</p>
+                    <p class="description">Sophia is the creative mind behind our new collections. Her innovative designs keep our products fresh and exciting.</p>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Social Proof Section -->
+        <div class="section">
+            <h2>What Our Customers Say</h2>
+            <div class="customer-testimonials">
+                <div class="customer">
+                    <img src="{{ url_for('static', filename='img/person1.jpg' ) }}" alt="Customer 1">
+                    <div class="customer-info">
+                        <h3>Sarah L.</h3>
+                        <p class="job-title">Interior Designer</p>
+                        <blockquote>
+                            "The painted mirror I bought is absolutely stunning! It adds so much character to my living room."
+                        </blockquote>
+                    </div>
+                </div>
+
+                <!-- Our Team Section -->
+
+
+
+                <div class="customer">
+                    <img src="{{ url_for('static', filename='img/person2.jpg' ) }}" alt="Customer 2">
+                    <div class="customer-info">
+                        <h3>John D.</h3>
+                        <p class="job-title">Artist</p>
+                        <blockquote>
+                            "I adore the crochet key holders! They're not only functional but also beautiful."
+                        </blockquote>
+                    </div>
+                </div>
+                <div class="customer">
+                    <img src="{{ url_for('static', filename='img/person3.jpg' ) }}" alt="Customer 3">
+                    <div class="customer-info">
+                        <h3>Emily R.</h3>
+                        <p class="job-title">Event Planner</p>
+                        <blockquote>
+                            "The handmade plates are perfect for gifting. My friends were thrilled!"
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
