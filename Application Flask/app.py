@@ -583,7 +583,7 @@ def get_messages():
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT messages.id, messages.objet, messages.message, messages.date, users.FirstName, users.LastName
+        SELECT messages.id, messages.objet, messages.message, messages.date, messages.is_treated, messages.admin_response, users.FirstName, users.LastName
         FROM messages
         JOIN users ON messages.user_id = users.id
         WHERE messages.user_id = ?
@@ -601,7 +601,9 @@ def get_messages():
             "objet": msg[1],
             "message": msg[2],
             "date": msg[3],
-            "user_name": f"{msg[4]} {msg[5]}",  # Combine first and last name
+            "is_treated": msg[4],
+            "admin_response": msg[5],  # Include admin_response
+            "user_name": f"{msg[6]} {msg[7]}",  # Combine first and last name
         }
         for msg in messages
     ]

@@ -14,7 +14,7 @@
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
         </div>
         <ul class="nav-links">
-            <li><a href="">Accueil</a></li>
+            <li><a href="{{ url_for('index_user') }}">Accueil</a></li>
             <li><a href="">Produits</a></li>
             <li><a href="{{ url_for('about_us') }}">À propos</a></li>
             <li><a href="">Contact</a></li>
@@ -43,11 +43,22 @@
 <!-- Container to display the list of message objects -->
 <div id="messages-container" style="margin-top: 20px;"></div>
 
-
+<!-- Modal Structure -->
+<div id="message-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <div class="modal-body">
+            <p><strong>Date:</strong> <span id="modal-date"></span></p>
+            <p><strong>Subject:</strong> <span id="modal-objet"></span></p>
+            <p><strong>Message:</strong> <span id="modal-message"></span></p>
+            <p><strong>Admin Response:</strong> <span id="modal-admin-response"></span></p>
+        </div>
+    </div>
+</div>
 
     <!-- Back to Home Link -->
     <div class="back-link-container">
-        <a href="index.html" class="back-link">Back to Home</a>
+        <a href="{{ url_for('index_user') }}" class="back-link">Back to Home</a>
     </div>
 
 <!-- Success Message -->
@@ -93,45 +104,80 @@ document.getElementById("contact-form").addEventListener("submit", function (eve
         console.error("Error:", error);
     });
 });
-    // Function to fetch and display messages
-    function fetchAndDisplayMessages() {
-        fetch("{{ url_for('get_messages') }}")
-            .then(response => response.json())
-            .then(messages => {
-                const messagesContainer = document.getElementById("messages-container");
-                messagesContainer.innerHTML = ""; // Clear previous content
+// Function to open the modal and populate it with message details
+function openModal(message) {
+    const modal = document.getElementById("message-modal");
+    const modalDate = document.getElementById("modal-date");
+    const modalObjet = document.getElementById("modal-objet");
+    const modalMessage = document.getElementById("modal-message");
+    const modalAdminResponse = document.getElementById("modal-admin-response");
 
-                if (messages.length === 0) {
-                    messagesContainer.innerHTML = "<p>No messages found.</p>";
-                    return;
-                }
+    // Populate modal with message details
+    modalDate.textContent = message.date;
+    modalObjet.textContent = message.objet;
+    modalMessage.textContent = message.message;
+    modalAdminResponse.textContent = message.admin_response || "No response yet.";
 
-                // Create a list of message objects
-                messages.forEach(msg => {
-                    const messageDiv = document.createElement("div");
-                    messageDiv.className = "message-item";
-                    messageDiv.innerHTML = `
-                        <strong>${msg.objet}</strong>
-                        <div class="message-date">${msg.date}</div>
-                        <div class="message-text" style="display: none;">${msg.message}</div>
-                    `;
+    // Display the modal
+    modal.style.display = "flex";
+}
 
-                    // Add click event to show/hide the full message text
-                    messageDiv.addEventListener("click", () => {
-                        const messageText = messageDiv.querySelector(".message-text");
-                        messageText.style.display = messageText.style.display === "none" ? "block" : "none";
-                    });
+// Function to close the modal
+function closeModal() {
+    const modal = document.getElementById("message-modal");
+    modal.style.display = "none";
+}
 
-                    messagesContainer.appendChild(messageDiv);
+// Add event listeners to message items
+function fetchAndDisplayMessages() {
+    fetch("{{ url_for('get_messages') }}")
+        .then(response => response.json())
+        .then(messages => {
+            console.log("Messages received:", messages); // Debugging
+            const messagesContainer = document.getElementById("messages-container");
+            messagesContainer.innerHTML = ""; // Clear previous content
+
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = "<p>No messages found.</p>";
+                return;
+            }
+
+            // Create a list of message objects
+            messages.forEach(msg => {
+                console.log("Processing message:", msg); // Debugging
+                const messageDiv = document.createElement("div");
+                messageDiv.className = "message-item";
+                messageDiv.innerHTML = `
+                    <strong>${msg.objet}</strong>
+                    <div class="message-date">${msg.date}</div>
+                `;
+
+                // Add click event to open the modal
+                messageDiv.addEventListener("click", () => {
+                    openModal(msg);
                 });
-            })
-            .catch(error => {
-                console.error("Error fetching messages:", error);
-            });
-    }
 
-    // Add event listener to the button
-    document.getElementById("show-messages-btn").addEventListener("click", fetchAndDisplayMessages);
+                messagesContainer.appendChild(messageDiv);
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching messages:", error);
+        });
+}
+
+// Add event listener to the close button
+document.querySelector(".close-btn").addEventListener("click", closeModal);
+
+// Add event listener to the modal background to close the modal
+document.getElementById("message-modal").addEventListener("click", (event) => {
+    if (event.target === document.getElementById("message-modal")) {
+        closeModal();
+    }
+});
+
+// Add event listener to the button
+document.getElementById("show-messages-btn").addEventListener("click", fetchAndDisplayMessages);
+
 </script>
 </body>
 </html>

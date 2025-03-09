@@ -319,47 +319,6 @@ body.invoice-confirmation {
     border: 1px solid rgba(0, 0, 0, 0.1); /* Light border */
 }
 
-/* Modal Styles */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #FFFFFF; /* White background */
-    padding: 25px;
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-    z-index: 1000;
-    text-align: center;
-}
-
-.modal-overlay {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
-    z-index: 999;
-}
-
-.modal button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: #F4ACB7; /* Soft pink */
-    color: #FFFFFF; /* White text */
-    border: none;
-    border-radius: 25px; /* Pill-shaped */
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.modal button:hover {
-    background-color: #FFCAD4; /* Lighter pink on hover */
-}
-
 
 @media (max-width: 768px) {
     .product-card img {
@@ -930,3 +889,63 @@ blockquote em {
     background-color: #FFCAD4;
 }
 
+.admin-response {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-left: 4px solid #FFCAD4;
+    font-style: italic;
+}
+
+
+
+
+/* Modal Styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 1000; /* Ensure it appears above other content */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #FFFFFF;
+    padding: 25px;
+    border-radius: 12px;
+    width: 30%; /* 1/3 of the page width */
+    max-width: 400px; /* Maximum width */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #9D8189;
+}
+
+.close-btn:hover {
+    color: #F4ACB7;
+}
+
+.modal-body {
+    color: #9D8189;
+    font-family: 'Poppins', sans-serif;
+}
+
+.modal-body p {
+    margin: 10px 0;
+}
+
+.modal-body strong {
+    font-weight: 500;
+}
