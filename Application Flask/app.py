@@ -30,6 +30,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from flask import jsonify
 
 
 load_dotenv()  # Load environment variables
@@ -538,7 +539,6 @@ def contact_us():
     return render_template("contact_us.html")
 
 
-# Route for the contact us page
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
@@ -546,9 +546,7 @@ def contact():
         user_id = session.get("_user_id")
         objet = request.form["email"]
         message_text = request.form["message"]
-        current_date = datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )  # Format: YYYY-MM-DD HH:MM:SS
+        current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Insert data into the database
         conn = get_db()
@@ -562,8 +560,13 @@ def contact():
         conn.commit()
         conn.close()
 
-        # Redirect to a thank you page or back to home
-        return redirect(url_for("contact_us"))
+        # Return a JSON response indicating success
+        return jsonify(
+            {
+                "success": True,
+                "message": "Thank you! We will treat your message in the nearest time.",
+            }
+        )
 
     # If GET request, just render the contact page
     return render_template("contact_us.html")

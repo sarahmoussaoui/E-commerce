@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"></head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
@@ -19,12 +20,13 @@
             <li><a href="">Contact</a></li>
         </ul>
     </nav>
+
     <!-- Contact Us Section -->
     <section class="contact-section">
         <div class="contact-container">
             <h1>Contact Us</h1>
             <p>We'd love to hear from you! Reach out to us for any inquiries or feedback.</p>
-            <form action="{{ url_for('contact') }}" method="POST">
+            <form id="contact-form" action="{{ url_for('contact') }}" method="POST">
                 <label for="email">Objet</label>
                 <input type="text" id="email" name="email" placeholder="Your email" required>
             
@@ -40,5 +42,50 @@
     <div class="back-link-container">
         <a href="index.html" class="back-link">Back to Home</a>
     </div>
+
+<!-- Success Message -->
+<div id="success-message" class="success-message">
+    <button class="close-btn" onclick="closeSuccessMessage()">&times;</button>
+    <p>Thank you! We will treat your message in the nearest time.</p>
+</div>
+
+    <!-- JavaScript to handle form submission -->
+    <script>
+// Function to close the success message
+function closeSuccessMessage() {
+    const successMessage = document.getElementById("success-message");
+    successMessage.style.display = "none";
+}
+
+// Modify the form submission handler to show the success message
+document.getElementById("contact-form").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Submit the form using Fetch API
+    fetch("{{ url_for('contact') }}", {
+        method: "POST",
+        body: new FormData(this),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show the success message
+            const successMessage = document.getElementById("success-message");
+            successMessage.style.display = "block";
+
+            // Hide the message after 5 seconds (optional)
+            setTimeout(() => {
+                successMessage.style.display = "none";
+            }, 5000);
+
+            // Optionally, reset the form
+            document.getElementById("contact-form").reset();
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+});
+    </script>
 </body>
 </html>
