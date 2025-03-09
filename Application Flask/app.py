@@ -530,6 +530,11 @@ def about_us():
     return render_template("about_us.html")
 
 
+@app.route("/contactus")
+def contact_us():
+    return render_template("contact_us.html")
+
+
 # Initialize Database
 
 # add_sample_products()

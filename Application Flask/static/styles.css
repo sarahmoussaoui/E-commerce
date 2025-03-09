@@ -97,10 +97,7 @@ button:hover {
 form {
     width: 40%;
     margin: 20px auto;
-    background: #FFFFFF; /* White background */
-    padding: 25px;
     border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     text-align: left;
 }
 
@@ -668,4 +665,90 @@ blockquote em {
     font-size: 0.9em;
     color: #9D8189;
     line-height: 1.6;
+}
+
+
+/*Contact Us Section______________________________________________________________*/
+/* Contact Us Section */
+.contact-section {
+    background-image: url("../static/img/background2.jpg"); /* Add your image path here */
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh; /* Full page height */
+    display: flex;
+    align-items: center; /* Vertically center the content */
+    justify-content: center; /* Horizontally center the content */
+    padding: 20px;
+    text-align: center;
+    color: #FFFFFF; /* White text for better contrast on the image */
+}
+
+.contact-container {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Full width of the parent */
+    max-width: 600px; /* Limit maximum width */
+}
+
+.contact-container h1 {
+    color: #9D8189; /* Dark muted pink for headings */
+    margin-bottom: 20px;
+    margin-top: 0; /* Reset default margin */
+}
+
+.contact-container p {
+    color: #9D8189; /* Dark muted pink for text */
+    margin-bottom: 30px;
+    margin-top: 0; /* Reset default margin */
+}
+
+
+
+.contact-container form {
+    width: 100%;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.contact-container label {
+    color: #9D8189; /* Dark muted pink for labels */
+}
+
+.contact-container input[type="text"],
+.contact-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #D8E2DC; /* Soft green border */
+    border-radius: 8px;
+    font-size: 14px;
+    color: #9D8189; /* Dark muted pink for input text */
+}
+
+.contact-container textarea {
+    resize: vertical; /* Allow vertical resizing */
+}
+
+.contact-container button {
+    background-color: #F4ACB7; /* Soft pink for buttons */
+    color: #FFFFFF; /* White text */
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 25px; /* Pill-shaped buttons */
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.contact-container button:hover {
+    background-color: #FFCAD4; /* Lighter pink on hover */
+}
+
+/* Back to Home Link */
+.back-link-container {
+    text-align: center;
+    margin-top: 20px;
 }

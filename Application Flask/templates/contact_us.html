@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"></head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
+        </div>
+        <ul class="nav-links">
+            <li><a href="">Accueil</a></li>
+            <li><a href="">Produits</a></li>
+            <li><a href="{{ url_for('about_us') }}">À propos</a></li>
+            <li><a href="">Contact</a></li>
+        </ul>
+    </nav>
+    <!-- Contact Us Section -->
+    <section class="contact-section">
+        <div class="contact-container">
+            <h1>Contact Us</h1>
+            <p>We'd love to hear from you! Reach out to us for any inquiries or feedback.</p>
+            <form>
+
+                <label for="email">Objet</label>
+                <input type="text" id="email" name="email" placeholder="Your email" required>
+
+                <label for="message">Message</label>
+                <textarea id="message" name="message" placeholder="Your message" rows="5" required></textarea>
+
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Back to Home Link -->
+    <div class="back-link-container">
+        <a href="index.html" class="back-link">Back to Home</a>
+    </div>
+</body>
+</html>
