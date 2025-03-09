@@ -551,9 +551,8 @@ def contact():
         )  # Format: YYYY-MM-DD HH:MM:SS
 
         # Insert data into the database
-        conn = sqlite3.connect(DATABASE)
-        cursor = conn.cursor()
-        cursor.execute(
+        conn = get_db()
+        conn.execute(
             """
             INSERT INTO messages (user_id, objet, message, date, is_treated)
             VALUES (?, ?, ?, ?, ?)
@@ -564,16 +563,10 @@ def contact():
         conn.close()
 
         # Redirect to a thank you page or back to home
-        return redirect(url_for("thank_you"))
+        return redirect(url_for("contact_us"))
 
     # If GET request, just render the contact page
     return render_template("contact_us.html")
-
-
-# Route for the thank you page
-@app.route("/thank-you")
-def thank_you():
-    return "Thank you for your message!"
 
 
 # Initialize Database
