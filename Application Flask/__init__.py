@@ -88,7 +88,8 @@ def init_db():
             objet TEXT NOT NULL,
             message TEXT NOT NULL,
             date TEXT NOT NULL,
-            is_treated INTEGER DEFAULT 0
+            is_treated INTEGER DEFAULT 0,
+            admin_response TEXT
         )
         """
     )

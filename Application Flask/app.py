@@ -572,7 +572,129 @@ def contact():
     return render_template("contact_us.html")
 
 
-# Initialize Database
+@app.route("/get_messages", methods=["GET"])
+def get_messages():
+    user_id = session.get("_user_id")
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
+
+    # Fetch messages from the database
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT messages.id, messages.objet, messages.message, messages.date, users.FirstName, users.LastName
+        FROM messages
+        JOIN users ON messages.user_id = users.id
+        WHERE messages.user_id = ?
+        ORDER BY messages.date DESC
+        """,
+        (user_id,),
+    )
+    messages = cursor.fetchall()
+    conn.close()
+
+    # Convert the result to a list of dictionaries
+    messages_list = [
+        {
+            "id": msg[0],
+            "objet": msg[1],
+            "message": msg[2],
+            "date": msg[3],
+            "user_name": f"{msg[4]} {msg[5]}",  # Combine first and last name
+        }
+        for msg in messages
+    ]
+
+    return jsonify(messages_list)
+
+
+@app.route("/admin/reply", methods=["POST"])
+def admin_reply():
+    message_id = request.form.get("message_id")
+    admin_response = request.form.get("response")
+
+    # Update the database: mark as treated and store the response
+    conn = get_db()
+    conn.execute(
+        """
+        UPDATE messages
+        SET is_treated = 1, admin_response = ?
+        WHERE id = ?
+        """,
+        (admin_response, message_id),
+    )
+    conn.commit()
+    conn.close()
+
+    # Optionally, send an email to the user with the response
+    # (You can use Flask-Mail or another email library for this)
+
+    return jsonify({"success": True, "message": "Reply sent successfully!"})
+
+
+@app.route("/admin/messages", methods=["GET"])
+def admin_messages():
+    # Get filter parameters from the request
+    status_filter = request.args.get("status", "pending")  # Default: pending
+    date_filter = request.args.get("date", "")  # Default: all dates
+    email_filter = request.args.get("email", "")  # Default: all emails
+
+    # Build the SQL query based on filters
+    query = """
+        SELECT messages.id, messages.objet, messages.message, messages.date, messages.is_treated, messages.admin_response, users.FirstName, users.LastName, users.Email
+        FROM messages
+        JOIN users ON messages.user_id = users.id
+        WHERE 1=1
+    """
+    params = []
+
+    # Status filter
+    if status_filter == "pending":
+        query += " AND messages.is_treated = 0"
+    elif status_filter == "treated":
+        query += " AND messages.is_treated = 1"
+
+    # Date filter
+    if date_filter == "last_day":
+        query += " AND messages.date >= datetime('now', '-1 day')"
+    elif date_filter == "last_week":
+        query += " AND messages.date >= datetime('now', '-7 days')"
+    elif date_filter == "last_month":
+        query += " AND messages.date >= datetime('now', '-1 month')"
+
+    # Email filter
+    if email_filter:
+        query += " AND users.Email LIKE ?"
+        params.append(f"%{email_filter}%")
+
+    # Order by date (newest first)
+    query += " ORDER BY messages.date DESC"
+
+    # Fetch messages from the database
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(query, params)
+    messages = cursor.fetchall()
+    conn.close()
+
+    # Convert the result to a list of dictionaries
+    messages_list = [
+        {
+            "id": msg[0],
+            "objet": msg[1],
+            "message": msg[2],
+            "date": msg[3],
+            "is_treated": msg[4],
+            "admin_response": msg[5],
+            "user_name": f"{msg[6]} {msg[7]}",  # Combine first and last name
+            "user_email": msg[8],  # User email
+        }
+        for msg in messages
+    ]
+
+    return render_template("admin_messages.html", messages=messages_list)
+
 
 # add_sample_products()
 

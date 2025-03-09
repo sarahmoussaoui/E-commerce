@@ -37,6 +37,13 @@
             </form>
         </div>
     </section>
+<!-- Add this button below your contact form -->
+<button id="show-messages-btn">Show My Messages</button>
+
+<!-- Container to display the list of message objects -->
+<div id="messages-container" style="margin-top: 20px;"></div>
+
+
 
     <!-- Back to Home Link -->
     <div class="back-link-container">
@@ -86,6 +93,45 @@ document.getElementById("contact-form").addEventListener("submit", function (eve
         console.error("Error:", error);
     });
 });
-    </script>
+    // Function to fetch and display messages
+    function fetchAndDisplayMessages() {
+        fetch("{{ url_for('get_messages') }}")
+            .then(response => response.json())
+            .then(messages => {
+                const messagesContainer = document.getElementById("messages-container");
+                messagesContainer.innerHTML = ""; // Clear previous content
+
+                if (messages.length === 0) {
+                    messagesContainer.innerHTML = "<p>No messages found.</p>";
+                    return;
+                }
+
+                // Create a list of message objects
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = "message-item";
+                    messageDiv.innerHTML = `
+                        <strong>${msg.objet}</strong>
+                        <div class="message-date">${msg.date}</div>
+                        <div class="message-text" style="display: none;">${msg.message}</div>
+                    `;
+
+                    // Add click event to show/hide the full message text
+                    messageDiv.addEventListener("click", () => {
+                        const messageText = messageDiv.querySelector(".message-text");
+                        messageText.style.display = messageText.style.display === "none" ? "block" : "none";
+                    });
+
+                    messagesContainer.appendChild(messageDiv);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching messages:", error);
+            });
+    }
+
+    // Add event listener to the button
+    document.getElementById("show-messages-btn").addEventListener("click", fetchAndDisplayMessages);
+</script>
 </body>
 </html>
