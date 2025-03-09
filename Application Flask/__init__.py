@@ -2,19 +2,38 @@ import sqlite3
 from flask_bcrypt import Bcrypt
 import random
 import posixpath
+import shutil
+import subprocess
 import os
 
-bcrypt = (
-    Bcrypt()
-)  # Initialize Bcrypt (Make sure Flask app is passed if used in a Flask project)
+
+# Step 1: Drop tables if they exist
+def drop_tables():
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    # Drop tables if they exist
+    cursor.execute("DROP TABLE IF EXISTS products")
+    cursor.execute("DROP TABLE IF EXISTS enchere")
+    cursor.execute("DROP TABLE IF EXISTS users")
+    cursor.execute("DROP TABLE IF EXISTS messages")
+
+    conn.commit()
+    conn.close()
 
 
+# Step 2: Initialize Bcrypt
+bcrypt = Bcrypt()
+
+
+# Step 3: Get database connection
 def get_db():
-    conn = sqlite3.connect("database.db")  # Ensure this is your actual DB file
-    conn.row_factory = sqlite3.Row  # Enable dictionary-like access
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
     return conn
 
 
+# Step 4: Initialize database
 def init_db():
     conn = get_db()
     cursor = conn.cursor()
@@ -27,7 +46,21 @@ def init_db():
             name TEXT NOT NULL,
             price REAL NOT NULL,
             stock INTEGER NOT NULL,
-            image_url TEXT
+            image_url TEXT, 
+            is_vintage INTEGER NOT NULL DEFAULT 0 CHECK(is_vintage IN (0,1))  
+        )
+        """
+    )
+    # Create products Enchere
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS enchere (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_user INTEGER,
+            id_product INTEGER,
+            price REAL NOT NULL,
+            FOREIGN KEY (id_user) REFERENCES users(id),
+            FOREIGN KEY (id_product) REFERENCES products(id)
         )
         """
     )
@@ -47,13 +80,24 @@ def init_db():
         """
     )
 
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            objet TEXT NOT NULL,
+            message TEXT NOT NULL,
+            date TEXT NOT NULL,
+            is_treated INTEGER DEFAULT 0
+        )
+        """
+    )
+
     conn.commit()
     conn.close()
 
 
-""" CREATE ADMIN USER """
-
-
+# Step 5: Insert products
 def insert_products():
     conn = get_db()
     cursor = conn.cursor()
@@ -72,8 +116,7 @@ def insert_products():
         ]  # Use the filename (without extension) as the product name
         price = random.randint(10, 50)  # Random price between 10 and 50
         stock = random.randint(0, 15)  # Random stock between 0 and 15
-        image_url = posixpath.join("products_img", image)
-        # Store relative path only
+        image_url = posixpath.join("products_img", image)  # Store relative path only
 
         cursor.execute(
             """
@@ -87,6 +130,7 @@ def insert_products():
     conn.close()
 
 
+# Step 6: Create admin user
 def create_admin():
     conn = get_db()
     cursor = conn.cursor()
@@ -107,6 +151,57 @@ def create_admin():
     conn.close()
 
 
-init_db()
-insert_products()
-create_admin()
+# Step 7: Create virtual environment and install dependencies
+def setup_venv():
+    venv_dir = "venv"
+
+    # Step 1: Delete the existing virtual environment if it exists
+    if os.path.exists(venv_dir):
+        print(f"Deleting existing virtual environment at {venv_dir}...")
+        shutil.rmtree(venv_dir)
+        print(f"Deleted {venv_dir}.")
+
+    # Step 2: Create a new virtual environment
+    print("Creating a new virtual environment...")
+    subprocess.run(["python", "-m", "venv", venv_dir], check=True)
+    print(f"Virtual environment created at {venv_dir}.")
+
+    # Step 3: Install dependencies in the virtual environment
+    if os.name == "nt":  # Windows
+        pip_path = os.path.join(venv_dir, "Scripts", "pip")
+    else:  # Unix or MacOS
+        pip_path = os.path.join(venv_dir, "bin", "pip")
+
+    print("Installing dependencies...")
+    subprocess.run([pip_path, "install", "-r", "requirements.txt"], check=True)
+    print("Dependencies installed in the virtual environment.")
+
+    # Step 4: Print instructions to activate the virtual environment
+    if os.name == "nt":  # Windows
+        activate_script = os.path.join(venv_dir, "Scripts", "activate")
+        print(
+            f"\nTo activate the virtual environment, run the following command:\n{activate_script}"
+        )
+    else:  # Unix or MacOS
+        activate_script = os.path.join(venv_dir, "bin", "activate")
+        print(
+            f"\nTo activate the virtual environment, run the following command:\nsource {activate_script}"
+        )
+
+
+# Main execution
+if __name__ == "__main__":
+    # Setup virtual environment and install dependencies
+    setup_venv()
+
+    # Drop tables if they exist
+    drop_tables()
+
+    # Initialize database
+    init_db()
+
+    # Insert products
+    insert_products()
+
+    # Create admin user
+    create_admin()

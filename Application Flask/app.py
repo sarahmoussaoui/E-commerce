@@ -8,6 +8,7 @@ from flask import (
     send_file,
     flash,
 )
+from datetime import datetime
 import time
 import sqlite3
 import stripe
@@ -153,7 +154,9 @@ def login():
 
         if user is None:  # Handle missing user
             flash("User not found. Please register.", "danger")
-            # return render_template("login.html")
+            return render_template(
+                "login.html"
+            )  # Return to login page with flash message
 
         print("Stored Hashed Password:", user["password"])
         print("Entered Password:", password)
@@ -533,6 +536,44 @@ def about_us():
 @app.route("/contactus")
 def contact_us():
     return render_template("contact_us.html")
+
+
+# Route for the contact us page
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        # Get form data
+        user_id = session.get("_user_id")
+        objet = request.form["email"]
+        message_text = request.form["message"]
+        current_date = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )  # Format: YYYY-MM-DD HH:MM:SS
+
+        # Insert data into the database
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO messages (user_id, objet, message, date, is_treated)
+            VALUES (?, ?, ?, ?, ?)
+        """,
+            (user_id, objet, message_text, current_date, 0),
+        )
+        conn.commit()
+        conn.close()
+
+        # Redirect to a thank you page or back to home
+        return redirect(url_for("thank_you"))
+
+    # If GET request, just render the contact page
+    return render_template("contact_us.html")
+
+
+# Route for the thank you page
+@app.route("/thank-you")
+def thank_you():
+    return "Thank you for your message!"
 
 
 # Initialize Database

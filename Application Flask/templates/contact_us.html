@@ -24,14 +24,13 @@
         <div class="contact-container">
             <h1>Contact Us</h1>
             <p>We'd love to hear from you! Reach out to us for any inquiries or feedback.</p>
-            <form>
-
+            <form action="{{ url_for('contact') }}" method="POST">
                 <label for="email">Objet</label>
                 <input type="text" id="email" name="email" placeholder="Your email" required>
-
+            
                 <label for="message">Message</label>
                 <textarea id="message" name="message" placeholder="Your message" rows="5" required></textarea>
-
+            
                 <button type="submit">Send Message</button>
             </form>
         </div>
