@@ -2,7 +2,7 @@ Flask==2.3.2
 stripe==5.4.0
 reportlab==4.0.4
 Faker==19.6.1
-python-dotenv
-Flask-Session
-Flask-Bcrypt
-flask-login
+python-dotenv==1.0.1
+Flask-Session==0.8.0
+Flask-Bcrypt==1.0.1
+flask-login==0.6.3
