@@ -8,16 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation Bar -->
+    <!-- Navigation Menu with Logo -->
     <nav class="navbar">
         <div class="logo">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
         </div>
         <ul class="nav-links">
             <li><a href="{{ url_for('index_user') }}">Accueil</a></li>
-            <li><a href="">Produits</a></li>
+            <li><a href="{{ url_for('index_user') }}">Produits</a></li>
             <li><a href="{{ url_for('about_us') }}">À propos</a></li>
-            <li><a href="">Contact</a></li>
+            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
         </ul>
     </nav>
 
