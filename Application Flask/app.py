@@ -270,6 +270,22 @@ def view_cart():
     )
 
 
+@app.route("/remove_from_cart", methods=["POST"])
+@login_required
+def remove_from_cart():
+    product_id = int(request.form.get("product_id"))  # Get the product ID from the form
+    cart = session.get("cart", [])  # Retrieve the cart from the session
+
+    # Find and remove the product from the cart
+    updated_cart = [item for item in cart if item["product_id"] != product_id]
+
+    # Update the session's cart
+    session["cart"] = updated_cart
+
+    # Redirect back to the cart page
+    return redirect(url_for("view_cart"))
+
+
 @app.route("/product/<int:product_id>")
 def product_detail(product_id):
     db = get_db()
