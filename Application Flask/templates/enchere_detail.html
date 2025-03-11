@@ -50,7 +50,7 @@
                 <input type="hidden" id="enchere_id" value="{{ enchere.id_enchere }}">
                 <label for="proposed_price">Votre offre (€) :</label>
                 <input type="number" id="proposed_price" required min="{{ enchere.prix }}" step="0.01">
-                <button type="button" onclick="openNextModal()">Valider</button>
+                <button type="button" class="btn-valider" onclick="openNextModal()">Valider</button>
             </form>
         </div>
     </div>
@@ -67,7 +67,7 @@
                 <label for="email">Email :</label>
                 <input type="email" id="email" required value="{{ user.Email if user is defined else '' }}">
 
-                <button type="submit">Confirmer</button>
+                <button type="submit" class="btn-confirmer">Confirmer</button>
             </form>
         </div>
     </div>

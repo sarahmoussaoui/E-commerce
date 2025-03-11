@@ -1068,3 +1068,116 @@
   background-color: #ffcad4; /* Lighter pink on hover */
 }
 
+/* Style de la fenêtre modale */
+/* Modales */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal-content label {
+  display: block;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.modal-content button {
+  background-color: #5f4e51; 
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-top: 15px;
+  cursor: pointer;
+  border-radius: 20px;
+}
+
+.modal-content button:hover {
+  background-color: #5f4e51; 
+  
+}
+
+.close {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.btn-valider {
+  background-color: #007bff; /* Bleu */
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-valider:hover {
+  background-color: #0056b3;
+}
+
+.btn-confirmer {
+  background-color: #ff6600; /* Orange */
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-confirmer:hover {
+  background-color: #cc5500;
+}
+
+.close:hover {
+  color: rgb(75, 69, 69);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .enchere-wrapper {
+      flex-direction: column;
+      align-items: center;
+  }
+  
+  .enchere-left, .enchere-info-box {
+      width: 90%;
+  }
+}
+
