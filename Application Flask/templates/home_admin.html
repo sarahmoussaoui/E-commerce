@@ -8,7 +8,7 @@
     <title>Admin Dashboard</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}" />
+      href="{{ url_for('static', filename='home_admin.css') }}" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet" />
@@ -20,7 +20,7 @@
       </div>
       <ul class="nav-links">
         <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
-        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Products</a></li>
         <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
         <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
       </ul>
@@ -28,17 +28,31 @@
 
     <div class="admin-dashboard">
       <h1>Admin Dashboard</h1>
-
-      <div class="dashboard-buttons">
-        <a href="{{ url_for('gestion_produits') }}">
-          <button class="dashboard-btn">Product Management</button>
-        </a>
-        <a href="{{ url_for('gestion_encheres') }}">
-          <button class="dashboard-btn">Enchère Management</button>
-        </a>
-        <a href="{{ url_for('admin_messages') }}">
-          <button class="dashboard-btn">Messages Management</button>
-        </a>
+      <div class="managment-container">
+        <div class="managment-card">
+          <img
+            src="{{ url_for('static', filename='img/product_managment.jpg') }}"
+            alt="Product Management" />
+          <a href="{{ url_for('gestion_produits') }}">
+            <button class="dashboard-btn">Product Management</button>
+          </a>
+        </div>
+        <div class="managment-card">
+          <img
+            src="{{ url_for('static', filename='img/enchere_managment.jpg') }}"
+            alt="Enchère Management" />
+          <a href="{{ url_for('gestion_encheres') }}">
+            <button class="dashboard-btn">Enchère Management</button>
+          </a>
+        </div>
+        <div class="managment-card">
+          <img
+            src="{{ url_for('static', filename='img/messages_managment.jpg') }}"
+            alt="Messages Management" />
+          <a href="{{ url_for('admin_messages') }}">
+            <button class="dashboard-btn">Messages Management</button>
+          </a>
+        </div>
       </div>
     </div>
   </body>
