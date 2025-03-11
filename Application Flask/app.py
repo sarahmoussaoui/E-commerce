@@ -181,7 +181,7 @@ def login():
             if user["is_admin"] == 1:
                 return redirect(url_for("home_admin"))
             else:
-                return redirect(url_for("index_user"))
+                return redirect(url_for("about_us"))
 
         flash("Invalid email or password", "danger")
 
@@ -639,6 +639,10 @@ def delete_enchere(enchere_id):
 @app.route("/aboutus")
 def about_us():
     return render_template("about_us.html")
+
+@app.route("/encheruser")
+def encher_user():
+    return render_template("encher_user.html")
 
 
 @app.route("/contactus")
