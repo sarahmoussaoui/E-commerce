@@ -6,7 +6,6 @@
     <title>Admin Messages</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    
 </head>
 <body>
     <nav class="navbar">
@@ -17,62 +16,72 @@
             <li><a href="{{ url_for('index_admin') }}">Produits</a></li>
             <li><a href="">Enchers</a></li>
             <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+            <li><a href="{{ url_for('admin_orders') }}">Admin Orders</a></li>
         </ul>
     </nav>
     <h1>Admin Messages</h1>
 
+    <!-- Filters -->
+    <div class="filters">
+        <label for="filter-status">Status:</label>
+        <select id="filter-status">
+            <option value="pending">Pending</option>
+            <option value="treated">Treated</option>
+            <option value="all">All</option>
+        </select>
 
+        <label for="filter-date">Date:</label>
+        <select id="filter-date">
+            <option value="">All</option>
+            <option value="last_day">Last Day</option>
+            <option value="last_week">Last Week</option>
+            <option value="last_month">Last Month</option>
+        </select>
 
-        <div class="filters">
-            <label for="filter-status">Status:</label>
-            <select id="filter-status">
-                <option value="pending">Pending</option>
-                <option value="treated">Treated</option>
-                <option value="all">All</option>
-            </select>
-        
-            <label for="filter-date">Date:</label>
-            <select id="filter-date">
-                <option value="">All</option>
-                <option value="last_day">Last Day</option>
-                <option value="last_week">Last Week</option>
-                <option value="last_month">Last Month</option>
-            </select>
-        
-            <label for="filter-email">Email:</label>
-            <input type="text" id="filter-email" placeholder="Search by email...">
-        
-            <button id="apply-filters">Apply Filters</button>
-            <button id="reset-filters">Reset Filters</button>
+        <label for="filter-email">Email:</label>
+        <input type="text" id="filter-email" placeholder="Search by email...">
 
-        </div>
-
-
-
-    <div class="messages-container">
-        {% for msg in messages %}
-        <div class="message-item">
-            <strong>{{ msg.objet }}</strong>
-            <p>{{ msg.message }}</p>
-            <div class="date">{{ msg.date }}</div>
-            <div class="user-info">From: {{ msg.user_name }} ({{ msg.user_email }})</div>
-            <div class="status">Status: {{ "Treated" if msg.is_treated else "Pending" }}</div>
-
-            <!-- Reply Form (only for pending messages) -->
-            {% if not msg.is_treated %}
-            <form class="reply-form" onsubmit="sendReply(event, {{ msg.id }})">
-                <textarea name="response" placeholder="Your response..." required></textarea>
-                <button type="submit">Send Reply</button>
-            </form>
-            {% elif msg.admin_response %}
-            <div class="admin-response">
-                <strong>Admin Response:</strong>
-                <p>{{ msg.admin_response }}</p>
-            </div>
-            {% endif %}
-        </div>
-        {% endfor %}
+        <button id="apply-filters">Apply Filters</button>
+        <button id="reset-filters">Reset Filters</button>
     </div>
+
+    <!-- Messages Table -->
+    <table class="messages-table">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>User</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for msg in messages %}
+            <tr>
+                <td>{{ msg.objet }}</td>
+                <td>{{ msg.message }}</td>
+                <td>{{ msg.date }}</td>
+                <td>{{ msg.user_name }} ({{ msg.user_email }})</td>
+                <td>{{ "Treated" if msg.is_treated else "Pending" }}</td>
+                <td>
+                    {% if not msg.is_treated %}
+                    <form class="reply-form" onsubmit="sendReply(event, {{ msg.id }})">
+                        <textarea name="response" placeholder="Your response..." required></textarea>
+                        <button type="submit">Send Reply</button>
+                    </form>
+                    {% elif msg.admin_response %}
+                    <div class="admin-response">
+                        <strong>Admin Response:</strong>
+                        <p>{{ msg.admin_response }}</p>
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <!-- Success Message -->
     <div id="success-message" class="success-message">
@@ -127,13 +136,14 @@
             // Redirect to the filtered page
             window.location.href = `/admin/messages?status=${status}&date=${date}&email=${email}`;
         });
+
         // Function to reset filters
-document.getElementById("reset-filters").addEventListener("click", () => {
-    document.getElementById("filter-status").value = "pending";
-    document.getElementById("filter-date").value = "";
-    document.getElementById("filter-email").value = "";
-    window.location.href = "/admin/messages"; // Reload the page with default filters
-});
+        document.getElementById("reset-filters").addEventListener("click", () => {
+            document.getElementById("filter-status").value = "pending";
+            document.getElementById("filter-date").value = "";
+            document.getElementById("filter-email").value = "";
+            window.location.href = "/admin/messages"; // Reload the page with default filters
+        });
     </script>
 </body>
 </html>

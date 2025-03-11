@@ -806,7 +806,91 @@ def admin_messages():
     return render_template("admin_messages.html", messages=messages_list)
 
 
-# add_sample_products()
+@app.route("/admin/orders")
+def admin_orders():
+    cursor = get_db()
+
+    # Fetch all orders with user and product information
+    orders = cursor.execute(
+        """
+        SELECT 
+            commande.id as order_id, 
+            commande.user_id, 
+            users.FirstName, 
+            users.LastName, 
+            users.Email, 
+            commande.address, 
+            commande.delivery_option, 
+            commande.delivery_cost, 
+            commande.total_amount, 
+            commande.order_date, 
+            commande.status,
+            commande_items.product_id,
+            products.name as product_name,
+            commande_items.quantity,
+            commande_items.price_per_unit
+        FROM commande
+        JOIN users ON commande.user_id = users.id
+        JOIN commande_items ON commande.id = commande_items.commande_id
+        JOIN products ON commande_items.product_id = products.id
+        """
+    ).fetchall()  # Use .fetchall() instead of .fetchone()
+
+    cursor.close()
+
+    # Organize orders by order_id
+    orders_dict = {}
+    for order in orders:
+        order_id = order["order_id"]
+        if order_id not in orders_dict:
+            orders_dict[order_id] = {
+                "user_id": order["user_id"],
+                "FirstName": order["FirstName"],
+                "LastName": order["LastName"],
+                "Email": order["Email"],
+                "address": order["address"],
+                "delivery_option": order["delivery_option"],
+                "delivery_cost": order["delivery_cost"],
+                "total_amount": order["total_amount"],
+                "order_date": order["order_date"],
+                "status": order["status"],
+                "order_items": [],  # Renamed to avoid conflict with dict.items()
+            }
+        orders_dict[order_id]["order_items"].append(
+            {
+                "product_id": order["product_id"],
+                "product_name": order["product_name"],
+                "quantity": order["quantity"],
+                "price_per_unit": order["price_per_unit"],
+            }
+        )
+    print(orders_dict)  # Add this before returning the template
+
+    return render_template("admin_orders.html", orders=orders_dict)
+
+
+@app.route("/admin/update_order_status/<int:order_id>", methods=["POST"])
+def update_order_status(order_id):
+    new_status = request.form["status"]
+    conn = conn = get_db()
+    cursor = conn.cursor()
+
+    # Update the order status
+    cursor.execute(
+        """
+        UPDATE commande
+        SET status = ?
+        WHERE id = ?
+    """,
+        (new_status, order_id),
+    )
+
+    conn.commit()
+    conn.close()
+
+    flash("Order status updated successfully!", "success")
+    return redirect(url_for("admin_orders"))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
