@@ -220,14 +220,20 @@ def index_user():
 @login_required
 def add_to_cart(product_id, quantity, stock):
     # Check if the quantity is valid (greater than 0 and less than or equal to stock)
-    if quantity <= 0 or quantity > stock:
+    if quantity > stock:
         return jsonify(
             {
                 "success": False,
                 "message": "The selected quantity is greater than the stock.",
             }
         )
-
+    elif quantity <= 0:
+        return jsonify(
+            {
+                "success": False,
+                "message": "Invalid quantity value.",
+            }
+        )
     # Initialize the cart if it doesn't exist
     if "cart" not in session:
         session["cart"] = []
