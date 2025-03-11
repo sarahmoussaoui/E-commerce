@@ -1,0 +1,65 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encheres Management</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
+      </div>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
+    </nav>
+
+    <h1>Enchères List</h1>
+
+    <a href="{{ url_for('add_enchere') }}"><button>Add Enchère</button></a>
+
+    <div class="product-container">
+      {% for enchere in encheres %}
+      <div class="product-card">
+        <img src="{{ enchere.image_url }}" alt="{{ enchere.name }}" />
+        <h3>{{ enchere.name }}</h3>
+        <!-- <p>Description: {{ enchere.description }}</p> -->
+        <p>Prix: ${{ enchere.prix }}</p>
+        <p>Date de fin: {{ enchere.date_fin }}</p>
+
+        <div class="product-actions">
+          <a
+            href="{{ url_for('update_enchere', enchere_id=enchere.id_enchere) }}">
+            <button class="update-btn">Update</button>
+          </a>
+          <form
+            action="{{ url_for('delete_enchere', enchere_id=enchere.id_enchere) }}"
+            method="POST"
+            class="delete-form">
+            <button
+              type="submit"
+              class="delete-btn"
+              onclick="return confirm('Are you sure you want to delete this auction?')">
+              Delete
+            </button>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <p>No auctions available.</p>
+      {% endfor %}
+    </div>
+  </body>
+</html>

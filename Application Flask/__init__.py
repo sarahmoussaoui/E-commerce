@@ -51,16 +51,29 @@ def init_db():
         )
         """
     )
-    # Create products Enchere
+    # Create historique Enchere
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS historique_enchere (
+            id_enchere INTEGER NOT NULL,
+            id_user INTEGER,
+            proposed_price REAL NOT NULL,
+            FOREIGN KEY (id_user) REFERENCES users(id),
+            FOREIGN KEY (id_enchere) REFERENCES enchere(id),
+            PRIMARY KEY (id_enchere, id_user, proposed_price)
+        )
+        """
+    )
+    # Create enchere table
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS enchere (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_user INTEGER,
-            id_product INTEGER,
-            price REAL NOT NULL,
-            FOREIGN KEY (id_user) REFERENCES users(id),
-            FOREIGN KEY (id_product) REFERENCES products(id)
+            id_enchere INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            image_url TEXT, 
+            prix REAL NOT NULL,
+            date_fin DATE NOT NULL
         )
         """
     )
