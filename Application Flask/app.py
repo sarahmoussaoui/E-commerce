@@ -338,7 +338,7 @@ def checkout():
         base_total = request.form.get("total", "0")
         base_total = float(base_total) * 100  # Convert to cents
 
-        # Get the delivery option, cost, and address from the form
+        # Get delivery details from the form
         delivery_option = request.form.get("delivery_option", "Sans Livraison")
         delivery_cost = request.form.get("delivery_cost", "0")
         delivery_cost = float(delivery_cost) * 100  # Convert to cents
@@ -364,34 +364,61 @@ def checkout():
             cursor = conn.cursor()
             cart = session.get("cart", [])
 
-            # Save each product in the cart to the commande table
+            # Step 1: Insert into `commande` (order-level details)
+            cursor.execute(
+                """
+                INSERT INTO commande (user_id, address, delivery_option, delivery_cost, total_amount, status)
+                VALUES (?, ?, ?, ?, ?, 'pending')
+                """,
+                (
+                    current_user.get_id(),
+                    delivery_address,
+                    delivery_option,
+                    delivery_cost / 100,  # Convert back to EUR
+                    final_total / 100,  # Convert back to EUR
+                ),
+            )
+            commande_id = cursor.lastrowid  # Get the last inserted commande ID
+
+            # Step 2: Insert each product into `commande_items`
             for item in cart:
+                # Get the product's price to store historical data
+                cursor.execute(
+                    "SELECT price FROM products WHERE id = ?", (item["product_id"],)
+                )
+                product = cursor.fetchone()
+                if not product:
+                    continue  # Skip if product doesn't exist (edge case)
+
+                price_per_unit = product[0]
+
                 cursor.execute(
                     """
-                    INSERT INTO commande (product_id, user_id, quantity, address, delivery_option, delivery_cost, total_amount)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO commande_items (commande_id, product_id, quantity, price_per_unit)
+                    VALUES (?, ?, ?, ?)
                     """,
                     (
+                        commande_id,
                         item["product_id"],
-                        current_user.get_id(),
                         item["quantity"],
-                        delivery_address,
-                        delivery_option,
-                        delivery_cost / 100,  # Convert back to EUR
-                        final_total / 100,  # Convert back to EUR
+                        price_per_unit,
                     ),
                 )
 
-                # Update stock for each product in the cart
+                # Step 3: Update stock for each product
                 cursor.execute(
-                    "UPDATE products SET stock = stock - ? WHERE id = ? AND stock > ?",
-                    (item["quantity"], item["product_id"], item["quantity"] - 1),
+                    """
+                    UPDATE products 
+                    SET stock = stock - ? 
+                    WHERE id = ? AND stock >= ?
+                    """,
+                    (item["quantity"], item["product_id"], item["quantity"]),
                 )
 
             conn.commit()
             conn.close()
 
-            # Generate invoice and clear cart
+            # Step 4: Generate invoice & clear cart
             session["invoice"] = generate_invoice(
                 cart, final_total, delivery_option, delivery_cost
             )
