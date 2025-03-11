@@ -33,7 +33,9 @@
     <div class="product-container">
       {% for enchere in encheres %}
       <div class="product-card">
-        <img src="{{ enchere.image_url }}" alt="{{ enchere.name }}" />
+        <img
+          src="{{ url_for('static', filename=enchere.image_url) }}"
+          alt="{{ enchere.name }}" />
         <h3>{{ enchere.name }}</h3>
         <!-- <p>Description: {{ enchere.description }}</p> -->
         <p>Prix: ${{ enchere.prix }}</p>

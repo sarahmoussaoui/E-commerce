@@ -5,6 +5,7 @@ import posixpath
 import shutil
 import subprocess
 import os
+from datetime import datetime, timedelta
 
 
 # Step 1: Drop tables if they exist
@@ -143,6 +144,37 @@ def insert_products():
     conn.commit()
     conn.close()
 
+# Step : insert encheres from database
+def insert_encheres():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Répertoire contenant les images des enchères
+    image_dir = "./static/encheres_img/"
+
+    # Récupérer tous les fichiers image dans le dossier
+    image_files = [
+        f for f in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, f))
+    ]
+
+    for image in image_files:
+        name = os.path.splitext(image)[0]  # Utiliser le nom du fichier comme nom de l'enchère
+        description = f"Enchère exclusive pour {name}"  # Générer une description
+        prix = round(random.uniform(500, 6000), 2)  # Prix aléatoire entre 500 et 6000
+        date_fin = (datetime.now() + timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d")  # Date de fin aléatoire dans les 30 jours suivants
+        image_url = posixpath.join("encheres_img", image)  # Stocker le chemin relatif de l'image
+
+        cursor.execute(
+            """
+            INSERT INTO enchere (name, description, image_url, prix, date_fin)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (name, description, image_url, prix, date_fin),
+        )
+
+    conn.commit()
+    conn.close()
+
 
 # Step 6: Create admin user
 def create_admin():
@@ -179,6 +211,9 @@ if __name__ == "__main__":
 
     # Insert products
     insert_products()
+
+    # Insert encheres
+    insert_encheres()
 
     # Create admin user
     create_admin()
