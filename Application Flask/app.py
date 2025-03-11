@@ -216,23 +216,47 @@ def index_user():
 
 
 # Add Product to Cart
-@app.route("/add_to_cart/<int:product_id>/<int:quantity>")
+@app.route("/add_to_cart/<int:product_id>/<int:quantity>/<int:stock>")
 @login_required
-def add_to_cart(product_id, quantity):
+def add_to_cart(product_id, quantity, stock):
+    # Check if the quantity is valid (greater than 0 and less than or equal to stock)
+    if quantity <= 0 or quantity > stock:
+        return jsonify(
+            {
+                "success": False,
+                "message": "The selected quantity is greater than the stock.",
+            }
+        )
+
+    # Initialize the cart if it doesn't exist
     if "cart" not in session:
         session["cart"] = []
+
+    product_exists = False
 
     # Check if the product is already in the cart
     for item in session["cart"]:
         if item["product_id"] == product_id:
+            # Check if the updated quantity exceeds the stock
+            if item["quantity"] + quantity > stock:
+                return jsonify(
+                    {
+                        "success": False,
+                        "message": "The selected quantity is greater than the stock.",
+                    }
+                )
+
             item["quantity"] += quantity  # Update quantity if product exists
             session.modified = True
-            return redirect(url_for("index_user"))
+            product_exists = True
+            return jsonify({"success": True})
 
     # If the product is not in the cart, add it
-    session["cart"].append({"product_id": product_id, "quantity": quantity})
-    session.modified = True
-    return redirect(url_for("index_user"))
+    if not product_exists:
+        session["cart"].append({"product_id": product_id, "quantity": quantity})
+        session.modified = True
+
+    return jsonify({"success": True})
 
 
 @app.route("/cart")
