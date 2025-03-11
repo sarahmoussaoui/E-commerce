@@ -1,139 +1,150 @@
+<!-- @format -->
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Messages</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
     <nav class="navbar">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
-        </div>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('index_admin') }}">Produits</a></li>
-            <li><a href="">Enchers</a></li>
-            <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
-        </ul>
+      <div class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
+      </div>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchers</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
     </nav>
     <h1>Admin Messages</h1>
 
+    <div class="filters">
+      <label for="filter-status">Status:</label>
+      <select id="filter-status">
+        <option value="pending">Pending</option>
+        <option value="treated">Treated</option>
+        <option value="all">All</option>
+      </select>
 
+      <label for="filter-date">Date:</label>
+      <select id="filter-date">
+        <option value="">All</option>
+        <option value="last_day">Last Day</option>
+        <option value="last_week">Last Week</option>
+        <option value="last_month">Last Month</option>
+      </select>
 
-        <div class="filters">
-            <label for="filter-status">Status:</label>
-            <select id="filter-status">
-                <option value="pending">Pending</option>
-                <option value="treated">Treated</option>
-                <option value="all">All</option>
-            </select>
-        
-            <label for="filter-date">Date:</label>
-            <select id="filter-date">
-                <option value="">All</option>
-                <option value="last_day">Last Day</option>
-                <option value="last_week">Last Week</option>
-                <option value="last_month">Last Month</option>
-            </select>
-        
-            <label for="filter-email">Email:</label>
-            <input type="text" id="filter-email" placeholder="Search by email...">
-        
-            <button id="apply-filters">Apply Filters</button>
-            <button id="reset-filters">Reset Filters</button>
+      <label for="filter-email">Email:</label>
+      <input type="text" id="filter-email" placeholder="Search by email..." />
 
-        </div>
-
-
+      <button id="apply-filters">Apply Filters</button>
+      <button id="reset-filters">Reset Filters</button>
+    </div>
 
     <div class="messages-container">
-        {% for msg in messages %}
-        <div class="message-item">
-            <strong>{{ msg.objet }}</strong>
-            <p>{{ msg.message }}</p>
-            <div class="date">{{ msg.date }}</div>
-            <div class="user-info">From: {{ msg.user_name }} ({{ msg.user_email }})</div>
-            <div class="status">Status: {{ "Treated" if msg.is_treated else "Pending" }}</div>
-
-            <!-- Reply Form (only for pending messages) -->
-            {% if not msg.is_treated %}
-            <form class="reply-form" onsubmit="sendReply(event, {{ msg.id }})">
-                <textarea name="response" placeholder="Your response..." required></textarea>
-                <button type="submit">Send Reply</button>
-            </form>
-            {% elif msg.admin_response %}
-            <div class="admin-response">
-                <strong>Admin Response:</strong>
-                <p>{{ msg.admin_response }}</p>
-            </div>
-            {% endif %}
+      {% for msg in messages %}
+      <div class="message-item">
+        <strong>{{ msg.objet }}</strong>
+        <p>{{ msg.message }}</p>
+        <div class="date">{{ msg.date }}</div>
+        <div class="user-info">
+          From: {{ msg.user_name }} ({{ msg.user_email }})
         </div>
-        {% endfor %}
+        <div class="status">
+          Status: {{ "Treated" if msg.is_treated else "Pending" }}
+        </div>
+
+        <!-- Reply Form (only for pending messages) -->
+        {% if not msg.is_treated %}
+        <form class="reply-form" onsubmit="sendReply(event, '{{ msg.id }}')">
+          <textarea
+            name="response"
+            placeholder="Your response..."
+            required></textarea>
+          <button type="submit">Send Reply</button>
+        </form>
+        {% elif msg.admin_response %}
+        <div class="admin-response">
+          <strong>Admin Response:</strong>
+          <p>{{ msg.admin_response }}</p>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
     </div>
 
     <!-- Success Message -->
     <div id="success-message" class="success-message">
-        Reply sent successfully!
+      Reply sent successfully!
     </div>
 
     <script>
-        // Function to send a reply
-        function sendReply(event, messageId) {
-            event.preventDefault(); // Prevent form submission
+      // Function to send a reply
+      function sendReply(event, messageId) {
+        event.preventDefault(); // Prevent form submission
 
-            const form = event.target;
-            const response = form.querySelector("textarea").value;
+        const form = event.target;
+        const response = form.querySelector("textarea").value;
 
-            // Send the reply to the server
-            fetch("/admin/reply", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: `message_id=${messageId}&response=${encodeURIComponent(response)}`,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show the success message
-                    const successMessage = document.getElementById("success-message");
-                    successMessage.style.display = "block";
+        // Send the reply to the server
+        fetch("/admin/reply", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `message_id=${messageId}&response=${encodeURIComponent(
+            response
+          )}`,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Show the success message
+              const successMessage = document.getElementById("success-message");
+              successMessage.style.display = "block";
 
-                    // Hide the message after 3 seconds
-                    setTimeout(() => {
-                        successMessage.style.display = "none";
-                    }, 3000);
+              // Hide the message after 3 seconds
+              setTimeout(() => {
+                successMessage.style.display = "none";
+              }, 3000);
 
-                    // Reload the page to update the message status
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1000);
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-        }
+              // Reload the page to update the message status
+              setTimeout(() => {
+                location.reload();
+              }, 1000);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
 
-        // Function to apply filters
-        document.getElementById("apply-filters").addEventListener("click", () => {
-            const status = document.getElementById("filter-status").value;
-            const date = document.getElementById("filter-date").value;
-            const email = document.getElementById("filter-email").value;
+      // Function to apply filters
+      document.getElementById("apply-filters").addEventListener("click", () => {
+        const status = document.getElementById("filter-status").value;
+        const date = document.getElementById("filter-date").value;
+        const email = document.getElementById("filter-email").value;
 
-            // Redirect to the filtered page
-            window.location.href = `/admin/messages?status=${status}&date=${date}&email=${email}`;
-        });
-        // Function to reset filters
-document.getElementById("reset-filters").addEventListener("click", () => {
-    document.getElementById("filter-status").value = "pending";
-    document.getElementById("filter-date").value = "";
-    document.getElementById("filter-email").value = "";
-    window.location.href = "/admin/messages"; // Reload the page with default filters
-});
+        // Redirect to the filtered page
+        window.location.href = `/admin/messages?status=${status}&date=${date}&email=${email}`;
+      });
+      // Function to reset filters
+      document.getElementById("reset-filters").addEventListener("click", () => {
+        document.getElementById("filter-status").value = "pending";
+        document.getElementById("filter-date").value = "";
+        document.getElementById("filter-email").value = "";
+        window.location.href = "/admin/messages"; // Reload the page with default filters
+      });
     </script>
-</body>
+  </body>
 </html>

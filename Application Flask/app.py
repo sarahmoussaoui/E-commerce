@@ -179,7 +179,7 @@ def login():
 
             # Redirect admin (id = 0) to index_admin, others to index
             if user["is_admin"] == 1:
-                return redirect(url_for("index_admin"))
+                return redirect(url_for("home_admin"))
             else:
                 return redirect(url_for("index_user"))
 
@@ -198,6 +198,12 @@ def logout():
     return redirect(url_for("login"))
 
 
+@app.route("/home_admin")
+@login_required
+def home_admin():
+    return render_template("home_admin.html")
+
+
 # Home Page: Display Products
 @app.route("/home_user")
 @login_required
@@ -213,6 +219,8 @@ def index_user():
     conn.close()
     products = [dict(product) for product in products]
     return render_template("index.html", products=products)
+
+
 
 
 # Add Product to Cart
@@ -455,13 +463,13 @@ def generate_invoice(cart, total):
 
 
 # Home Page: Display Products
-@app.route("/home_admin")
+@app.route("/gestion_produits")
 @login_required
-def index_admin():
+def gestion_produits():
     conn = get_db()
     products = conn.execute("SELECT * FROM products").fetchall()
     conn.close()
-    return render_template("home_admin.html", products=products)
+    return render_template("gestion_produits.html", products=products)
 
 
 # Add Product Page
@@ -483,7 +491,7 @@ def add_product():
         conn.close()
 
         flash("Product added successfully!", "success")
-        return redirect(url_for("index_admin"))
+        return redirect(url_for("gestion_produits"))
 
     return render_template("add_product.html")
 
@@ -511,7 +519,7 @@ def update_product(product_id):
         conn.close()
 
         flash("Product updated successfully!", "success")
-        return redirect(url_for("index_admin"))
+        return redirect(url_for("gestion_produits"))
 
     return render_template("update_product.html", product=product)
 
@@ -526,7 +534,106 @@ def delete_product(product_id):
     conn.close()
 
     flash("Product deleted successfully!", "danger")
-    return redirect(url_for("index_admin"))
+    return redirect(url_for("gestion_produits"))
+
+
+#  Encheres
+
+
+@app.route("/gestion_encheres")
+@login_required
+def gestion_encheres():
+    conn = get_db()
+    encheres = conn.execute("SELECT * FROM enchere").fetchall()
+    conn.close()
+    return render_template("gestion_encheres.html", encheres=encheres)
+
+
+
+@app.route("/add_enchere", methods=["GET", "POST"])
+@login_required
+def add_enchere():
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        image_url = request.form["image_url"]
+        prix = float(request.form["prix"])
+        date_fin = request.form["date_fin"]
+
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "INSERT INTO enchere (name, description, image_url, prix, date_fin) VALUES (?, ?, ?, ?, ?)",
+            (name, description, image_url, prix, date_fin),
+        )
+        conn.commit()
+        conn.close()
+
+        flash("Auction created successfully!", "success")
+        return redirect(url_for("gestion_encheres"))
+
+    return render_template("add_enchere.html")
+
+@app.route("/update_enchere/<int:enchere_id>", methods=["GET", "POST"])
+@login_required
+def update_enchere(enchere_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # Fetch the auction details
+    enchere = cursor.execute(
+        "SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)
+    ).fetchone()
+
+    if not enchere:
+        flash("Auction not found!", "danger")
+        return redirect(url_for("gestion_encheres"))
+
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        image_url = request.form["image_url"]
+        prix = float(request.form["prix"])
+        date_fin = request.form["date_fin"]
+
+        cursor.execute(
+            """
+            UPDATE enchere 
+            SET name=?, description=?, image_url=?, prix=?, date_fin=?
+            WHERE id_enchere=?
+            """,
+            (name, description, image_url, prix, date_fin, enchere_id),
+        )
+        conn.commit()
+        conn.close()
+
+        flash("Auction updated successfully!", "success")
+        return redirect(url_for("gestion_encheres"))
+
+    return render_template("update_enchere.html", enchere=enchere)
+
+
+@app.route("/delete_enchere/<int:enchere_id>", methods=["POST"])
+@login_required
+def delete_enchere(enchere_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Delete bids associated with this auction first
+    cursor.execute("DELETE FROM historique_enchere WHERE id_enchere = ?", (enchere_id,))
+    
+    # Then delete the auction itself
+    cursor.execute("DELETE FROM enchere WHERE id_enchere = ?", (enchere_id,))
+
+    conn.commit()
+    conn.close()
+
+    flash("Auction deleted successfully!", "danger")
+    return redirect(url_for("gestion_encheres"))
+
+
+
 
 
 @app.route("/aboutus")
