@@ -80,6 +80,25 @@ def init_db():
         """
     )
 
+    # Create commande table
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS commande (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            address TEXT NOT NULL,
+            delivery_option TEXT NOT NULL,
+            delivery_cost REAL NOT NULL,
+            total_amount REAL NOT NULL,
+            order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (product_id) REFERENCES products(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+        """
+    )
+
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS messages (

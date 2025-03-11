@@ -285,11 +285,12 @@ def view_cart():
 
     conn.close()  # Close the database connection
 
-    # Render the cart template with the products and total price
+    # Ensure delivery_cost is defined in the template
     return render_template(
         "cart.html",
         products=products,
         total=total,
+        delivery_cost=0,  # Default value (to prevent UndefinedError)
         stripe_public_key=stripe_public_key,
     )
 
@@ -327,15 +328,26 @@ def product_detail(product_id):
 @login_required
 def checkout():
     try:
-        total = request.form.get("total", "0")
-        total = float(total) * 100  # Convert to cents
+        # Get the base total (without delivery cost) from the form
+        base_total = request.form.get("total", "0")
+        base_total = float(base_total) * 100  # Convert to cents
 
-        if total < 1:
+        # Get the delivery option, cost, and address from the form
+        delivery_option = request.form.get("delivery_option", "Sans Livraison")
+        delivery_cost = request.form.get("delivery_cost", "0")
+        delivery_cost = float(delivery_cost) * 100  # Convert to cents
+        delivery_address = request.form.get("delivery_address", "")
+
+        # Calculate the final total (base total + delivery cost)
+        final_total = base_total + delivery_cost
+
+        # Ensure the final total is valid
+        if final_total < 1:
             return "Error: Amount must be greater than 0.", 400
 
-        # Process payment
+        # Process payment with Stripe
         charge = stripe.Charge.create(
-            amount=int(total),
+            amount=int(final_total),  # Use the final total (base + delivery)
             currency="eur",
             description="Payment",
             source=request.form.get("stripeToken"),
@@ -343,11 +355,29 @@ def checkout():
 
         if charge["paid"]:  # Payment successful
             conn = get_db()
+            cursor = conn.cursor()
             cart = session.get("cart", [])
 
-            # Update stock for each product in the cart
+            # Save each product in the cart to the commande table
             for item in cart:
-                conn.execute(
+                cursor.execute(
+                    """
+                    INSERT INTO commande (product_id, user_id, quantity, address, delivery_option, delivery_cost, total_amount)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        item["product_id"],
+                        current_user.get_id(),
+                        item["quantity"],
+                        delivery_address,
+                        delivery_option,
+                        delivery_cost / 100,  # Convert back to EUR
+                        final_total / 100,  # Convert back to EUR
+                    ),
+                )
+
+                # Update stock for each product in the cart
+                cursor.execute(
                     "UPDATE products SET stock = stock - ? WHERE id = ? AND stock > ?",
                     (item["quantity"], item["product_id"], item["quantity"] - 1),
                 )
@@ -356,7 +386,9 @@ def checkout():
             conn.close()
 
             # Generate invoice and clear cart
-            session["invoice"] = generate_invoice(cart, total)
+            session["invoice"] = generate_invoice(
+                cart, final_total, delivery_option, delivery_cost
+            )
             session["cart"] = []
 
             return redirect(url_for("invoice"))
@@ -395,7 +427,7 @@ def download_invoice():
     )
 
 
-def generate_invoice(cart, total):
+def generate_invoice(cart, total, delivery_option, delivery_cost):
     # Ensure 'invoices' folder exists
     invoices_folder = "invoices"
     if not os.path.exists(invoices_folder):
@@ -463,6 +495,9 @@ def generate_invoice(cart, total):
                 ]
             )
     conn.close()
+
+    # Add Delivery Option to the Table
+    data.append(["Livraison", "", "", f"{delivery_cost / 100:.2f} EUR"])
 
     # Create the table
     table = Table(data)

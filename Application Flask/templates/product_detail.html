@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8" />
     <title>Détails du Produit</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
-        <!-- Navigation Menu with Logo -->
-        <nav class="navbar">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
-            </div>
-            <ul class="nav-links">
-                <li><a href="{{ url_for('index_user') }}">Accueil</a></li>
-                <li><a href="{{ url_for('index_user') }}">Produits</a></li>
-                <li><a href="{{ url_for('about_us') }}">À propos</a></li>
-                <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-            </ul>
-        </nav>
+    <!-- Navigation Menu with Logo -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index_user') }}">Accueil</a></li>
+            <li><a href="{{ url_for('index_user') }}">Produits</a></li>
+            <li><a href="{{ url_for('about_us') }}">À propos</a></li>
+            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+        </ul>
+    </nav>
     <h1>{{ product.name }}</h1>
-    <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}"  class="product-image"/>
+    <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" class="product-image" />
     <p>Prix: {{ product.price }} EUR</p>
     <p>Stock: {{ product.stock }}</p>
 
@@ -33,69 +35,69 @@
     <a href="{{ url_for('index_user') }}" class="back-link">Retour aux produits</a>
 
     <!-- Custom Modal -->
-<div id="custom-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">×</span>
-        <div class="modal-body">
-            <p id="modal-message"></p>
+    <div id="custom-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+            </div>
         </div>
     </div>
-</div>
 
     <script>
         function addToCart(event) {
             event.preventDefault(); // Prevent default form submission
-        
+
             const quantity = document.getElementById('quantity').value;
             const productStock = parseInt("{{ product.stock }}");
-        
+
             // Check if stock is 0
             if (productStock === 0) {
                 showModal("Produit en rupture de stock");
                 return; // Exit the function early
             }
-        
+
             // Check if quantity exceeds stock
             if (parseInt(quantity) > productStock) {
                 showModal(`Quantité non disponible! La quantité maximale que vous pouvez commander est ${productStock}.`);
                 return;
             }
-        
+
             // Proceed with form submission if quantity is valid
             const productId = "{{ product.id }}";
             const url = "{{ url_for('add_to_cart', product_id=product.id, quantity=0, stock=product.stock) }}".replace("0", quantity);
-        
+
             // Use Fetch API to submit the form data
             fetch(url, {
                 method: 'GET', // Use GET since your route is a GET request
             })
-            .then(response => response.json()) // Parse the JSON response
-            .then(data => {
-                if (data.success) {
-                    // Redirect to the index page if the product is added successfully
-                    window.location.href = "{{ url_for('index_user') }}";
-                } else {
-                    // Show the error message in the modal
-                    showModal(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showModal('Une erreur s\'est produite. Veuillez réessayer.');
-            });
+                .then(response => response.json()) // Parse the JSON response
+                .then(data => {
+                    if (data.success) {
+                        // Redirect to the index page if the product is added successfully
+                        window.location.href = "{{ url_for('index_user') }}";
+                    } else {
+                        // Show the error message in the modal
+                        showModal(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showModal('Une erreur s\'est produite. Veuillez réessayer.');
+                });
         }
-function showModal(message) {
-    const modal = document.getElementById('custom-modal');
-    const modalMessage = document.getElementById('modal-message');
+        function showModal(message) {
+            const modal = document.getElementById('custom-modal');
+            const modalMessage = document.getElementById('modal-message');
 
-    modalMessage.textContent = message; // Set the message
-    modal.style.display = 'flex'; // Show the modal
-}
+            modalMessage.textContent = message; // Set the message
+            modal.style.display = 'flex'; // Show the modal
+        }
 
-function closeModal() {
-    const modal = document.getElementById('custom-modal');
-    modal.style.display = 'none'; // Hide the modal
-}
+        function closeModal() {
+            const modal = document.getElementById('custom-modal');
+            modal.style.display = 'none'; // Hide the modal
+        }
 
         function checkQuantity() {
             const quantityInput = document.getElementById('quantity');
@@ -103,20 +105,21 @@ function closeModal() {
             const productStock = parseInt("{{ product.stock }}");
 
 
-                addToCartBtn.disabled = false;
+            addToCartBtn.disabled = false;
 
-                // Add blur effect if quantity exceeds stock
-                if (parseInt(quantityInput.value) > productStock) {
-                    addToCartBtn.classList.add('blurred');
-                } else {
-                    addToCartBtn.classList.remove('blurred');
-                }
+            // Add blur effect if quantity exceeds stock
+            if (parseInt(quantityInput.value) > productStock) {
+                addToCartBtn.classList.add('blurred');
+            } else {
+                addToCartBtn.classList.remove('blurred');
             }
-        
+        }
+
 
 
         // Initial check when the page loads
         document.addEventListener('DOMContentLoaded', checkQuantity);
     </script>
 </body>
+
 </html>
