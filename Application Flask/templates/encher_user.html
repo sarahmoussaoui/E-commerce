@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Produits</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='encher_user.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -21,26 +21,27 @@
     </nav>
 
     <!-- Welcome Section with Background Image and Slogan -->
-    <header class="welcome-section">
-
-    </header>
+    <header class="welcome-section-encher"></header>
+    
     <div class="slogan">
-      <p>Décorez votre monde avec des créations uniques et faites main.</p>
-  </div>
+        <p>Il est temps de découvrir nos produits vintage à encherir.</p>
+    </div>
+
     <!-- Lien "Voir le panier" en haut -->
     <div class="cart-container">
         <a href="{{ url_for('view_cart') }}" class="cart-link">Voir le panier</a>
     </div> 
 
-    <!-- Product Display -->
+    <!-- Liste des enchères -->
     <div class="product-container">
-        {% for product in products %}
-        <div class="product-card {% if product.stock == 0 %}out-of-stock{% endif %}">       
-          <a href="{{ url_for('product_detail', product_id=product.id) }}">
-            <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" />
-            <h3>{{ product.name }}</h3>
-            <p>{{ product.price }} EUR</p>
-          </a>
+        {% for enchere in encheres %}
+        <div class="product-card">
+            <a href="{{ url_for('enchere_detail', enchere_id=enchere.id_enchere) }}">
+            <img src="{{ url_for('static', filename= enchere.image_url ) }}" alt="{{ enchere.name }}" />
+            <h3>{{ enchere.name }}</h3>
+            <p>{{ enchere.prix }} EUR</p>
+            <p>Fin de l'enchère : {{ enchere.date_fin }}</p>
+        </a>
         </div>
         {% endfor %}
     </div>

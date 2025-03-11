@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Détails de l'Enchère</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='encher_user.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('about_us') }}">About us</a></li>
+            <li><a href="{{ url_for('index_user') }}">Products</a></li>
+            <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
+            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Wrapper principal -->
+    <div class="enchere-wrapper">
+        <!-- Image et description -->
+        <div class="enchere-left">
+            <div class="enchere-image-box">
+                <img src="{{ url_for('static', filename=enchere.image_url) }}" alt="{{ enchere.name }}" />
+            </div>
+            <p class="enchere-description"><strong>Description :</strong> {{ enchere.description }}</p>
+        </div>
+
+        <!-- Détails de l'enchère -->
+        <div class="enchere-info-box">
+            <h1>{{ enchere.name }}</h1>
+            <p><strong>Prix de départ :</strong> {{ enchere.prix }} EUR</p>
+            <p><strong>Fin de l'enchère :</strong> {{ enchere.date_fin }}</p>
+            <p><strong>📍</strong> {{ enchere.adresse }}</p>
+            
+            <a href="#" class="encherir-btn" onclick="openModal('modalEnchere')">Enchérir</a>
+        </div>
+    </div>
+
+    <!-- Première Fenêtre Modale : Saisie du prix -->
+    <div id="modalEnchere" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modalEnchere')">&times;</span>
+            <h2>Placer une enchère</h2>
+            <form id="enchereForm">
+                <input type="hidden" id="enchere_id" value="{{ enchere.id_enchere }}">
+                <label for="proposed_price">Votre offre (€) :</label>
+                <input type="number" id="proposed_price" required min="{{ enchere.prix }}" step="0.01">
+                <button type="button" onclick="openNextModal()">Valider</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Deuxième Fenêtre Modale : Confirmation des informations utilisateur -->
+    <div id="modalConfirmation" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modalConfirmation')">&times;</span>
+            <h2>Confirmer votre enchère</h2>
+            <form id="confirmationForm">
+                <label for="nom">Nom :</label>
+                <input type="text" id="nom" required value="{{ (user.FirstName if user is defined else '') ~ ' ' ~ (user.LastName if user is defined else '') }}">
+
+                <label for="email">Email :</label>
+                <input type="email" id="email" required value="{{ user.Email if user is defined else '' }}">
+
+                <button type="submit">Confirmer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript pour gérer les modales et l'enchère -->
+    <script>
+        function openModal(id) {
+            document.getElementById(id).classList.add("show");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove("show");
+        }
+
+        function openNextModal() {
+            closeModal('modalEnchere');
+            openModal('modalConfirmation');
+        }
+
+        // Fermer la modale si l'utilisateur clique en dehors du formulaire
+        window.onclick = function(event) {
+            let modalEnchere = document.getElementById("modalEnchere");
+            let modalConfirmation = document.getElementById("modalConfirmation");
+            
+            if (event.target === modalEnchere) {
+                closeModal('modalEnchere');
+            } else if (event.target === modalConfirmation) {
+                closeModal('modalConfirmation');
+            }
+        }
+
+        // Soumettre l'enchère au serveur
+        document.getElementById('confirmationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let enchereId = document.getElementById('enchere_id').value;
+            let prix = document.getElementById('proposed_price').value;
+            let nom = document.getElementById('nom').value;
+            let email = document.getElementById('email').value;
+
+            fetch('/encherir', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id_enchere: enchereId,
+                    prix: prix,
+                    nom: nom,
+                    email: email
+                })
+            }).then(response => response.json())
+              .then(data => {
+                  alert(data.message);
+                  closeModal('modalConfirmation');
+              });
+        });
+    </script>
+
+</body>
+</html>
