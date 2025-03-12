@@ -47,8 +47,7 @@ def init_db():
             name TEXT NOT NULL,
             price REAL NOT NULL,
             stock INTEGER NOT NULL,
-            image_url TEXT, 
-            is_vintage INTEGER NOT NULL DEFAULT 0 CHECK(is_vintage IN (0,1))  
+            image_url TEXT
         )
         """
     )
@@ -71,6 +70,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS enchere (
             id_enchere INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            etat TEXT NOT NULL DEFAULT 'En cours',
             description TEXT NOT NULL,
             image_url TEXT, 
             prix REAL NOT NULL,

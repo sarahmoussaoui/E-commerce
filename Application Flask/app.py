@@ -575,6 +575,7 @@ def add_enchere():
 
     return render_template("add_enchere.html")
 
+
 @app.route("/update_enchere/<int:enchere_id>", methods=["GET", "POST"])
 @login_required
 def update_enchere(enchere_id):
@@ -803,6 +804,34 @@ def admin_messages():
     ]
 
     return render_template("admin_messages.html", messages=messages_list)
+
+
+
+@app.route("/admin/historique_encheres", methods=["GET"])
+def historique_encheres():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # SQL Query to join historique_enchere, enchere, and users tables
+    cursor.execute("""
+        SELECT 
+            e.image_url, 
+            e.name AS enchere_name, 
+            e.date_fin, 
+            u.FirstName || ' ' || u.LastName AS user_full_name, 
+            u.phoneNum,
+            h.proposed_price,
+            e.etat
+        FROM historique_enchere h
+        JOIN enchere e ON h.id_enchere = e.id_enchere
+        JOIN users u ON h.id_user = u.id
+        ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
+    """)
+    
+    historique = cursor.fetchall()
+    conn.close()
+
+    return render_template("historique_encheres.html", historique=historique)
 
 
 # add_sample_products()
