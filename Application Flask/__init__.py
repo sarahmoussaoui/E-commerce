@@ -52,7 +52,7 @@ def init_db():
         """
     )
     # Create historique Enchere
-    cursor.execute(
+    cursor.execute( 
         """
         CREATE TABLE IF NOT EXISTS historique_enchere (
             id_enchere INTEGER NOT NULL,
@@ -61,6 +61,7 @@ def init_db():
             FOREIGN KEY (id_user) REFERENCES users(id),
             FOREIGN KEY (id_enchere) REFERENCES enchere(id),
             PRIMARY KEY (id_enchere, id_user, proposed_price)
+            
         )
         """
     )
@@ -74,7 +75,8 @@ def init_db():
             description TEXT NOT NULL,
             image_url TEXT, 
             prix REAL NOT NULL,
-            date_fin DATE NOT NULL
+            date_fin DATE NOT NULL,
+            adresse TEXT NOT NULL
         )
         """
     )
@@ -156,20 +158,21 @@ def insert_encheres():
     image_files = [
         f for f in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, f))
     ]
-
+    
     for image in image_files:
         name = os.path.splitext(image)[0]  # Utiliser le nom du fichier comme nom de l'enchère
-        description = f"Enchère exclusive pour {name}"  # Générer une description
+        description = f" {name} "  # Générer une description
         prix = round(random.uniform(500, 6000), 2)  # Prix aléatoire entre 500 et 6000
         date_fin = (datetime.now() + timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d")  # Date de fin aléatoire dans les 30 jours suivants
         image_url = posixpath.join("encheres_img", image)  # Stocker le chemin relatif de l'image
+        adresse  = f"{random.randint(1, 200)} Rue de l'Antiquité, 75000 Paris, France" #adresse aleatoire 
 
         cursor.execute(
             """
-            INSERT INTO enchere (name, description, image_url, prix, date_fin)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO enchere (name, description, image_url, prix, date_fin,adresse)
+            VALUES (?, ?, ?, ?, ?,?)
             """,
-            (name, description, image_url, prix, date_fin),
+            (name, description, image_url, prix, date_fin,adresse),
         )
 
     conn.commit()

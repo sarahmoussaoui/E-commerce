@@ -9,13 +9,15 @@
 <body>
         <!-- Navigation Menu with Logo -->
         <nav class="navbar">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
-            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <img
+                  src="{{ url_for('static', filename='img/logout.png') }}"
+                  alt="Logout" />
+              </a>
             <ul class="nav-links">
-                <li><a href="{{ url_for('index_user') }}">Accueil</a></li>
-                <li><a href="{{ url_for('index_user') }}">Produits</a></li>
-                <li><a href="{{ url_for('about_us') }}">À propos</a></li>
+                <li><a href="{{ url_for('about_us') }}">About us</a></li>
+                <li><a href="{{ url_for('index_user') }}">Products</a></li>
+                <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
                 <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
             </ul>
         </nav>

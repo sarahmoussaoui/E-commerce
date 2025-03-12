@@ -181,7 +181,7 @@ def login():
             if user["is_admin"] == 1:
                 return redirect(url_for("home_admin"))
             else:
-                return redirect(url_for("index_user"))
+                return redirect(url_for("about_us"))
 
         flash("Invalid email or password", "danger")
 
@@ -559,13 +559,14 @@ def add_enchere():
         image_url = request.form["image_url"]
         prix = float(request.form["prix"])
         date_fin = request.form["date_fin"]
+        adresse = request.form["adresse"]
 
         conn = get_db()
         cursor = conn.cursor()
 
         cursor.execute(
-            "INSERT INTO enchere (name, description, image_url, prix, date_fin) VALUES (?, ?, ?, ?, ?)",
-            (name, description, image_url, prix, date_fin),
+            "INSERT INTO enchere (name, description, image_url, prix, date_fin,adresse) VALUES (?, ?, ?, ?, ?,?)",
+            (name, description, image_url, prix, date_fin,adresse),
         )
         conn.commit()
         conn.close()
@@ -597,14 +598,15 @@ def update_enchere(enchere_id):
         image_url = request.form["image_url"]
         prix = float(request.form["prix"])
         date_fin = request.form["date_fin"]
+        adresse = request.form["adresse"]
 
         cursor.execute(
             """
             UPDATE enchere 
-            SET name=?, description=?, image_url=?, prix=?, date_fin=?
+            SET name=?, description=?, image_url=?, prix=?, date_fin=?,adresse=?
             WHERE id_enchere=?
             """,
-            (name, description, image_url, prix, date_fin, enchere_id),
+            (name, description, image_url, prix, date_fin, enchere_id,adresse),
         )
         conn.commit()
         conn.close()
@@ -645,6 +647,8 @@ def about_us():
 @app.route("/contactus")
 def contact_us():
     return render_template("contact_us.html")
+
+
 
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -787,7 +791,7 @@ def admin_messages():
     cursor.execute(query, params)
     messages = cursor.fetchall()
     conn.close()
-
+   
     # Convert the result to a list of dictionaries
     messages_list = [
         {
@@ -806,6 +810,96 @@ def admin_messages():
     return render_template("admin_messages.html", messages=messages_list)
 
 
+@app.route("/encheres")
+@login_required
+def encher_user():
+    conn = get_db()
+    encheres = conn.execute("SELECT * FROM enchere").fetchall()
+    conn.close()
+    encheres = [dict(enchere) for enchere in encheres]
+    return render_template("encher_user.html", encheres=encheres)
+
+
+
+@app.route("/enchere/<int:enchere_id>")
+@login_required
+def enchere_detail(enchere_id):
+    db = get_db()
+    enchere = db.execute("SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)).fetchone()
+    if not enchere:
+        return "Enchère non trouvée", 404
+    return render_template("enchere_detail.html", enchere=enchere, user=current_user)
+
+
+@app.route('/ajouter_enchere', methods=['POST'])
+def ajouter_enchere():
+    data = request.json
+    id_enchere = data.get('id_enchere')
+    prix = data.get('prix')
+    nom = data.get('nom')
+    email = data.get('email')
+    
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    # Récupérer l'utilisateur basé sur l'email
+    cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+    user = cursor.fetchone()
+    
+    if user:
+        id_user = user[0]
+    else:
+        return jsonify({"message": "Utilisateur non trouvé"}), 400
+
+    # Insérer l'enchère dans la table historique_enchere
+    cursor.execute(
+        "INSERT INTO historique_enchere (id_enchere, id_user, proposed_price) VALUES (?, ?, ?)",
+        (id_enchere, id_user, prix)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Votre enchère a été enregistrée avec succès!"})
+
+@app.route("/encherir", methods=["POST"])
+def encherir():
+    try:
+        data = request.json
+        enchere_id = data.get("id_enchere")
+        prix = data.get("prix")
+        first_name = data.get("firstName")
+        last_name = data.get("lastName")
+        email = data.get("email")
+        phone = data.get("phone")
+
+        db = get_db()
+        cursor = db.cursor()
+
+        # Vérifier si l'utilisateur existe déjà
+        cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"message": "Utilisateur non trouvé"}), 400
+
+        user_id = user["id"]
+
+        # Enregistrer l'enchère dans historique_enchere
+        cursor.execute(
+            """
+            INSERT INTO historique_enchere (id_enchere, id_user, proposed_price)
+            VALUES (?, ?, ?)
+            """,
+            (enchere_id, user_id, prix),
+        )
+        db.commit()
+
+        return jsonify({"message": "Enchère enregistrée avec succès !"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/admin/historique_encheres", methods=["GET"])
 def historique_encheres():
