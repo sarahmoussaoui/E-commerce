@@ -6,7 +6,8 @@
 
  body {
     font-family: "Poppins", sans-serif; /* Modern and aesthetic font */
-    background-color: #ffffff; /* White background */
+    /* background-color: #F8F9FA; White background */
+    background-color: white;
     margin: 0;
     padding: 20px;
     text-align: center;
@@ -969,54 +970,73 @@
 
   .enchere-wrapper {
     display: flex;
-    align-items: stretch;
-    justify-content: center;
-    max-width: 900px;
-    margin: 50px auto;
-    padding: 20px;
+    /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); ajouter l'ombre */
+    gap: 45px; /* Espacement entre les deux colonnes */
+    max-width: 700px; /* Ajuste selon ton besoin */
+    margin: auto; /* Centre le tout dans la page */
     background: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    gap: 20px;
+    margin-top: 50px;
+   
 }
 
-/* Colonne gauche */
+
 .enchere-left {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  padding: 0; /* Supprime tout padding */
+  margin: 0; /* Supprime tout espace externe */
+}
+
+.enchere-image-box {
+  width: 100%;
+  height: 100%;
 }
 
 .enchere-image-box img {
-    width: 100%;
-    max-width: 300px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Remplit toute la zone */
+  display: block; /* Supprime les marges des images */
+  border-radius: 0; /* Assure que les coins ne sont pas arrondis */
 }
 
-.enchere-description {
-    font-size: 18px;
-    text-align: center;
-    margin-top: 15px;
-}
-
-/* Colonne droite */
 .enchere-info-box {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
+  flex: 1; /* La colonne droite prend le reste de l’espace */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centrer verticalement les infos */
+  align-items: start; /* Aligner le texte à gauche */
+  gap: 10px; /* Espacement entre les éléments */
 }
 
 .enchere-info-box h1 {
-    font-size: 24px;
+    font-size: 30px;
     margin-bottom: 10px;
+    color: black;
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 0px;
 }
 
+.info-container {
+  display: grid;
+  grid-template-columns: auto auto; /* Two columns with automatic width */
+  justify-content: space-between; /* Push elements apart */
+  width: 100%;
+  text-align: left;
+}
+
+.titre {
+  color: black;
+  font-size: 16px;
+}
+
+
 .enchere-info-box p {
-    font-size: 18px;
+    font-size: 14px;
     margin-bottom: 10px;
+    color: black;
 }
 
 /* Bouton retour en bas */
@@ -1052,22 +1072,40 @@
   background: #218838;
 }*/
 /*bouton encherir*/
-.encherir-btn {
+/*.encherir-btn {
   display: inline-block;
   margin-top: 15px;
   padding: 10px 5px; /* Moins de hauteur, mais une largeur équilibrée */
-  background-color: #5f4e51; 
+  /*background-color: #5f4e51; 
   color: #ffffff;
   border-radius: 20px; /* Garde l'effet arrondi */
-  font-size: 14px; /* Réduit la taille du texte */
-  transition: background-color 0.3s ease;
+  /*font-size: 14px; /* Réduit la taille du texte */
+  /*transition: background-color 0.3s ease;
 }
 
 
 .encherir-btn:hover {
   background-color: #ffcad4; /* Lighter pink on hover */
+/*}*/
+
+
+
+.encherir-btn {
+  display: inline-block;  /* Le bouton garde une largeur normale */
+  padding: 12px 24px;     /* Ajoute de l'espace à l'intérieur du bouton */
+  font-size: 18px;        /* Agrandit le texte */
+  text-align: center;     /* Centre le texte */
+  background-color: #5f4e51; /* Bleu */
+  color: white;           /* Texte en blanc */
+  border: none;
+  border-radius: 5px;     /* Arrondi léger */
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
+.encherir-btn:hover {
+  background-color: #ffcad4;
+}
 /* Style de la fenêtre modale */
 /* Modales */
 .modal {

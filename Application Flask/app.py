@@ -818,25 +818,16 @@ def encher_user():
     encheres = [dict(enchere) for enchere in encheres]
     return render_template("encher_user.html", encheres=encheres)
 
-from flask import session
+
 
 @app.route("/enchere/<int:enchere_id>")
+@login_required
 def enchere_detail(enchere_id):
     db = get_db()
-    enchere = db.execute(
-        "SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)
-    ).fetchone()
-
+    enchere = db.execute("SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)).fetchone()
     if not enchere:
-        return "Enchère non trouvée", 404  
-
-    # Récupérer l'utilisateur connecté à partir de la session
-    user_id = session.get('user_id')
-    user = None
-    if user_id:
-        user = db.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-
-    return render_template("enchere_detail.html", enchere=enchere, user=user)
+        return "Enchère non trouvée", 404
+    return render_template("enchere_detail.html", enchere=enchere, user=current_user)
 
 
 @app.route('/ajouter_enchere', methods=['POST'])
@@ -870,7 +861,43 @@ def ajouter_enchere():
 
     return jsonify({"message": "Votre enchère a été enregistrée avec succès!"})
 
+@app.route("/encherir", methods=["POST"])
+def encherir():
+    try:
+        data = request.json
+        enchere_id = data.get("id_enchere")
+        prix = data.get("prix")
+        first_name = data.get("firstName")
+        last_name = data.get("lastName")
+        email = data.get("email")
+        phone = data.get("phone")
 
+        db = get_db()
+        cursor = db.cursor()
+
+        # Vérifier si l'utilisateur existe déjà
+        cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"message": "Utilisateur non trouvé"}), 400
+
+        user_id = user["id"]
+
+        # Enregistrer l'enchère dans historique_enchere
+        cursor.execute(
+            """
+            INSERT INTO historique_enchere (id_enchere, id_user, proposed_price)
+            VALUES (?, ?, ?)
+            """,
+            (enchere_id, user_id, prix),
+        )
+        db.commit()
+
+        return jsonify({"message": "Enchère enregistrée avec succès !"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # add_sample_products()
 
