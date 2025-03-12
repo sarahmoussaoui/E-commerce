@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Orders</title>
+    <style>
+
+        pre {
+            display: none; /* Hide debug output by default */
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
+      <ul class="nav-links">
+        <li>
+          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+        </li>
+
+        <li><a href="{{ url_for('admin_orders') }}">Commandes</a></li>
+        <!-- must change to historique_commandes later -->
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
+    </nav>
+    <h1>Admin Orders</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Address</th>
+                <th>Delivery Option</th>
+                <th>Total Amount</th>
+                <th>Order Date</th>
+                <th>Status</th>
+                <th>Items</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order_id, order in orders.items() %}
+                <tr>
+                    <td>{{ order_id }}</td>
+                    <td>{{ order.FirstName }} {{ order.LastName }} ({{ order.Email }})</td>
+                    <td>{{ order.address }}</td>
+                    <td>{{ order.delivery_option }}</td>
+                    <td>${{ order.total_amount }}</td>
+                    <td>{{ order.order_date }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        <pre>{{ order | tojson }}</pre>  <!-- Debugging: Print the entire order object -->
+                        <ul>
+                            {% for item in order.order_items %}
+                                <li>{{ item.product_name }} (x{{ item.quantity }}) - ${{ item.price_per_unit }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('update_order_status', order_id=order_id) }}" method="POST">
+                            <select name="status">
+                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

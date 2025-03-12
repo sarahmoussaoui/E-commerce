@@ -25,7 +25,7 @@
           <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
         </li>
 
-        <li><a href="{{ url_for('historique_encheres') }}">Commandes</a></li>
+        <li><a href="{{ url_for('admin_orders') }}">Commandes</a></li>
         <!-- must change to historique_commandes later -->
         <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
         <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
@@ -91,6 +91,49 @@
       {% endfor %}
     </div>
 
+    <!-- Messages Table -->
+    <table class="messages-table">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Message</th>
+          <th>Date</th>
+          <th>User</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for msg in messages %}
+        <tr>
+          <td>{{ msg.objet }}</td>
+          <td>{{ msg.message }}</td>
+          <td>{{ msg.date }}</td>
+          <td>{{ msg.user_name }} ({{ msg.user_email }})</td>
+          <td>{{ "Treated" if msg.is_treated else "Pending" }}</td>
+          <td>
+            {% if not msg.is_treated %}
+            <form
+              class="reply-form"
+              onsubmit="sendReply(event, '{{ msg.id }}')">
+              <textarea
+                name="response"
+                placeholder="Your response..."
+                required></textarea>
+              <button type="submit">Send Reply</button>
+            </form>
+            {% elif msg.admin_response %}
+            <div class="admin-response">
+              <strong>Admin Response:</strong>
+              <p>{{ msg.admin_response }}</p>
+            </div>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
     <!-- Success Message -->
     <div id="success-message" class="success-message">
       Reply sent successfully!
@@ -146,6 +189,7 @@
         // Redirect to the filtered page
         window.location.href = `/admin/messages?status=${status}&date=${date}&email=${email}`;
       });
+
       // Function to reset filters
       document.getElementById("reset-filters").addEventListener("click", () => {
         document.getElementById("filter-status").value = "pending";

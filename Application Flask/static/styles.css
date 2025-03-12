@@ -966,3 +966,145 @@ blockquote em {
 .logout-btn img:hover {
   opacity: 0.7;
 }
+
+/* Table Styles */
+table {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #d8e2dc;
+}
+
+th {
+  background-color: #582900;
+  color: white;
+  font-weight: 600;
+}
+
+tr:hover {
+  background-color: #f8f9fa;
+}
+
+select {
+  padding: 8px;
+  border: 1px solid #d8e2dc;
+  border-radius: 4px;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  color: #9d8189;
+  background-color: #ffffff;
+  transition: border-color 0.3s ease;
+}
+
+/* Debugging Styles */
+pre {
+  display: none; /* Hide debug output by default */
+}
+
+/* Order Items List */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul li {
+  padding: 5px 0;
+  color: #9d8189;
+  font-size: 14px;
+}
+
+/* Messages Table Styles */
+.messages-table {
+  width: 90%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.messages-table th,
+.messages-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #d8e2dc;
+}
+
+.messages-table th {
+  background-color: #582900;
+  color: white;
+  font-weight: 600;
+}
+
+.messages-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Reply Form Styles */
+.reply-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d8e2dc;
+  border-radius: 4px;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.reply-form button {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background-color: #f4acb7;
+  color: #ffffff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.reply-form button:hover {
+  background-color: #ffcad4;
+}
+
+/* Admin Response Styles */
+.admin-response {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-left: 4px solid #ffcad4;
+  font-style: italic;
+  color: #9d8189;
+}
+
+/* Success Message Styles */
+.success-message {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  color: #9d8189;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1000;
+}

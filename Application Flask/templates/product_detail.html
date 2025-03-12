@@ -1,109 +1,145 @@
+<!-- @format -->
+
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>Détails du Produit</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-<body>
-        <!-- Navigation Menu with Logo -->
-        <nav class="navbar">
-            <a href="{{ url_for('logout') }}" class="logout-btn">
-                <img
-                  src="{{ url_for('static', filename='img/logout.png') }}"
-                  alt="Logout" />
-              </a>
-            <ul class="nav-links">
-                <li><a href="{{ url_for('about_us') }}">About us</a></li>
-                <li><a href="{{ url_for('index_user') }}">Products</a></li>
-                <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-                <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-            </ul>
-        </nav>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+  </head>
+
+  <body>
+    <!-- Navigation Menu with Logo -->
+    <nav class="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('about_us') }}">About us</a></li>
+        <li><a href="{{ url_for('index_user') }}">Products</a></li>
+        <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
+        <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+      </ul>
+    </nav>
     <h1>{{ product.name }}</h1>
-    <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}"  class="product-image"/>
+    <img
+      src="{{ url_for('static', filename= product.image_url ) }}"
+      alt="{{ product.name }}"
+      class="product-image" />
     <p>Prix: {{ product.price }} EUR</p>
     <p>Stock: {{ product.stock }}</p>
 
     <form onsubmit="addToCart(event)">
-        <label for="quantity">Quantité:</label>
-        <input type="number" id="quantity" name="quantity" min="1" max="{{ product.stock }}" value="1" required oninput="checkQuantity()">
-        <button type="submit" id="add-to-cart-btn">Ajouter au panier</button>
+      <label for="quantity">Quantité:</label>
+      <input
+        type="number"
+        id="quantity"
+        name="quantity"
+        value="1"
+        required
+        oninput="checkQuantity()" />
+      <button type="submit" id="add-to-cart-btn">Ajouter au panier</button>
     </form>
 
-    <a href="{{ url_for('index_user') }}" class="back-link">Retour aux produits</a>
+    <a href="{{ url_for('index_user') }}" class="back-link"
+      >Retour aux produits</a
+    >
 
     <!-- Custom Modal -->
-    <div id="modal-overlay" class="modal-overlay"></div>
     <div id="custom-modal" class="modal">
-        <p id="modal-message"></p>
-        <button onclick="closeModal()">Fermer</button>
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <div class="modal-body">
+          <p id="modal-message"></p>
+        </div>
+      </div>
     </div>
 
     <script>
-        function addToCart(event) {
-            event.preventDefault(); // Prevent default form submission
+      function addToCart(event) {
+        event.preventDefault(); // Prevent default form submission
 
-            const quantity = document.getElementById('quantity').value;
-            const productStock = parseInt("{{ product.stock }}");
+        const quantity = document.getElementById("quantity").value;
+        const productStock = parseInt("{{ product.stock }}");
 
-            // Check if quantity exceeds stock
-            if (parseInt(quantity) > productStock) {
-                showModal(`Quantité non disponible! La quantité maximale que vous pouvez commander est ${productStock}.`);
-                return;
-            }
-
-            // Proceed with form submission if quantity is valid
-            const productId = "{{ product.id }}";
-            const url = "{{ url_for('add_to_cart', product_id=product.id, quantity=0) }}".replace("0", quantity);
-            window.location.href = url;
+        // Check if stock is 0
+        if (productStock === 0) {
+          showModal("Produit en rupture de stock");
+          return; // Exit the function early
         }
 
-        function checkQuantity() {
-            const quantityInput = document.getElementById('quantity');
-            const addToCartBtn = document.getElementById('add-to-cart-btn');
-            const productStock = parseInt("{{ product.stock }}");
+        // Check if quantity exceeds stock
+        if (parseInt(quantity) > productStock) {
+          showModal(
+            `Quantité non disponible! La quantité maximale que vous pouvez commander est ${productStock}.`
+          );
+          return;
+        }
 
-            // Disable the button only if stock is 0
-            if (productStock === 0) {
-                addToCartBtn.disabled = true;
-                addToCartBtn.classList.add('blurred');
-                addToCartBtn.title = "Ce produit est en rupture de stock."; // Tooltip for disabled button
+        // Proceed with form submission if quantity is valid
+        const productId = "{{ product.id }}";
+        const url =
+          "{{ url_for('add_to_cart', product_id=product.id, quantity=0, stock=product.stock) }}".replace(
+            "0",
+            quantity
+          );
+
+        // Use Fetch API to submit the form data
+        fetch(url, {
+          method: "GET", // Use GET since your route is a GET request
+        })
+          .then((response) => response.json()) // Parse the JSON response
+          .then((data) => {
+            if (data.success) {
+              // Redirect to the index page if the product is added successfully
+              window.location.href = "{{ url_for('index_user') }}";
             } else {
-                addToCartBtn.disabled = false;
-
-                // Add blur effect if quantity exceeds stock
-                if (parseInt(quantityInput.value) > productStock) {
-                    addToCartBtn.classList.add('blurred');
-                } else {
-                    addToCartBtn.classList.remove('blurred');
-                }
+              // Show the error message in the modal
+              showModal(data.message);
             }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            showModal("Une erreur s'est produite. Veuillez réessayer.");
+          });
+      }
+      function showModal(message) {
+        const modal = document.getElementById("custom-modal");
+        const modalMessage = document.getElementById("modal-message");
+
+        modalMessage.textContent = message; // Set the message
+        modal.style.display = "flex"; // Show the modal
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("custom-modal");
+        modal.style.display = "none"; // Hide the modal
+      }
+
+      function checkQuantity() {
+        const quantityInput = document.getElementById("quantity");
+        const addToCartBtn = document.getElementById("add-to-cart-btn");
+        const productStock = parseInt("{{ product.stock }}");
+
+        addToCartBtn.disabled = false;
+
+        // Add blur effect if quantity exceeds stock
+        if (parseInt(quantityInput.value) > productStock) {
+          addToCartBtn.classList.add("blurred");
+        } else {
+          addToCartBtn.classList.remove("blurred");
         }
+      }
 
-        // Show custom modal
-        function showModal(message) {
-            const modal = document.getElementById('custom-modal');
-            const modalOverlay = document.getElementById('modal-overlay');
-            const modalMessage = document.getElementById('modal-message');
-
-            modalMessage.textContent = message; // Set the message
-            modal.style.display = 'block'; // Show the modal
-            modalOverlay.style.display = 'block'; // Show the overlay
-        }
-
-        // Close custom modal
-        function closeModal() {
-            const modal = document.getElementById('custom-modal');
-            const modalOverlay = document.getElementById('modal-overlay');
-
-            modal.style.display = 'none'; // Hide the modal
-            modalOverlay.style.display = 'none'; // Hide the overlay
-        }
-
-        // Initial check when the page loads
-        document.addEventListener('DOMContentLoaded', checkQuantity);
+      // Initial check when the page loads
+      document.addEventListener("DOMContentLoaded", checkQuantity);
     </script>
-</body>
+  </body>
 </html>

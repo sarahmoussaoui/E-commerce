@@ -5,7 +5,6 @@
     <title>Panier</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
   </head>
   <body>
     <nav class="navbar">
@@ -23,31 +22,104 @@
   </nav>
     <div class="cart-container">
       <h1>Votre Panier</h1>
-      {% for product in products %}
-      <div class="cart-item">
-        <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" />
-        <div class="cart-item-details">
-          <div class="cart-item-name">{{ product.name }}</div>
-          <div class="cart-item-price">{{ product.price }} EUR (unité)</div>
-          <div class="cart-item-quantity">Quantité: {{ product.quantity }}</div>
+      {% if products %}
+        {% for product in products %}
+        <div class="cart-item">
+          <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" />
+          <div class="cart-item-details">
+            <div class="cart-item-name">{{ product.name }}</div>
+            <div class="cart-item-price">{{ product.price }} EUR (unité)</div>
+            <div class="cart-item-quantity">Quantité: {{ product.quantity }}</div>
+          </div>
+          <div class="cart-item-total">{{ product.price * product.quantity }} EUR</div>
+          <!-- Add a delete button -->
+          <form action="{{ url_for('remove_from_cart') }}" method="POST" style="display: inline;">
+            <input type="hidden" name="product_id" value="{{ product.id }}" />
+            <button type="submit" class="delete-button">Supprimer</button>
+          </form>
         </div>
-        <div class="cart-item-total">{{ product.price * product.quantity }} EUR</div>
-      </div>
-      {% endfor %}
-      <div class="total">Total : {{ total }} EUR</div>
-      <div class="stripe-button">
-        <form action="{{ url_for('checkout') }}" method="POST">
-          <input type="hidden" name="total" value="{{ total }}" />
-          <script
-            src="https://checkout.stripe.com/checkout.js"
-            class="stripe-button"
-            data-key="{{ stripe_public_key }}"
-            data-amount="{{ total * 100 }}"
-            data-name="Mon Site"
-            data-description="Paiement"
-            data-currency="EUR"></script>
-        </form>
-      </div>
+        {% endfor %}
+        
+        <!-- Delivery Options -->
+        <div class="delivery-options">
+          <h2>Options de Livraison</h2>
+          <label>
+            <input type="radio" name="delivery" value="0" checked> Sans Livraison (0 EUR)
+          </label>
+          <label>
+            <input type="radio" name="delivery" value="5"> Livraison à Domicile (5 EUR)
+          </label>
+          <label>
+            <input type="radio" name="delivery" value="3"> Livraison Yalidine (3 EUR)
+          </label>
+        </div>
+
+        <!-- Address Input -->
+        <div class="address-input">
+          <h2>Adresse de Livraison</h2>
+          <textarea id="deliveryAddress" name="delivery_address" placeholder="Entrez votre adresse de livraison" required></textarea>
+        </div>
+
+        <!-- Updated Total -->
+        <div class="total">Total : <span id="total">{{ total }}</span> EUR</div>
+
+        <!-- Stripe Checkout Button -->
+        <div class="stripe-button">
+          <form action="{{ url_for('checkout') }}" method="POST">
+            <input type="hidden" name="total" id="stripeTotal" value="{{ total }}" />
+            <input type="hidden" name="delivery_option" id="deliveryOption" value="" />
+            <input type="hidden" name="delivery_cost" id="deliveryCost" value="0" />
+            <input type="hidden" name="delivery_address" id="deliveryAddressInput" value="" />
+            <script
+              src="https://checkout.stripe.com/checkout.js"
+              class="stripe-button"
+              data-key="{{ stripe_public_key }}"
+              data-amount="{{ (total + delivery_cost) * 100 }}"
+              data-name="Mon Site"
+              data-description="Paiement"
+              data-currency="EUR"></script>
+          </form>
+        </div>
+
+
+      {% else %}
+        <p>Votre panier est vide.</p>
+      {% endif %}
     </div>
+
+    <!-- JavaScript to Update Total and Address -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const deliveryOptions = document.querySelectorAll('input[name="delivery"]');
+        const totalElement = document.getElementById('total');
+        const stripeTotalInput = document.getElementById('stripeTotal');
+        const deliveryOptionInput = document.getElementById('deliveryOption');
+        const deliveryCostInput = document.getElementById('deliveryCost');
+        const deliveryAddressInput = document.getElementById('deliveryAddressInput');
+        const deliveryAddressTextarea = document.getElementById('deliveryAddress');
+        const baseTotal = parseFloat("{{ total }}"); // Base total without delivery cost
+      
+        // Initialize total display
+        totalElement.textContent = baseTotal.toFixed(2);
+        stripeTotalInput.value = baseTotal.toFixed(2);
+      
+        // Update delivery option and cost
+        deliveryOptions.forEach(option => {
+          option.addEventListener('change', function() {
+            const deliveryCost = parseFloat(this.value);
+            const newTotal = baseTotal + deliveryCost; // Display total with delivery cost
+            totalElement.textContent = newTotal.toFixed(2);
+            stripeTotalInput.value = baseTotal.toFixed(2); // Send base total to backend
+            deliveryOptionInput.value = this.nextSibling.textContent.trim(); // Set delivery option name
+            deliveryCostInput.value = deliveryCost.toFixed(2); // Set delivery cost
+          });
+        });
+      
+        // Update delivery address
+        deliveryAddressTextarea.addEventListener('input', function() {
+          deliveryAddressInput.value = this.value;
+        });
+      });
+    </script>
   </body>
 </html>

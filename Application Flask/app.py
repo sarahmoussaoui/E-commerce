@@ -224,23 +224,53 @@ def index_user():
 
 
 # Add Product to Cart
-@app.route("/add_to_cart/<int:product_id>/<int:quantity>")
+@app.route("/add_to_cart/<int:product_id>/<int:quantity>/<int:stock>")
 @login_required
-def add_to_cart(product_id, quantity):
+def add_to_cart(product_id, quantity, stock):
+    # Check if the quantity is valid (greater than 0 and less than or equal to stock)
+    if quantity > stock:
+        return jsonify(
+            {
+                "success": False,
+                "message": "The selected quantity is greater than the stock.",
+            }
+        )
+    elif quantity <= 0:
+        return jsonify(
+            {
+                "success": False,
+                "message": "Invalid quantity value.",
+            }
+        )
+    # Initialize the cart if it doesn't exist
     if "cart" not in session:
         session["cart"] = []
+
+    product_exists = False
 
     # Check if the product is already in the cart
     for item in session["cart"]:
         if item["product_id"] == product_id:
+            # Check if the updated quantity exceeds the stock
+            if item["quantity"] + quantity > stock:
+                return jsonify(
+                    {
+                        "success": False,
+                        "message": "The selected quantity is greater than the stock.",
+                    }
+                )
+
             item["quantity"] += quantity  # Update quantity if product exists
             session.modified = True
-            return redirect(url_for("index_user"))
+            product_exists = True
+            return jsonify({"success": True})
 
     # If the product is not in the cart, add it
-    session["cart"].append({"product_id": product_id, "quantity": quantity})
-    session.modified = True
-    return redirect(url_for("index_user"))
+    if not product_exists:
+        session["cart"].append({"product_id": product_id, "quantity": quantity})
+        session.modified = True
+
+    return jsonify({"success": True})
 
 
 @app.route("/cart")
@@ -269,13 +299,30 @@ def view_cart():
 
     conn.close()  # Close the database connection
 
-    # Render the cart template with the products and total price
+    # Ensure delivery_cost is defined in the template
     return render_template(
         "cart.html",
         products=products,
         total=total,
+        delivery_cost=0,  # Default value (to prevent UndefinedError)
         stripe_public_key=stripe_public_key,
     )
+
+
+@app.route("/remove_from_cart", methods=["POST"])
+@login_required
+def remove_from_cart():
+    product_id = int(request.form.get("product_id"))  # Get the product ID from the form
+    cart = session.get("cart", [])  # Retrieve the cart from the session
+
+    # Find and remove the product from the cart
+    updated_cart = [item for item in cart if item["product_id"] != product_id]
+
+    # Update the session's cart
+    session["cart"] = updated_cart
+
+    # Redirect back to the cart page
+    return redirect(url_for("view_cart"))
 
 
 @app.route("/product/<int:product_id>")
@@ -295,15 +342,26 @@ def product_detail(product_id):
 @login_required
 def checkout():
     try:
-        total = request.form.get("total", "0")
-        total = float(total) * 100  # Convert to cents
+        # Get the base total (without delivery cost) from the form
+        base_total = request.form.get("total", "0")
+        base_total = float(base_total) * 100  # Convert to cents
 
-        if total < 1:
+        # Get delivery details from the form
+        delivery_option = request.form.get("delivery_option", "Sans Livraison")
+        delivery_cost = request.form.get("delivery_cost", "0")
+        delivery_cost = float(delivery_cost) * 100  # Convert to cents
+        delivery_address = request.form.get("delivery_address", "")
+
+        # Calculate the final total (base total + delivery cost)
+        final_total = base_total + delivery_cost
+
+        # Ensure the final total is valid
+        if final_total < 1:
             return "Error: Amount must be greater than 0.", 400
 
-        # Process payment
+        # Process payment with Stripe
         charge = stripe.Charge.create(
-            amount=int(total),
+            amount=int(final_total),  # Use the final total (base + delivery)
             currency="eur",
             description="Payment",
             source=request.form.get("stripeToken"),
@@ -311,20 +369,67 @@ def checkout():
 
         if charge["paid"]:  # Payment successful
             conn = get_db()
+            cursor = conn.cursor()
             cart = session.get("cart", [])
 
-            # Update stock for each product in the cart
+            # Step 1: Insert into `commande` (order-level details)
+            cursor.execute(
+                """
+                INSERT INTO commande (user_id, address, delivery_option, delivery_cost, total_amount, status)
+                VALUES (?, ?, ?, ?, ?, 'pending')
+                """,
+                (
+                    current_user.get_id(),
+                    delivery_address,
+                    delivery_option,
+                    delivery_cost / 100,  # Convert back to EUR
+                    final_total / 100,  # Convert back to EUR
+                ),
+            )
+            commande_id = cursor.lastrowid  # Get the last inserted commande ID
+
+            # Step 2: Insert each product into `commande_items`
             for item in cart:
-                conn.execute(
-                    "UPDATE products SET stock = stock - ? WHERE id = ? AND stock > ?",
-                    (item["quantity"], item["product_id"], item["quantity"] - 1),
+                # Get the product's price to store historical data
+                cursor.execute(
+                    "SELECT price FROM products WHERE id = ?", (item["product_id"],)
+                )
+                product = cursor.fetchone()
+                if not product:
+                    continue  # Skip if product doesn't exist (edge case)
+
+                price_per_unit = product[0]
+
+                cursor.execute(
+                    """
+                    INSERT INTO commande_items (commande_id, product_id, quantity, price_per_unit)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (
+                        commande_id,
+                        item["product_id"],
+                        item["quantity"],
+                        price_per_unit,
+                    ),
+                )
+
+                # Step 3: Update stock for each product
+                cursor.execute(
+                    """
+                    UPDATE products 
+                    SET stock = stock - ? 
+                    WHERE id = ? AND stock >= ?
+                    """,
+                    (item["quantity"], item["product_id"], item["quantity"]),
                 )
 
             conn.commit()
             conn.close()
 
-            # Generate invoice and clear cart
-            session["invoice"] = generate_invoice(cart, total)
+            # Step 4: Generate invoice & clear cart
+            session["invoice"] = generate_invoice(
+                cart, final_total, delivery_option, delivery_cost
+            )
             session["cart"] = []
 
             return redirect(url_for("invoice"))
@@ -363,7 +468,7 @@ def download_invoice():
     )
 
 
-def generate_invoice(cart, total):
+def generate_invoice(cart, total, delivery_option, delivery_cost):
     # Ensure 'invoices' folder exists
     invoices_folder = "invoices"
     if not os.path.exists(invoices_folder):
@@ -431,6 +536,9 @@ def generate_invoice(cart, total):
                 ]
             )
     conn.close()
+
+    # Add Delivery Option to the Table
+    data.append(["Livraison", "", "", f"{delivery_cost / 100:.2f} EUR"])
 
     # Create the table
     table = Table(data)
@@ -810,58 +918,90 @@ def admin_messages():
     return render_template("admin_messages.html", messages=messages_list)
 
 
-@app.route("/encheres")
-@login_required
-def encher_user():
-    conn = get_db()
-    encheres = conn.execute("SELECT * FROM enchere").fetchall()
-    conn.close()
-    encheres = [dict(enchere) for enchere in encheres]
-    return render_template("encher_user.html", encheres=encheres)
+@app.route("/admin/orders")
+def admin_orders():
+    cursor = get_db()
+
+    # Fetch all orders with user and product information
+    orders = cursor.execute(
+        """
+        SELECT 
+            commande.id as order_id, 
+            commande.user_id, 
+            users.FirstName, 
+            users.LastName, 
+            users.Email, 
+            commande.address, 
+            commande.delivery_option, 
+            commande.delivery_cost, 
+            commande.total_amount, 
+            commande.order_date, 
+            commande.status,
+            commande_items.product_id,
+            products.name as product_name,
+            commande_items.quantity,
+            commande_items.price_per_unit
+        FROM commande
+        JOIN users ON commande.user_id = users.id
+        JOIN commande_items ON commande.id = commande_items.commande_id
+        JOIN products ON commande_items.product_id = products.id
+        """
+    ).fetchall()  # Use .fetchall() instead of .fetchone()
+
+    cursor.close()
+
+    # Organize orders by order_id
+    orders_dict = {}
+    for order in orders:
+        order_id = order["order_id"]
+        if order_id not in orders_dict:
+            orders_dict[order_id] = {
+                "user_id": order["user_id"],
+                "FirstName": order["FirstName"],
+                "LastName": order["LastName"],
+                "Email": order["Email"],
+                "address": order["address"],
+                "delivery_option": order["delivery_option"],
+                "delivery_cost": order["delivery_cost"],
+                "total_amount": order["total_amount"],
+                "order_date": order["order_date"],
+                "status": order["status"],
+                "order_items": [],  # Renamed to avoid conflict with dict.items()
+            }
+        orders_dict[order_id]["order_items"].append(
+            {
+                "product_id": order["product_id"],
+                "product_name": order["product_name"],
+                "quantity": order["quantity"],
+                "price_per_unit": order["price_per_unit"],
+            }
+        )
+    print(orders_dict)  # Add this before returning the template
+
+    return render_template("admin_orders.html", orders=orders_dict)
 
 
-
-@app.route("/enchere/<int:enchere_id>")
-@login_required
-def enchere_detail(enchere_id):
-    db = get_db()
-    enchere = db.execute("SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)).fetchone()
-    if not enchere:
-        return "Enchère non trouvée", 404
-    return render_template("enchere_detail.html", enchere=enchere, user=current_user)
-
-
-@app.route('/ajouter_enchere', methods=['POST'])
-def ajouter_enchere():
-    data = request.json
-    id_enchere = data.get('id_enchere')
-    prix = data.get('prix')
-    nom = data.get('nom')
-    email = data.get('email')
-    
-
-    conn = sqlite3.connect('database.db')
+@app.route("/admin/update_order_status/<int:order_id>", methods=["POST"])
+def update_order_status(order_id):
+    new_status = request.form["status"]
+    conn = conn = get_db()
     cursor = conn.cursor()
 
-    # Récupérer l'utilisateur basé sur l'email
-    cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
-    user = cursor.fetchone()
-    
-    if user:
-        id_user = user[0]
-    else:
-        return jsonify({"message": "Utilisateur non trouvé"}), 400
-
-    # Insérer l'enchère dans la table historique_enchere
+    # Update the order status
     cursor.execute(
-        "INSERT INTO historique_enchere (id_enchere, id_user, proposed_price) VALUES (?, ?, ?)",
-        (id_enchere, id_user, prix)
+        """
+        UPDATE commande
+        SET status = ?
+        WHERE id = ?
+    """,
+        (new_status, order_id),
     )
 
     conn.commit()
     conn.close()
-
-    return jsonify({"message": "Votre enchère a été enregistrée avec succès!"})
+    
+    flash("Order status updated successfully!", "success")
+    return redirect(url_for("admin_orders"))
 
 @app.route("/encherir", methods=["POST"])
 def encherir():
@@ -928,7 +1068,122 @@ def historique_encheres():
     return render_template("historique_encheres.html", historique=historique)
 
 
-# add_sample_products()
+@app.route("/encheres")
+@login_required
+def encher_user():
+    conn = get_db()
+    encheres = conn.execute("SELECT * FROM enchere").fetchall()
+    conn.close()
+    encheres = [dict(enchere) for enchere in encheres]
+    return render_template("encher_user.html", encheres=encheres)
 
+
+
+@app.route("/enchere/<int:enchere_id>")
+@login_required
+def enchere_detail(enchere_id):
+    db = get_db()
+    enchere = db.execute("SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)).fetchone()
+    if not enchere:
+        return "Enchère non trouvée", 404
+    return render_template("enchere_detail.html", enchere=enchere, user=current_user)
+
+
+@app.route('/ajouter_enchere', methods=['POST'])
+def ajouter_enchere():
+    data = request.json
+    id_enchere = data.get('id_enchere')
+    prix = data.get('prix')
+    nom = data.get('nom')
+    email = data.get('email')
+    
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    # Récupérer l'utilisateur basé sur l'email
+    cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+    user = cursor.fetchone()
+    
+    if user:
+        id_user = user[0]
+    else:
+        return jsonify({"message": "Utilisateur non trouvé"}), 400
+
+    # Insérer l'enchère dans la table historique_enchere
+    cursor.execute(
+        "INSERT INTO historique_enchere (id_enchere, id_user, proposed_price) VALUES (?, ?, ?)",
+        (id_enchere, id_user, prix)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Votre enchère a été enregistrée avec succès!"})
+
+# @app.route("/encherir", methods=["POST"])
+# def encherir():
+#     try:
+#         data = request.json
+#         enchere_id = data.get("id_enchere")
+#         prix = data.get("prix")
+#         first_name = data.get("firstName")
+#         last_name = data.get("lastName")
+#         email = data.get("email")
+#         phone = data.get("phone")
+
+#         db = get_db()
+#         cursor = db.cursor()
+
+#         # Vérifier si l'utilisateur existe déjà
+#         cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+#         user = cursor.fetchone()
+
+#         if not user:
+#             return jsonify({"message": "Utilisateur non trouvé"}), 400
+
+#         user_id = user["id"]
+
+#         # Enregistrer l'enchère dans historique_enchere
+#         cursor.execute(
+#             """
+#             INSERT INTO historique_enchere (id_enchere, id_user, proposed_price)
+#             VALUES (?, ?, ?)
+#             """,
+#             (enchere_id, user_id, prix),
+#         )
+#         db.commit()
+
+#         return jsonify({"message": "Enchère enregistrée avec succès !"})
+
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+# @app.route("/admin/historique_encheres", methods=["GET"])
+# def historique_encheres():
+#     conn = get_db()
+#     cursor = conn.cursor()
+    
+#     # SQL Query to join historique_enchere, enchere, and users tables
+#     cursor.execute("""
+#         SELECT 
+#             e.image_url, 
+#             e.name AS enchere_name, 
+#             e.date_fin, 
+#             u.FirstName || ' ' || u.LastName AS user_full_name, 
+#             u.phoneNum,
+#             h.proposed_price,
+#             e.etat
+#         FROM historique_enchere h
+#         JOIN enchere e ON h.id_enchere = e.id_enchere
+#         JOIN users u ON h.id_user = u.id
+#         ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
+#     """)
+    
+#     historique = cursor.fetchall()
+#     conn.close()
+
+#     return render_template("historique_encheres.html", historique=historique)
+    
 if __name__ == "__main__":
     app.run(debug=True)
