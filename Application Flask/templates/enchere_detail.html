@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Détails de l'Enchère</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='encher_user.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_enchere.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navbar">
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            <img
+              src="{{ url_for('static', filename='img/logout.png') }}"
+              alt="Logout" />
+          </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('about_us') }}">About us</a></li>
+            <li><a href="{{ url_for('index_user') }}">Products</a></li>
+            <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
+            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Wrapper principal -->
+    <div class="enchere-wrapper">
+        <!-- Image et description -->
+        <div class="enchere-left">
+            <div class="enchere-image-box">
+                <img src="{{ url_for('static', filename=enchere.image_url) }}" alt="{{ enchere.name }}" />
+            </div>
+            
+        </div>
+
+        <!-- Détails de l'enchère -->
+        <div class="enchere-info-box">
+            <h1>{{ enchere.name }}</h1>
+            <div class="info-container">
+            <p class="titre"><strong>Prix de départ </strong> {{ enchere.prix }} EUR</p>
+            <p class="titre"><strong>Fin de l'enchère </strong> {{ enchere.date_fin }}</p></div>
+            <p style="text-align: left;"><strong>📍</strong> {{ enchere.adresse }}</p>
+            <p class="enchere-description"><strong>Description :</strong> {{ enchere.description }}</p>
+            
+            <a href="#" class="encherir-btn" onclick="openModal('modalConfirmation')">Enchérir</a>
+        </div>
+    </div>
+
+    <!-- Fenêtre Modale : Confirmation des informations utilisateur -->
+    <div id="modalConfirmation" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modalConfirmation')">&times;</span>
+            <h2>Placer votre enchère</h2>
+            <form id="confirmationForm">
+                <label for="firstName">FirstName:</label>
+                <input type="text" id="firstName" required value="{{ user['FirstName'] if user is defined and user['FirstName'] else 'TestPrenom' }}" readonly disabled>
+
+                <label for="lastName">LastName :</label>
+                <input type="text" id="lastName" required value="{{ user.LastName if user is defined else '' }}" readonly disabled>
+
+                <label for="email">Email :</label>
+                <input type="email" id="email" required value="{{ user.Email if user is defined else '' }}" readonly disabled>
+
+                <label for="phone">Phone number :</label>
+                <input type="tel" id="phone" required value="{{ user.phoneNum if user is defined else '' }}" readonly disabled>
+
+                <label for="proposed_price_confirm">Proposed Price (€):</label>
+                <input type="number" id="proposed_price_confirm" required min="{{ enchere.prix }}" step="0.01" onblur="checkPrice(this)">
+                
+                <button type="button" class="btn-confirmer" onclick="openModal('modalConfirmFinal')">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fenêtre Modale : Confirmation finale -->
+    <div id="modalConfirmFinal" class="modal">
+        <div class="modal-content">
+            <h2>Confirmez-vous votre enchère ?</h2>
+            <p>Votre enchère de <strong><span id="confirmPrice"></span> €</strong> sera soumise.</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm" onclick="submitBid()">Confirmer</button>
+                <button class="btn-cancel" onclick="closeModal('modalConfirmFinal')">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript pour gérer les modales et l'enchère -->
+    <script>
+        function openModal(id) {
+            if (id === 'modalConfirmFinal') {
+                let proposedPriceConfirmInput = document.getElementById("proposed_price_confirm");
+                let confirmedPriceValue = parseFloat(proposedPriceConfirmInput.value);
+                let minConfirmedPrice = parseFloat(proposedPriceConfirmInput.min);
+
+                if (isNaN(confirmedPriceValue) || confirmedPriceValue < minConfirmedPrice) {
+                    alert("❌ Le prix proposé ne peut pas être inférieur à " + minConfirmedPrice + " EUR.");
+                    return; // Bloque l'affichage du modal si le prix est invalide
+                }
+
+                document.getElementById("confirmPrice").innerText = confirmedPriceValue;
+            }
+            document.getElementById(id).classList.add("show");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove("show");
+        }
+
+        function checkPrice(input) {
+            let minPrice = parseFloat(input.min);
+            let enteredPrice = parseFloat(input.value);
+
+            if (isNaN(enteredPrice) || enteredPrice < minPrice) {
+                alert("⚠️ Veuillez entrer un prix supérieur ou égal à " + minPrice + " EUR.");
+                input.value = ""; // Vide le champ pour forcer l'utilisateur à entrer un prix valide
+            }
+        }
+
+        function submitBid() {
+            let proposedPriceConfirmInput = document.getElementById("proposed_price_confirm");
+            let confirmedPriceValue = parseFloat(proposedPriceConfirmInput.value);
+            let minConfirmedPrice = parseFloat(proposedPriceConfirmInput.min);
+
+            if (isNaN(confirmedPriceValue) || confirmedPriceValue < minConfirmedPrice) {
+                alert("Le prix confirmé ne peut pas être inférieur à " + minConfirmedPrice + " EUR.");
+                return;
+            }
+
+            let enchereId = "{{ enchere.id_enchere }}";
+            let firstName = document.getElementById('firstName').value;
+            let lastName = document.getElementById('lastName').value;
+            let email = document.getElementById('email').value;
+            let phone = document.getElementById('phone').value;
+
+            fetch('/encherir', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id_enchere: enchereId,
+                    prix: confirmedPriceValue,
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Erreur : " + data.error);
+                } else {
+                    alert("✅ Enchère enregistrée avec succès !");
+                    closeModal('modalConfirmFinal');
+                    closeModal('modalConfirmation');
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error("Erreur:", error);
+                alert("❌ Une erreur est survenue. Veuillez réessayer.");
+            });
+        }
+    </script>
+
+</body>
+</html>

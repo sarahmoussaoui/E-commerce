@@ -1,0 +1,91 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Management</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='admin_products.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
+      <ul class="nav-links">
+        <li>
+          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+        </li>
+
+        <li><a href="{{ url_for('historique_encheres') }}">Commandes</a></li>
+        <!-- must change to historique_commandes later -->
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
+    </nav>
+    <h1>Product List</h1>
+
+    <a href="{{ url_for('add_product') }}"><button>Add Product</button></a>
+
+    <div class="product-container">
+      {% for product in products %}
+      <div class="product-card">
+        <img
+          src="{{ url_for('static', filename= product.image_url ) }}"
+          alt="{{ product.name }}" />
+        <h3>{{ product.name }}</h3>
+        <p>Price: ${{ product.price }}</p>
+        <p>Stock: {{ product.stock }}</p>
+        <div class="product-actions">
+          <a href="{{ url_for('update_product', product_id=product.id) }}">
+            <button class="update-btn">Update</button>
+          </a>
+
+          <!-- Delete Button triggers the modal -->
+          <button
+            type="button"
+            class="delete-btn"
+            onclick="document.getElementById('delete-modal-{{ product.id }}').showModal();">
+            Delete
+          </button>
+
+          <!-- Delete Confirmation Modal -->
+          <dialog id="delete-modal-{{ product.id }}" class="delete-modal">
+            <form
+              method="POST"
+              action="{{ url_for('delete_product', product_id=product.id) }}">
+              <h2>Confirm Deletion</h2>
+              <p>
+                Are you sure you want to delete "<strong
+                  >{{ product.name }}</strong
+                >"?
+              </p>
+              <div class="modal-buttons">
+                <button type="submit" class="confirm-delete">
+                  Yes, Delete
+                </button>
+                <button
+                  type="button"
+                  onclick="this.closest('dialog').close();"
+                  class="cancel-delete">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </dialog>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </body>
+</html>

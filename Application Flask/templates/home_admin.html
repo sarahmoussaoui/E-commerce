@@ -1,47 +1,84 @@
+<!-- @format -->
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='home_admin.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
     <nav class="navbar">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
-        </div>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('index_admin') }}">Produits</a></li>
-            <li><a href="">Enchers</a></li>
-            <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
-            <li><a href="{{ url_for('admin_orders') }}">Orders</a></li> <!-- Added Admin Orders link -->
-        </ul>
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
+      <ul class="nav-links">
+        <li>
+          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+        </li>
+
+        <li><a href="{{ url_for('historique_encheres') }}">Commandes</a></li>
+        <!-- must change to historique_commandes later -->
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
     </nav>
-    <h1>Product List</h1>
 
-    <a href="{{ url_for('add_product') }}"><button>Add Product</button></a>
-
-    <div class="product-container">
-        {% for product in products %}
-        <div class="product-card">
-            <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" />
-            <h3>{{ product.name }}</h3>
-            <p>Price: ${{ product.price }}</p>
-            <p>Stock: {{ product.stock }}</p>
-            <div class="product-actions">
-                <a href="{{ url_for('update_product', product_id=product.id) }}">
-                    <button class="update-btn">Update</button>
-                </a>
-                <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST" class="delete-form">
-                    <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this product?')">Delete</button>
-                </form>
-            </div>
-            
-            
+    <div class="admin-dashboard">
+      <h1>Admin Dashboard</h1>
+      <div class="managment-container">
+        <div class="managment-card">
+          <img
+            src="{{ url_for('static', filename='img/product_managment.jpg') }}"
+            alt="Product Management" />
+          <a href="{{ url_for('gestion_produits') }}">
+            <button class="dashboard-btn">Products</button>
+          </a>
         </div>
-        {% endfor %}
+        <div class="managment-card">
+          <img
+            src="{{ url_for('static', filename='img/enchere_managment.jpg') }}"
+            alt="Enchère Management" />
+          <a href="{{ url_for('gestion_encheres') }}">
+            <button class="dashboard-btn">Produits Enchères</button>
+          </a>
+        </div>
+        <div class="managment-card">
+          <img
+            src="{{ url_for('static', filename='img/messages_managment.jpg') }}"
+            alt="Messages Management" />
+          <a href="{{ url_for('admin_messages') }}">
+            <button class="dashboard-btn">Messages</button>
+          </a>
+        </div>
+        <div class="managment-card">
+          <img
+            src="{{ url_for('static', filename='img/historique_encheres.jpg') }}"
+            alt="Encheres Historique Management" />
+          <a href="{{ url_for('historique_encheres') }}">
+            <button class="dashboard-btn">Historique Enchères</button>
+          </a>
+        </div>
+
+        <div class="managment-card">
+          <img
+            src="{{ url_for('static', filename='img/historique_commandes.jpg') }}"
+            alt="Historique Commandes Management" />
+          <a href="{{ url_for('historique_encheres') }}">
+            <button class="dashboard-btn">Historique Commandes</button>
+          </a>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>

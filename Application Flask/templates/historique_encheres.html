@@ -1,0 +1,74 @@
+<!-- @format -->
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Historique des Enchères</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='admin_enchere.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
+      <ul class="nav-links">
+        <li>
+          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+        </li>
+
+        <li><a href="{{ url_for('historique_encheres') }}">Commandes</a></li>
+        <!-- must change to historique_commandes later -->
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
+    </nav>
+    <h1>Historique des Enchères</h1>
+
+    <div class="table-container">
+      <table class="historique-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Nom de l'Enchère</th>
+            <th>Utilisateur</th>
+            <th>Numéro de Téléphone</th>
+            <th>Prix Proposé</th>
+            <th>Date de Fin</th>
+            <th>Etat Enchère</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in historique %}
+          <tr>
+            <td>
+              <img
+                src="{{ url_for('static', filename=item.image_url) }}"
+                alt="{{ item.enchere_name }}" />
+            </td>
+            <td>{{ item.enchere_name }}</td>
+            <td>{{ item.user_full_name }}</td>
+            <td>{{ item.phoneNum }}</td>
+            <td>{{ item.proposed_price}}</td>
+            <td>{{ item.date_fin }}</td>
+            <td>{{item.etat}}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5">Aucun historique disponible.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

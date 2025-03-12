@@ -179,9 +179,9 @@ def login():
 
             # Redirect admin (id = 0) to index_admin, others to index
             if user["is_admin"] == 1:
-                return redirect(url_for("index_admin"))
+                return redirect(url_for("home_admin"))
             else:
-                return redirect(url_for("index_user"))
+                return redirect(url_for("about_us"))
 
         flash("Invalid email or password", "danger")
 
@@ -196,6 +196,12 @@ def logout():
     print("Session after logout:", session)
     flash("Logged out successfully!", "info")
     return redirect(url_for("login"))
+
+
+@app.route("/home_admin")
+@login_required
+def home_admin():
+    return render_template("home_admin.html")
 
 
 # Home Page: Display Products
@@ -213,6 +219,8 @@ def index_user():
     conn.close()
     products = [dict(product) for product in products]
     return render_template("index.html", products=products)
+
+
 
 
 # Add Product to Cart
@@ -563,13 +571,13 @@ def generate_invoice(cart, total, delivery_option, delivery_cost):
 
 
 # Home Page: Display Products
-@app.route("/home_admin")
+@app.route("/gestion_produits")
 @login_required
-def index_admin():
+def gestion_produits():
     conn = get_db()
     products = conn.execute("SELECT * FROM products").fetchall()
     conn.close()
-    return render_template("home_admin.html", products=products)
+    return render_template("gestion_produits.html", products=products)
 
 
 # Add Product Page
@@ -591,7 +599,7 @@ def add_product():
         conn.close()
 
         flash("Product added successfully!", "success")
-        return redirect(url_for("index_admin"))
+        return redirect(url_for("gestion_produits"))
 
     return render_template("add_product.html")
 
@@ -619,7 +627,7 @@ def update_product(product_id):
         conn.close()
 
         flash("Product updated successfully!", "success")
-        return redirect(url_for("index_admin"))
+        return redirect(url_for("gestion_produits"))
 
     return render_template("update_product.html", product=product)
 
@@ -634,7 +642,109 @@ def delete_product(product_id):
     conn.close()
 
     flash("Product deleted successfully!", "danger")
-    return redirect(url_for("index_admin"))
+    return redirect(url_for("gestion_produits"))
+
+
+#  Encheres
+
+
+@app.route("/gestion_encheres")
+@login_required
+def gestion_encheres():
+    conn = get_db()
+    encheres = conn.execute("SELECT * FROM enchere").fetchall()
+    conn.close()
+    return render_template("gestion_encheres.html", encheres=encheres)
+
+
+
+@app.route("/add_enchere", methods=["GET", "POST"])
+@login_required
+def add_enchere():
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        image_url = request.form["image_url"]
+        prix = float(request.form["prix"])
+        date_fin = request.form["date_fin"]
+        adresse = request.form["adresse"]
+
+        conn = get_db()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "INSERT INTO enchere (name, description, image_url, prix, date_fin,adresse) VALUES (?, ?, ?, ?, ?,?)",
+            (name, description, image_url, prix, date_fin,adresse),
+        )
+        conn.commit()
+        conn.close()
+
+        flash("Auction created successfully!", "success")
+        return redirect(url_for("gestion_encheres"))
+
+    return render_template("add_enchere.html")
+
+
+@app.route("/update_enchere/<int:enchere_id>", methods=["GET", "POST"])
+@login_required
+def update_enchere(enchere_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # Fetch the auction details
+    enchere = cursor.execute(
+        "SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)
+    ).fetchone()
+
+    if not enchere:
+        flash("Auction not found!", "danger")
+        return redirect(url_for("gestion_encheres"))
+
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        image_url = request.form["image_url"]
+        prix = float(request.form["prix"])
+        date_fin = request.form["date_fin"]
+        adresse = request.form["adresse"]
+
+        cursor.execute(
+            """
+            UPDATE enchere 
+            SET name=?, description=?, image_url=?, prix=?, date_fin=?,adresse=?
+            WHERE id_enchere=?
+            """,
+            (name, description, image_url, prix, date_fin, enchere_id,adresse),
+        )
+        conn.commit()
+        conn.close()
+
+        flash("Auction updated successfully!", "success")
+        return redirect(url_for("gestion_encheres"))
+
+    return render_template("update_enchere.html", enchere=enchere)
+
+
+@app.route("/delete_enchere/<int:enchere_id>", methods=["POST"])
+@login_required
+def delete_enchere(enchere_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Delete bids associated with this auction first
+    cursor.execute("DELETE FROM historique_enchere WHERE id_enchere = ?", (enchere_id,))
+    
+    # Then delete the auction itself
+    cursor.execute("DELETE FROM enchere WHERE id_enchere = ?", (enchere_id,))
+
+    conn.commit()
+    conn.close()
+
+    flash("Auction deleted successfully!", "danger")
+    return redirect(url_for("gestion_encheres"))
+
+
+
 
 
 @app.route("/aboutus")
@@ -645,6 +755,8 @@ def about_us():
 @app.route("/contactus")
 def contact_us():
     return render_template("contact_us.html")
+
+
 
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -787,7 +899,7 @@ def admin_messages():
     cursor.execute(query, params)
     messages = cursor.fetchall()
     conn.close()
-
+   
     # Convert the result to a list of dictionaries
     messages_list = [
         {
@@ -887,10 +999,191 @@ def update_order_status(order_id):
 
     conn.commit()
     conn.close()
-
+    
     flash("Order status updated successfully!", "success")
     return redirect(url_for("admin_orders"))
 
+@app.route("/encherir", methods=["POST"])
+def encherir():
+    try:
+        data = request.json
+        enchere_id = data.get("id_enchere")
+        prix = data.get("prix")
+        first_name = data.get("firstName")
+        last_name = data.get("lastName")
+        email = data.get("email")
+        phone = data.get("phone")
 
+        db = get_db()
+        cursor = db.cursor()
+
+        # Vérifier si l'utilisateur existe déjà
+        cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"message": "Utilisateur non trouvé"}), 400
+
+        user_id = user["id"]
+
+        # Enregistrer l'enchère dans historique_enchere
+        cursor.execute(
+            """
+            INSERT INTO historique_enchere (id_enchere, id_user, proposed_price)
+            VALUES (?, ?, ?)
+            """,
+            (enchere_id, user_id, prix),
+        )
+        db.commit()
+
+        return jsonify({"message": "Enchère enregistrée avec succès !"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/admin/historique_encheres", methods=["GET"])
+def historique_encheres():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # SQL Query to join historique_enchere, enchere, and users tables
+    cursor.execute("""
+        SELECT 
+            e.image_url, 
+            e.name AS enchere_name, 
+            e.date_fin, 
+            u.FirstName || ' ' || u.LastName AS user_full_name, 
+            u.phoneNum,
+            h.proposed_price,
+            e.etat
+        FROM historique_enchere h
+        JOIN enchere e ON h.id_enchere = e.id_enchere
+        JOIN users u ON h.id_user = u.id
+        ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
+    """)
+    
+    historique = cursor.fetchall()
+    conn.close()
+
+    return render_template("historique_encheres.html", historique=historique)
+
+
+@app.route("/encheres")
+@login_required
+def encher_user():
+    conn = get_db()
+    encheres = conn.execute("SELECT * FROM enchere").fetchall()
+    conn.close()
+    encheres = [dict(enchere) for enchere in encheres]
+    return render_template("encher_user.html", encheres=encheres)
+
+
+
+@app.route("/enchere/<int:enchere_id>")
+@login_required
+def enchere_detail(enchere_id):
+    db = get_db()
+    enchere = db.execute("SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)).fetchone()
+    if not enchere:
+        return "Enchère non trouvée", 404
+    return render_template("enchere_detail.html", enchere=enchere, user=current_user)
+
+
+@app.route('/ajouter_enchere', methods=['POST'])
+def ajouter_enchere():
+    data = request.json
+    id_enchere = data.get('id_enchere')
+    prix = data.get('prix')
+    nom = data.get('nom')
+    email = data.get('email')
+    
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    # Récupérer l'utilisateur basé sur l'email
+    cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+    user = cursor.fetchone()
+    
+    if user:
+        id_user = user[0]
+    else:
+        return jsonify({"message": "Utilisateur non trouvé"}), 400
+
+    # Insérer l'enchère dans la table historique_enchere
+    cursor.execute(
+        "INSERT INTO historique_enchere (id_enchere, id_user, proposed_price) VALUES (?, ?, ?)",
+        (id_enchere, id_user, prix)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": "Votre enchère a été enregistrée avec succès!"})
+
+@app.route("/encherir", methods=["POST"])
+def encherir():
+    try:
+        data = request.json
+        enchere_id = data.get("id_enchere")
+        prix = data.get("prix")
+        first_name = data.get("firstName")
+        last_name = data.get("lastName")
+        email = data.get("email")
+        phone = data.get("phone")
+
+        db = get_db()
+        cursor = db.cursor()
+
+        # Vérifier si l'utilisateur existe déjà
+        cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({"message": "Utilisateur non trouvé"}), 400
+
+        user_id = user["id"]
+
+        # Enregistrer l'enchère dans historique_enchere
+        cursor.execute(
+            """
+            INSERT INTO historique_enchere (id_enchere, id_user, proposed_price)
+            VALUES (?, ?, ?)
+            """,
+            (enchere_id, user_id, prix),
+        )
+        db.commit()
+
+        return jsonify({"message": "Enchère enregistrée avec succès !"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/admin/historique_encheres", methods=["GET"])
+def historique_encheres():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # SQL Query to join historique_enchere, enchere, and users tables
+    cursor.execute("""
+        SELECT 
+            e.image_url, 
+            e.name AS enchere_name, 
+            e.date_fin, 
+            u.FirstName || ' ' || u.LastName AS user_full_name, 
+            u.phoneNum,
+            h.proposed_price,
+            e.etat
+        FROM historique_enchere h
+        JOIN enchere e ON h.id_enchere = e.id_enchere
+        JOIN users u ON h.id_user = u.id
+        ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
+    """)
+    
+    historique = cursor.fetchall()
+    conn.close()
+
+    return render_template("historique_encheres.html", historique=historique)
+    
 if __name__ == "__main__":
     app.run(debug=True)

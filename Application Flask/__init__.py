@@ -5,6 +5,7 @@ import posixpath
 import shutil
 import subprocess
 import os
+from datetime import datetime, timedelta
 
 
 # Step 1: Drop tables if they exist
@@ -46,21 +47,36 @@ def init_db():
             name TEXT NOT NULL,
             price REAL NOT NULL,
             stock INTEGER NOT NULL,
-            image_url TEXT, 
-            is_vintage INTEGER NOT NULL DEFAULT 0 CHECK(is_vintage IN (0,1))  
+            image_url TEXT
         )
         """
     )
-    # Create products Enchere
+    # Create historique Enchere
+    cursor.execute( 
+        """
+        CREATE TABLE IF NOT EXISTS historique_enchere (
+            id_enchere INTEGER NOT NULL,
+            id_user INTEGER,
+            proposed_price REAL NOT NULL,
+            FOREIGN KEY (id_user) REFERENCES users(id),
+            FOREIGN KEY (id_enchere) REFERENCES enchere(id),
+            PRIMARY KEY (id_enchere, id_user, proposed_price)
+            
+        )
+        """
+    )
+    # Create enchere table
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS enchere (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_user INTEGER,
-            id_product INTEGER,
-            price REAL NOT NULL,
-            FOREIGN KEY (id_user) REFERENCES users(id),
-            FOREIGN KEY (id_product) REFERENCES products(id)
+            id_enchere INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            etat TEXT NOT NULL DEFAULT 'En cours',
+            description TEXT NOT NULL,
+            image_url TEXT, 
+            prix REAL NOT NULL,
+            date_fin DATE NOT NULL,
+            adresse TEXT NOT NULL
         )
         """
     )
@@ -159,6 +175,38 @@ def insert_products():
     conn.commit()
     conn.close()
 
+# Step : insert encheres from database
+def insert_encheres():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Répertoire contenant les images des enchères
+    image_dir = "./static/encheres_img/"
+
+    # Récupérer tous les fichiers image dans le dossier
+    image_files = [
+        f for f in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, f))
+    ]
+    
+    for image in image_files:
+        name = os.path.splitext(image)[0]  # Utiliser le nom du fichier comme nom de l'enchère
+        description = f" {name} "  # Générer une description
+        prix = round(random.uniform(500, 6000), 2)  # Prix aléatoire entre 500 et 6000
+        date_fin = (datetime.now() + timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d")  # Date de fin aléatoire dans les 30 jours suivants
+        image_url = posixpath.join("encheres_img", image)  # Stocker le chemin relatif de l'image
+        adresse  = f"{random.randint(1, 200)} Rue de l'Antiquité, 75000 Paris, France" #adresse aleatoire 
+
+        cursor.execute(
+            """
+            INSERT INTO enchere (name, description, image_url, prix, date_fin,adresse)
+            VALUES (?, ?, ?, ?, ?,?)
+            """,
+            (name, description, image_url, prix, date_fin,adresse),
+        )
+
+    conn.commit()
+    conn.close()
+
 
 # Step 6: Create admin user
 def create_admin():
@@ -181,48 +229,11 @@ def create_admin():
     conn.close()
 
 
-# Step 7: Create virtual environment and install dependencies
-def setup_venv():
-    venv_dir = "venv"
-
-    # Step 1: Delete the existing virtual environment if it exists
-    if os.path.exists(venv_dir):
-        print(f"Deleting existing virtual environment at {venv_dir}...")
-        shutil.rmtree(venv_dir)
-        print(f"Deleted {venv_dir}.")
-
-    # Step 2: Create a new virtual environment
-    print("Creating a new virtual environment...")
-    subprocess.run(["python", "-m", "venv", venv_dir], check=True)
-    print(f"Virtual environment created at {venv_dir}.")
-
-    # Step 3: Install dependencies in the virtual environment
-    if os.name == "nt":  # Windows
-        pip_path = os.path.join(venv_dir, "Scripts", "pip")
-    else:  # Unix or MacOS
-        pip_path = os.path.join(venv_dir, "bin", "pip")
-
-    print("Installing dependencies...")
-    subprocess.run([pip_path, "install", "-r", "requirements.txt"], check=True)
-    print("Dependencies installed in the virtual environment.")
-
-    # Step 4: Print instructions to activate the virtual environment
-    if os.name == "nt":  # Windows
-        activate_script = os.path.join(venv_dir, "Scripts", "activate")
-        print(
-            f"\nTo activate the virtual environment, run the following command:\n{activate_script}"
-        )
-    else:  # Unix or MacOS
-        activate_script = os.path.join(venv_dir, "bin", "activate")
-        print(
-            f"\nTo activate the virtual environment, run the following command:\nsource {activate_script}"
-        )
 
 
 # Main execution
 if __name__ == "__main__":
-    # Setup virtual environment and install dependencies
-    setup_venv()
+   
 
     # Drop tables if they exist
     drop_tables()
@@ -232,6 +243,9 @@ if __name__ == "__main__":
 
     # Insert products
     insert_products()
+
+    # Insert encheres
+    insert_encheres()
 
     # Create admin user
     create_admin()

@@ -1,0 +1,99 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encheres Management</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='admin_enchere.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
+      <ul class="nav-links">
+        <li>
+          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+        </li>
+
+        <li><a href="{{ url_for('historique_encheres') }}">Commandes</a></li>
+        <!-- must change to historique_commandes later -->
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
+    </nav>
+
+    <h1>Enchères List</h1>
+
+    <a href="{{ url_for('add_enchere') }}"><button>Add Enchère</button></a>
+
+    <div class="product-container">
+      {% for enchere in encheres %}
+      <div class="product-card">
+        <img
+          src="{{ url_for('static', filename=enchere.image_url) }}"
+          alt="{{ enchere.name }}" />
+        <h3>{{ enchere.name }}</h3>
+        <!-- <p>Description: {{ enchere.description }}</p> -->
+        <p>Prix: ${{ enchere.prix }}</p>
+        <p>Date de fin: {{ enchere.date_fin }}</p>
+
+        <div class="product-actions">
+          <a
+            href="{{ url_for('update_enchere', enchere_id=enchere.id_enchere) }}">
+            <button class="update-btn">Update</button>
+          </a>
+
+          <!-- Delete Button that triggers the modal -->
+          <button
+            type="button"
+            class="delete-btn"
+            onclick="document.getElementById('delete-modal-{{ enchere.id_enchere }}').showModal();">
+            Delete
+          </button>
+
+          <!-- Delete Confirmation Modal -->
+          <dialog
+            id="delete-modal-{{ enchere.id_enchere }}"
+            class="delete-modal">
+            <form
+              method="POST"
+              action="{{ url_for('delete_enchere', enchere_id=enchere.id_enchere) }}">
+              <h2>Confirm Deletion</h2>
+              <p>
+                Are you sure you want to delete "<strong
+                  >{{ enchere.name }}</strong
+                >"?
+              </p>
+              <div class="modal-buttons">
+                <button type="submit" class="confirm-delete">
+                  Yes, Delete
+                </button>
+                <button
+                  type="button"
+                  onclick="this.closest('dialog').close();"
+                  class="cancel-delete">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </dialog>
+        </div>
+      </div>
+      {% else %}
+      <p>No auctions available.</p>
+      {% endfor %}
+    </div>
+  </body>
+</html>

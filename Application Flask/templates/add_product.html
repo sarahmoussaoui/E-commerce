@@ -1,31 +1,56 @@
+<!-- @format -->
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Product</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
+      <ul class="nav-links">
+        <li>
+          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+        </li>
+
+        <li><a href="{{ url_for('historique_encheres') }}">Commandes</a></li>
+        <!-- must change to historique_commandes later -->
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
+    </nav>
     <h2>Add a New Product</h2>
 
     <form action="{{ url_for('add_product') }}" method="POST">
-        <label for="name">Product Name:</label>
-        <input type="text" name="name" required>
+      <label for="name">Product Name:</label>
+      <input type="text" name="name" required />
 
-        <label for="price">Price:</label>
-        <input type="number" step="0.01" name="price" required>
+      <label for="price">Price:</label>
+      <input type="number" step="0.01" name="price" required />
 
-        <label for="stock">Stock:</label>
-        <input type="number" name="stock" required>
+      <label for="stock">Stock:</label>
+      <input type="number" name="stock" required />
 
-        <label for="image_url">Image URL:</label>
-        <input type="text" name="image_url">
+      <label for="image_url">Image URL:</label>
+      <input type="text" name="image_url" />
 
-        <button type="submit">Add Product</button>
+      <button type="submit">Add Product</button>
     </form>
 
-    <a href="{{ url_for('index_admin') }}">Back to Home</a>
-</body>
+    <a href="{{ url_for('home_admin') }}">Back to Home</a>
+  </body>
 </html>

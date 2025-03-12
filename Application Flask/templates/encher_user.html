@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Produits</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='encher_user.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_enchere.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Menu with Logo -->
+    <nav class="navbar">
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            <img
+              src="{{ url_for('static', filename='img/logout.png') }}"
+              alt="Logout" />
+          </a>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('about_us') }}">About us</a></li>
+            <li><a href="{{ url_for('index_user') }}">Products</a></li>
+            <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
+            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Welcome Section with Background Image and Slogan -->
+    <header class="welcome-section-encher"></header>
+    
+    <div class="slogan">
+        <p>Il est temps de découvrir nos produits vintage à encherir.</p>
+    </div>
+
+    <!-- Lien "Voir le panier" en haut -->
+    <div class="cart-container">
+        <a href="{{ url_for('view_cart') }}" class="cart-link">Voir le panier</a>
+    </div> 
+
+    <!-- Liste des enchères -->
+    <div class="product-container">
+        {% for enchere in encheres %}
+        <div class="product-card">
+            <a href="{{ url_for('enchere_detail', enchere_id=enchere.id_enchere) }}">
+            <img src="{{ url_for('static', filename= enchere.image_url ) }}" alt="{{ enchere.name }}" />
+            <h3>{{ enchere.name }}</h3>
+            <p>{{ enchere.prix }} EUR</p>
+            <p>Fin de l'enchère : {{ enchere.date_fin }}</p>
+        </a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
