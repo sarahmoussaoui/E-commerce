@@ -438,6 +438,7 @@ body.invoice-confirmation {
 .nav-links a:hover {
   color: #ddd;
 }
+
 /* Welcome Section with Background Image */
 .welcome-section {
   background-image: url("../static/welcome.jpg");
@@ -959,4 +960,16 @@ blockquote em {
 
 .modal-body strong {
   font-weight: 500;
+}
+
+/* Logout Button */
+.logout-btn img {
+  width: 40px; /* Adjust size */
+  height: auto;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.logout-btn img:hover {
+  opacity: 0.7;
 }
