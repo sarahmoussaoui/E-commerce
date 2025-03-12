@@ -4,14 +4,17 @@
     <meta charset="UTF-8" />
     <title>Produits</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='encher_user.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_enchere.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation Menu with Logo -->
     <nav class="navbar">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
-        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            <img
+              src="{{ url_for('static', filename='img/logout.png') }}"
+              alt="Logout" />
+          </a>
         <ul class="nav-links">
             <li><a href="{{ url_for('about_us') }}">About us</a></li>
             <li><a href="{{ url_for('index_user') }}">Products</a></li>

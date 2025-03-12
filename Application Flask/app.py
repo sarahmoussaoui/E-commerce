@@ -838,6 +838,7 @@ def ajouter_enchere():
     prix = data.get('prix')
     nom = data.get('nom')
     email = data.get('email')
+    
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
