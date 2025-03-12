@@ -1121,69 +1121,69 @@ def ajouter_enchere():
 
     return jsonify({"message": "Votre enchère a été enregistrée avec succès!"})
 
-@app.route("/encherir", methods=["POST"])
-def encherir():
-    try:
-        data = request.json
-        enchere_id = data.get("id_enchere")
-        prix = data.get("prix")
-        first_name = data.get("firstName")
-        last_name = data.get("lastName")
-        email = data.get("email")
-        phone = data.get("phone")
+# @app.route("/encherir", methods=["POST"])
+# def encherir():
+#     try:
+#         data = request.json
+#         enchere_id = data.get("id_enchere")
+#         prix = data.get("prix")
+#         first_name = data.get("firstName")
+#         last_name = data.get("lastName")
+#         email = data.get("email")
+#         phone = data.get("phone")
 
-        db = get_db()
-        cursor = db.cursor()
+#         db = get_db()
+#         cursor = db.cursor()
 
-        # Vérifier si l'utilisateur existe déjà
-        cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
-        user = cursor.fetchone()
+#         # Vérifier si l'utilisateur existe déjà
+#         cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
+#         user = cursor.fetchone()
 
-        if not user:
-            return jsonify({"message": "Utilisateur non trouvé"}), 400
+#         if not user:
+#             return jsonify({"message": "Utilisateur non trouvé"}), 400
 
-        user_id = user["id"]
+#         user_id = user["id"]
 
-        # Enregistrer l'enchère dans historique_enchere
-        cursor.execute(
-            """
-            INSERT INTO historique_enchere (id_enchere, id_user, proposed_price)
-            VALUES (?, ?, ?)
-            """,
-            (enchere_id, user_id, prix),
-        )
-        db.commit()
+#         # Enregistrer l'enchère dans historique_enchere
+#         cursor.execute(
+#             """
+#             INSERT INTO historique_enchere (id_enchere, id_user, proposed_price)
+#             VALUES (?, ?, ?)
+#             """,
+#             (enchere_id, user_id, prix),
+#         )
+#         db.commit()
 
-        return jsonify({"message": "Enchère enregistrée avec succès !"})
+#         return jsonify({"message": "Enchère enregistrée avec succès !"})
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
-@app.route("/admin/historique_encheres", methods=["GET"])
-def historique_encheres():
-    conn = get_db()
-    cursor = conn.cursor()
+# @app.route("/admin/historique_encheres", methods=["GET"])
+# def historique_encheres():
+#     conn = get_db()
+#     cursor = conn.cursor()
     
-    # SQL Query to join historique_enchere, enchere, and users tables
-    cursor.execute("""
-        SELECT 
-            e.image_url, 
-            e.name AS enchere_name, 
-            e.date_fin, 
-            u.FirstName || ' ' || u.LastName AS user_full_name, 
-            u.phoneNum,
-            h.proposed_price,
-            e.etat
-        FROM historique_enchere h
-        JOIN enchere e ON h.id_enchere = e.id_enchere
-        JOIN users u ON h.id_user = u.id
-        ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
-    """)
+#     # SQL Query to join historique_enchere, enchere, and users tables
+#     cursor.execute("""
+#         SELECT 
+#             e.image_url, 
+#             e.name AS enchere_name, 
+#             e.date_fin, 
+#             u.FirstName || ' ' || u.LastName AS user_full_name, 
+#             u.phoneNum,
+#             h.proposed_price,
+#             e.etat
+#         FROM historique_enchere h
+#         JOIN enchere e ON h.id_enchere = e.id_enchere
+#         JOIN users u ON h.id_user = u.id
+#         ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
+#     """)
     
-    historique = cursor.fetchall()
-    conn.close()
+#     historique = cursor.fetchall()
+#     conn.close()
 
-    return render_template("historique_encheres.html", historique=historique)
+#     return render_template("historique_encheres.html", historique=historique)
     
 if __name__ == "__main__":
     app.run(debug=True)
