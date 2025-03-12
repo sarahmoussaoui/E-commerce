@@ -8,17 +8,25 @@
     <title>Encheres Management</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}" />
+      href="{{ url_for('static', filename='admin_enchere.css') }}" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet" />
   </head>
   <body>
     <nav class="navbar">
-      <div class="logo">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" />
-      </div>
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
       <ul class="nav-links">
+        <li>
+          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+        </li>
+
+        <li><a href="{{ url_for('historique_encheres') }}">Commandes</a></li>
+        <!-- must change to historique_commandes later -->
         <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
         <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
         <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
@@ -46,17 +54,41 @@
             href="{{ url_for('update_enchere', enchere_id=enchere.id_enchere) }}">
             <button class="update-btn">Update</button>
           </a>
-          <form
-            action="{{ url_for('delete_enchere', enchere_id=enchere.id_enchere) }}"
-            method="POST"
-            class="delete-form">
-            <button
-              type="submit"
-              class="delete-btn"
-              onclick="return confirm('Are you sure you want to delete this auction?')">
-              Delete
-            </button>
-          </form>
+
+          <!-- Delete Button that triggers the modal -->
+          <button
+            type="button"
+            class="delete-btn"
+            onclick="document.getElementById('delete-modal-{{ enchere.id_enchere }}').showModal();">
+            Delete
+          </button>
+
+          <!-- Delete Confirmation Modal -->
+          <dialog
+            id="delete-modal-{{ enchere.id_enchere }}"
+            class="delete-modal">
+            <form
+              method="POST"
+              action="{{ url_for('delete_enchere', enchere_id=enchere.id_enchere) }}">
+              <h2>Confirm Deletion</h2>
+              <p>
+                Are you sure you want to delete "<strong
+                  >{{ enchere.name }}</strong
+                >"?
+              </p>
+              <div class="modal-buttons">
+                <button type="submit" class="confirm-delete">
+                  Yes, Delete
+                </button>
+                <button
+                  type="button"
+                  onclick="this.closest('dialog').close();"
+                  class="cancel-delete">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </dialog>
         </div>
       </div>
       {% else %}

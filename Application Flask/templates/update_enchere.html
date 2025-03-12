@@ -8,9 +8,31 @@
     <title>Update Auction</title>
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}" />
+      href="{{ url_for('static', filename='admin_enchere.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet" />
   </head>
   <body>
+    <nav class="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-btn">
+        <img
+          src="{{ url_for('static', filename='img/logout.png') }}"
+          alt="Logout" />
+      </a>
+      <ul class="nav-links">
+        <li>
+          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+        </li>
+
+        <li><a href="{{ url_for('historique_encheres') }}">Commandes</a></li>
+        <!-- must change to historique_commandes later -->
+        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
+        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
+        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
+      </ul>
+    </nav>
     <h2>Update Auction</h2>
 
     <form
@@ -20,7 +42,9 @@
       <input type="text" name="name" value="{{ enchere.name }}" required />
 
       <label for="description">Description:</label>
-      <textarea name="description" required>{{ enchere.description }}</textarea>
+      <textarea name="description" class="description-box" required>
+{{ enchere.description }}</textarea
+      >
 
       <label for="image_url">Image URL:</label>
       <input type="text" name="image_url" value="{{ enchere.image_url }}" />
