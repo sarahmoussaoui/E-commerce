@@ -1,0 +1,68 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculatrice Web</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Calculatrice Web</h1>
+      <form id="calculator-form">
+        <input type="number" id="a" placeholder="Entrez un nombre" required />
+        <input
+          type="number"
+          id="b"
+          placeholder="Entrez un autre nombre"
+          required />
+        <div class="operations">
+          <button type="submit" data-operation="add">Addition</button>
+          <button type="submit" data-operation="subtract">Soustraction</button>
+          <button type="submit" data-operation="multiply">
+            Multiplication
+          </button>
+          <button type="submit" data-operation="divide">Division</button>
+        </div>
+      </form>
+      <div id="result"></div>
+    </div>
+    <script>
+      document
+        .getElementById("calculator-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const a = parseFloat(document.getElementById("a").value);
+          const b = parseFloat(document.getElementById("b").value);
+          const operation = event.target
+            .querySelector('[type="submit"]:focus')
+            .getAttribute("data-operation");
+
+          // Préparer les données pour l'API
+          const formData = new FormData();
+          formData.append("a", a);
+          formData.append("b", b);
+          formData.append("operation", operation);
+          // Envoyer la requête AJAX
+          fetch("/calculate", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById(
+                "result"
+              ).innerHTML = `Résultat : ${data.result}`;
+            })
+            .catch((error) => {
+              document.getElementById("result").innerHTML =
+                "Une erreur est survenue.";
+            });
+        });
+    </script>
+  </body>
+</html>
