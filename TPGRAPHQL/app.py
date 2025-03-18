@@ -3,7 +3,8 @@ import graphene
 
 # Définition du type GraphQL
 class Query(graphene.ObjectType):
-    hello = graphene.String(name=graphene.String(default_value="Stranger"))
+    # Définit une query hello qui retourne une chaîne de caractères et prend un argument optionnel name.
+    hello = graphene.String(name=graphene.String(default_value="Stranger")) 
     goodbye = graphene.String(name=graphene.String(default_value="Stranger"))
 
     def resolve_hello(self, info, name):
