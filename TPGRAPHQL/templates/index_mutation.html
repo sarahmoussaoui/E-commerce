@@ -1,0 +1,73 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GraphQL with Flask</title>
+  </head>
+  <body>
+    <h1>GraphQL Query & Mutation</h1>
+    <h3>Query - Hello</h3>
+    <form id="graphql-query-form">
+      <textarea
+        id="query"
+        rows="5"
+        cols="50"
+        placeholder="Write your GraphQL query here (e.g.
+{ hello(name: 'John') })"></textarea
+      ><br /><br />
+      <button type="submit">Submit Query</button>
+    </form>
+    <h3>Mutation - Create User</h3>
+    <form id="graphql-mutation-form">
+      <textarea
+        id="mutation"
+        rows="5"
+        cols="50"
+        placeholder="Write your GraphQL mutation here
+(e.g. mutation { createUser(name: 'John') })"></textarea
+      ><br /><br />
+      <button type="submit">Create User</button>
+    </form>
+    <h3>Response:</h3>
+    <pre id="response"></pre>
+    <script>
+      // Fonction pour envoyer la requête GraphQL
+      function sendGraphQLRequest(query, isMutation = false) {
+        const responseElement = document.getElementById("response");
+        fetch("/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query: query }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            responseElement.textContent = JSON.stringify(data, null, 2);
+          })
+          .catch((error) => {
+            responseElement.textContent = `Error: ${error.message}`;
+          });
+      }
+      // Soumettre une requête de type Query
+      document
+        .getElementById("graphql-query-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const query = document.getElementById("query").value;
+          sendGraphQLRequest(query);
+        });
+      // Soumettre une requête de type Mutation
+      document
+        .getElementById("graphql-mutation-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const mutation = document.getElementById("mutation").value;
+          sendGraphQLRequest(mutation, true);
+        });
+    </script>
+  </body>
+</html>
