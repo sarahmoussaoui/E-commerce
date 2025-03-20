@@ -20,7 +20,7 @@ a {
 
 .container{
   
-    max-width: 1100px;
+    max-width: 1180px;
     margin: auto;
 }
 /* Logout Button */
@@ -143,6 +143,7 @@ main {
     justify-content: center;
     align-items: center;
     background: #f4f4f4;
+    margin-bottom: 100px;
 
 }
 
@@ -170,7 +171,7 @@ display: flex;
 justify-content: space-between;
 background:  #f4f4f4;
 align-items: center;
-gap: 4rem;
+gap: 8rem;
 
 }
 
@@ -216,9 +217,10 @@ gap: 4rem;
 /* Our Story Section */
 
 #our-story {
-    margin-top: 150px; /* Ajuste selon ton design */
+    margin-top: 200px; /* Ajuste selon ton design */
     padding-top: 50px;
     background:  #f4f4f4;
+
 }
 
 #our-story .about-story {
@@ -243,6 +245,7 @@ gap: 4rem;
     width: 100%; /* Ajuste la largeur du texte */
     /*margin-left: 0; /* Enlève le gros margin-left */
     margin-left: 6rem;
+    margin-right: 10rem;
 }
  #our-story .about-story a {
         margin-top: 2rem;
@@ -250,6 +253,7 @@ gap: 4rem;
 
  #our-story .about-story .text-content {
         flex: 1;
+        margin-right: 2rem;
     }
     
  #our-story .about-story h2 {
@@ -264,24 +268,103 @@ gap: 4rem;
 
 
 
-.our-story-content {
-    display: flex;
-    align-items: center;
+/* ou team section */
+.section {
+    margin-bottom: 40px;
+    margin-top: 100px;
+  }
+  
+.section h2 {
+    border-bottom: 2px solid #d8e2dc;
+    padding-bottom: 25px;
+    margin-bottom: 20px;
+    font-size: 2em;
+    color: #9d8189;
+  }
+
+  .team-members {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
   }
   
-  .our-story-content img {
-    flex: 1;
-    width: 50%; /* Ensure the image takes up half the container */
-    max-height: 400px; /* Increase max-height for a larger image */
-    height: auto; /* Let the height adjust based on the image's aspect ratio */
-    object-fit: cover; /* Ensure the image covers the container without distortion */
+  .team-member {
+    background-color: #f8f9fa;
+    padding: 20px;
     border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
   }
   
-  .our-story-text {
+  .team-member img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #d8e2dc;
+    margin-bottom: 15px;
+  }
+  
+  .team-member h3 {
+    margin: 10px 0 5px;
+    font-size: 1.3em;
+    color: #9d8189;
+  }
+  
+  .team-member .role {
+    margin: 0;
+    font-size: 0.9em;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  .team-member .description {
+    margin: 10px 0 0;
+    font-size: 0.9em;
+    color: #9e8484;
+    line-height: 1.6;
+    
+  }
+
+  /* Customer Testimonials */
+.customer-testimonials {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .customer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .customer img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #d8e2dc;
+  }
+  
+  .customer-info {
     flex: 1;
-    width: 50%; /* Ensure the text takes up the other half */
+  }
+  
+  .customer-info h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #9d8189;
+  }
+  
+  .customer-info .job-title {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #6c757d;
   }
   
 

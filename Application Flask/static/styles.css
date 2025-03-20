@@ -8,7 +8,7 @@ body {
   font-family: "Poppins", sans-serif; /* Modern and aesthetic font */
   background-color: #ffffff; /* White background */
   margin: 0;
-  padding: 20px;
+  /*padding: 20px;*********/
   text-align: center;
   color: #9d8189; /* Dark muted pink for text */
 }

@@ -6,15 +6,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}" />
     
     
+    
 </head>
 <body>
     <!-- header start -->
      <header>
         <div id="navbar">
-            <a href="{{ url_for('logout') }}" class="logout-btn">
-                <img
+            <a href="{{ url_for('logout') }}" class="btn btn-primary logout-text">Logout</a>
+                <!-- <img
                   src="{{ url_for('static', filename='img/logout.png') }}"
-                  alt="Logout" />
+                  alt="Logout" /> -->
               </a>
             <nav>
               <ul >
@@ -82,6 +83,91 @@
 
 
        <!-- Our team start -->
+       <div class="container">
+       <div class="section">
+        <h2>Our Team</h2>
+        <div class="team-members">
+            <!-- Member 1 -->
+            <div class="team-member">
+                <img src="{{ url_for('static', filename='img/team2.jpg' ) }}" alt="Team Member 1">
+                <h3>Alice Johnson</h3>
+                <p class="role">Founder & Creative Director</p>
+                <p class="description">Alice is the heart and soul of Handmade Decorations. With a passion for art and design, she ensures every product reflects creativity and quality.</p>
+            </div>
+    
+            <!-- Member 2 -->
+            <div class="team-member">
+                <img src="{{ url_for('static', filename='img/team1.jpg' ) }}" alt="Team Member 2">
+                <h3>Michael Smith</h3>
+                <p class="role">Lead Artisan</p>
+                <p class="description">Michael brings years of experience in crafting handmade items. His attention to detail ensures every piece is a masterpiece.</p>
+            </div>
+    
+            <!-- Member 3 -->
+            <div class="team-member">
+                <img src="{{ url_for('static', filename='img/team4.jpg' ) }}" alt="Team Member 3">
+                <h3>Emily Davis</h3>
+                <p class="role">Marketing Manager</p>
+                <p class="description">Emily is the voice of our brand. She connects with our customers and spreads the word about our unique creations.</p>
+            </div>
+            <!-- Member 4 -->
+            <div class="team-member">
+                <img src="{{ url_for('static', filename='img/team3.jpg' ) }}" alt="Team Member 5">
+                <h3>Sophia Lee</h3>
+                <p class="role">Product Designer</p>
+                <p class="description">Sophia is the creative mind behind our new collections. Her innovative designs keep our products fresh and exciting.</p>
+            </div>
+        </div>
+    </div>
+       </div>
+<!-- our team end -->
+
+
+
+<!-- Social Proof Section  start-->
+<div class="container">
+<div class="section">
+    <h2>What Our Customers Say</h2>
+    <div class="customer-testimonials">
+        <div class="customer">
+            <img src="{{ url_for('static', filename='img/person1.jpg' ) }}" alt="Customer 1">
+            <div class="customer-info">
+                <h3>Sarah L.</h3>
+                <p class="job-title">Interior Designer</p>
+                <blockquote>
+                    "The painted mirror I bought is absolutely stunning! It adds so much character to my living room."
+                </blockquote>
+            </div>
+        </div>
+
+        <!-- Our Team Section -->
+
+
+
+        <div class="customer">
+            <img src="{{ url_for('static', filename='img/person2.jpg' ) }}" alt="Customer 2">
+            <div class="customer-info">
+                <h3>John D.</h3>
+                <p class="job-title">Artist</p>
+                <blockquote>
+                    "I adore the crochet key holders! They're not only functional but also beautiful."
+                </blockquote>
+            </div>
+        </div>
+        <div class="customer">
+            <img src="{{ url_for('static', filename='img/person3.jpg' ) }}" alt="Customer 3">
+            <div class="customer-info">
+                <h3>Emily R.</h3>
+                <p class="job-title">Event Planner</p>
+                <blockquote>
+                    "The handmade plates are perfect for gifting. My friends were thrilled!"
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- Social Proof Section end  -->
         
      </main>
 </body>
