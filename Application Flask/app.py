@@ -745,6 +745,10 @@ def delete_enchere(enchere_id):
 
 
 
+@app.route("/home_page")
+def home():
+    return render_template("home.html")
+
 
 
 @app.route("/aboutus")
