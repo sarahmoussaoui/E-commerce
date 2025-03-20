@@ -12,7 +12,7 @@
     <!-- header start -->
      <header>
         <div id="navbar">
-            <a href="{{ url_for('logout') }}" class="btn btn-primary logout-text">Logout</a>
+            <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
                 <!-- <img
                   src="{{ url_for('static', filename='img/logout.png') }}"
                   alt="Logout" /> -->
@@ -20,7 +20,7 @@
             <nav>
               <ul >
                 <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('about_us') }}">About</a></li>
+                <li><a href="{{ url_for('home') }}#about">About</a></li>
                 <li><a href="{{ url_for('index_user') }}">Products</a></li>
                 <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
                 <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
@@ -30,7 +30,7 @@
         <div class="content">
             <h1>Welcome to <span class ="primary-text"> Handmade Wonders </span>Store </h1>
             <p> Here you can find most beautiful handmad Products </p>
-            <a href="a" class="btn btn-primary">Book a Table</a>
+            <a href="#about" class="btn btn-primary">Learn more</a>
         </div>
      </header>
 
@@ -52,7 +52,7 @@
                             beautifully crafted handmade products that inspire and delight. From painted mirrors to
                             crochet key holders, each item is made with love and care to add charm to your everyday life.
                         </p>
-                        <a href="#our-story" class="btn btn-secondary">LEARN MORE</a> <!-- Bouton bien placé -->
+                        <!-- <a href="#our-story" class="btn btn-secondary">LEARN MORE</a> Bouton bien placé -->
                     </div>
                     <img src="../static/img/handmade3.jpg" alt="candel">
                 </div>

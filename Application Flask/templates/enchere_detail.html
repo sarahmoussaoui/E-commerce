@@ -9,19 +9,22 @@
 </head>
 <body>
     <!-- Navigation Menu -->
-    <nav class="navbar">
-        <a href="{{ url_for('logout') }}" class="logout-btn">
-            <img
+    <div id="navbar">
+        <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
+            <!-- <img
               src="{{ url_for('static', filename='img/logout.png') }}"
-              alt="Logout" />
+              alt="Logout" /> -->
           </a>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('about_us') }}">About us</a></li>
+        <nav>
+          <ul >
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('home') }}#about">About</a></li>
             <li><a href="{{ url_for('index_user') }}">Products</a></li>
             <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
             <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
         </ul>
     </nav>
+    </div>
 
     <!-- Wrapper principal -->
     <div class="enchere-wrapper">

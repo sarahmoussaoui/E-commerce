@@ -9,30 +9,37 @@
 </head>
 <body>
     <!-- Navigation Menu with Logo -->
-    <nav class="navbar">
-        <a href="{{ url_for('logout') }}" class="logout-btn">
-            <img
-              src="{{ url_for('static', filename='img/logout.png') }}"
-              alt="Logout" />
-          </a>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('about_us') }}">About us</a></li>
-            <li><a href="{{ url_for('index_user') }}">Products</a></li>
-            <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-        </ul>
-    </nav>
-
-    <!-- Welcome Section with Background Image and Slogan -->
-    <header class="welcome-section-encher"></header>
+     <!-- Navigation Menu with Logo -->
+     <header class="welcome-section">
+        <div id="navbar">
+          <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
+              <!-- <img
+                src="{{ url_for('static', filename='img/logout.png') }}"
+                alt="Logout" /> -->
+            </a>
+          <nav>
+            <ul >
+              <li><a href="{{ url_for('home') }}">Home</a></li>
+              <li><a href="{{ url_for('home') }}#about">About</a></li>
+              <li><a href="{{ url_for('index_user') }}">Products</a></li>
+              <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
+              <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+          </ul>
+      </nav>
+      </div>
+    
+        <!-- Welcome Section with Background Image and Slogan -->
+        
+    
+        </header>
     
     <div class="slogan">
-        <p>Il est temps de découvrir nos produits vintage à encherir.</p>
+        <p>It's time to discover our vintage products up for auction.</p>
     </div>
 
     <!-- Lien "Voir le panier" en haut -->
     <div class="cart-container">
-        <a href="{{ url_for('view_cart') }}" class="cart-link">Voir le panier</a>
+        <a href="{{ url_for('view_cart') }}" class="cart-link">View my bids</a>
     </div> 
 
     <!-- Liste des enchères -->

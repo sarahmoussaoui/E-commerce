@@ -6,12 +6,11 @@
 
 body {
   font-family: "Poppins", sans-serif; /* Modern and aesthetic font */
-  /* background-color: #F8F9FA; White background */
-  background-color: white;
+  background-color: #f4f4f4; /* White background */
   margin: 0;
-  padding: 20px;
+  padding: 0px;
   text-align: center;
-  color: #9d8189; /* Dark muted pink for text */
+  color: #41262e; /* Dark muted pink for text */
 }
 
 h1,
@@ -22,8 +21,11 @@ h2 {
 
 a {
   text-decoration: none;
-  color: #f4acb7; /* Soft pink for links */
+  color: #7b313d; /* Soft pink for links */
   transition: color 0.3s ease;
+}
+ul{
+  list-style: none;
 }
 
 a:hover {
@@ -74,12 +76,12 @@ a:hover {
 .product-card h3 {
   margin: 15px 0 10px;
   font-size: 18px;
-  color: #9d8189; /* Dark muted pink for product names */
+  color: #6f515a; /* Dark muted pink for product names */
 }
 
 .product-card p {
   margin: 5px 0;
-  color: #9d8189; /* Dark muted pink for text */
+  color: #6f515a; /* Dark muted pink for text */
   font-size: 14px;
 }
 /* Button Styles */
@@ -220,6 +222,11 @@ input[type="number"] {
 
 .cart-item-quantity {
   color: #9d8189; /* Dark muted pink */
+}
+.cart-link .material-icons {
+  font-size: 20px;
+  vertical-align: middle;
+  margin-right: 5px;
 }
 
 .cart-item-total {
@@ -398,41 +405,51 @@ body.invoice-confirmation {
   outline: none;
   box-shadow: 0 0 5px rgba(244, 172, 183, 0.5); /* Soft glow effect */
 }
+#navbar {
+  position: fixed; /* Fixe le navbar en haut */
+  top: 0;
+  left: 0;
+  width: 100%; /* Prend toute la largeur */
+  
+  z-index: 1000; /* S'assure qu'il est au-dessus du contenu */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px; /* Ajuste l'espace autour des éléments */
+}
+
+.logout-text {
+  color: rgb(37, 36, 36);
+  font-weight: 600;
+  padding: 10px 20px;
+  margin-left: 10px;
+  transition: border-bottom 0.3s ease-in-out;
+}
+
+.logout-text:hover {
+  border-bottom: 2px solid #e4b95b;
+}
+
+#navbar ul {
+  display: flex;
+  gap: 15px;
+  margin-right: 100px;
+}
+
+#navbar ul li a {
+  padding: 15px 20px;
+  color: rgb(37, 36, 36);
+  font-weight: 600;
+  transition: border-bottom 0.3s ease-in-out;
+}
+
+#navbar ul li a:hover {
+  border-bottom: 2px solid #e4b95b;
+}
 
 /* Welcome Section */
 /* Navigation Bar */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #9d8189;
-  padding: 10px 20px;
-}
 
-.logo img {
-  height: 50px; /* Adjust logo size */
-}
-
-.nav-links {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-}
-
-.nav-links li {
-  margin-left: 20px;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.nav-links a:hover {
-  color: #ddd;
-}
 /* Welcome Section with Background Image */
 .welcome-section {
   background-image: url("../static/welcome.jpg");
@@ -447,7 +464,7 @@ body.invoice-confirmation {
 }
 
 .slogan {
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+  background-color: #f4f4f4;/* Semi-transparent background */
   padding: 20px;
   border-radius: 10px;
 }
@@ -1213,3 +1230,8 @@ blockquote em {
     width: 90%;
   }
 }
+
+
+
+
+

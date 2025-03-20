@@ -181,7 +181,7 @@ def login():
             if user["is_admin"] == 1:
                 return redirect(url_for("home_admin"))
             else:
-                return redirect(url_for("about_us"))
+                return redirect(url_for("home"))
 
         flash("Invalid email or password", "danger")
 

@@ -4,34 +4,42 @@
     <meta charset="UTF-8" />
     <title>Produits</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_enchere.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
     <!-- Navigation Menu with Logo -->
-    <nav class="navbar">
-        <a href="{{ url_for('logout') }}" class="logout-btn">
-            <img
-              src="{{ url_for('static', filename='img/logout.png') }}"
-              alt="Logout" />
-          </a>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('about_us') }}">About us</a></li>
-            <li><a href="{{ url_for('index_user') }}">Products</a></li>
-            <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-        </ul>
-    </nav>
+    <header class="welcome-section">
+    <div id="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
+          <!-- <img
+            src="{{ url_for('static', filename='img/logout.png') }}"
+            alt="Logout" /> -->
+        </a>
+      <nav>
+        <ul >
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('home') }}#about">About</a></li>
+          <li><a href="{{ url_for('index_user') }}">Products</a></li>
+          <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
+          <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+      </ul>
+  </nav>
+  </div>
 
     <!-- Welcome Section with Background Image and Slogan -->
-    <header class="welcome-section">
+    
 
     </header>
     <div class="slogan">
-      <p>Décorez votre monde avec des créations uniques et faites main.</p>
+      <p>Decorate your world with unique, handmade creations.</p>
   </div>
     <!-- Lien "Voir le panier" en haut -->
     <div class="cart-container">
-        <a href="{{ url_for('view_cart') }}" class="cart-link">Voir le panier</a>
+      <a href="{{ url_for('view_cart') }}" class="cart-link">
+        View my cart  <span class="material-icons">shopping_cart</span> 
+    </a>
     </div> 
 
     <!-- Product Display -->
