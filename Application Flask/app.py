@@ -52,7 +52,7 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 stripe_public_key = os.getenv("STRIPE_PUBLIC_KEY")
 
 # SQLite Database Path
-DATABASE = "inventory.db"
+DATABASE = "database.db"
 
 
 # User Model
@@ -91,10 +91,11 @@ def load_user(user_id):
 
 # Function to get database connection
 def get_db():
-    conn = sqlite3.connect("database.db")  # Ensure this is your actual DB file
-    conn.row_factory = sqlite3.Row  # Enable dictionary-like access
+    db_path = "database.db"  # Assure-toi que c'est bien le bon fichier
+    print(f"Using database: {os.path.abspath(db_path)}")  # Ajout du print
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
     return conn
-
 
 # Initialize Database
 
@@ -155,9 +156,7 @@ def login():
 
         if user is None:  # Handle missing user
             flash("User not found. Please register.", "danger")
-            return render_template(
-                "login.html"
-            )  # Return to login page with flash message
+            return render_template("login.html")
 
         print("Stored Hashed Password:", user["password"])
         print("Entered Password:", password)
@@ -174,10 +173,13 @@ def login():
                 user["is_admin"],
             )
             login_user(user_obj, remember=True)
-            session["email"] = email
+            
+            # ✅ Ajout de l'ID utilisateur dans la session
+            session["user_id"] = user["id"]  
+            session["email"] = email  
+
             flash("Login successful!", "success")
 
-            # Redirect admin (id = 0) to index_admin, others to index
             if user["is_admin"] == 1:
                 return redirect(url_for("home_admin"))
             else:
@@ -1125,6 +1127,54 @@ def ajouter_enchere():
 
     return jsonify({"message": "Votre enchère a été enregistrée avec succès!"})
 
+#fonction pour afficher mes encheres 
+
+@app.route('/mes_encheres')
+@login_required 
+def mes_encheres():
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return redirect(url_for('login'))  # Redirige vers la page de connexion si l'utilisateur n'est pas connecté
+
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT e.name, e.image_url, he.proposed_price, e.etat 
+        FROM historique_enchere he
+        JOIN enchere e ON he.id_enchere = e.id_enchere
+        WHERE he.id_user = ?
+    """, (user_id,))
+
+    encheres = cursor.fetchall()
+    conn.close()
+
+    return render_template('mes_encheres.html', encheres=encheres)
+
+
+#fonction pour supprimer un enchere cote user 
+@app.route('/supprimer_enchere', methods=['POST'])
+@login_required
+def supprimer_enchere():
+    enchere_id = request.form.get('enchere_id')
+    user_id = session.get('user_id')
+
+    if not enchere_id or not user_id:
+        flash("Erreur lors de la suppression.", "danger")
+        return redirect(url_for('mes_encheres'))
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    # Supprimer uniquement si l'enchère appartient à l'utilisateur
+    cursor.execute("DELETE FROM historique_enchere WHERE id = ? AND id_user = ?", (enchere_id, user_id))
+    conn.commit()
+    conn.close()
+
+    flash("L'enchère a été supprimée avec succès.", "success")
+    return redirect(url_for('mes_encheres'))
 # @app.route("/encherir", methods=["POST"])
 # def encherir():
 #     try:

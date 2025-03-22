@@ -486,7 +486,7 @@ body.invoice-confirmation {
 .welcome-section {
   background-image: url("../static/welcome.jpg");
   background-size: cover;
-  background-position: center;
+  background-position: top;
   height: 300px; /* Adjust height as needed */
   display: flex;
   align-items: flex-end; /* Align slogan at the bottom */
