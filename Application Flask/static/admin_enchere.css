@@ -6,11 +6,11 @@
 
 body {
   font-family: "Poppins", sans-serif; /* Modern and aesthetic font */
-  background-color: #ffffff; /* White background */
+  background-color: #f4f4f4; /* White background */
   margin: 0;
-  padding: 20px;
+  padding: 0px;
   text-align: center;
-  color: #9d8189; /* Dark muted pink for text */
+  color: #41262e; /* Dark muted pink for text */
 }
 
 h1,
@@ -21,13 +21,58 @@ h2 {
 
 a {
   text-decoration: none;
-  color: #f4acb7; /* Soft pink for links */
+  color: #7b313d; /* Soft pink for links */
   transition: color 0.3s ease;
 }
 
 a:hover {
   color: #ffcad4; /* Lighter pink on hover */
 }
+ul{
+  list-style: none;
+}
+#navbar {
+  position: fixed; /* Fixe le navbar en haut */
+  top: 0;
+  left: 0;
+  width: 100%; /* Prend toute la largeur */
+  
+  z-index: 1000; /* S'assure qu'il est au-dessus du contenu */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px; /* Ajuste l'espace autour des éléments */
+}
+
+.logout-text {
+  color: rgb(37, 36, 36);
+  font-weight: 600;
+  padding: 10px 20px;
+  margin-left: 10px;
+  transition: border-bottom 0.3s ease-in-out;
+}
+
+.logout-text:hover {
+  border-bottom: 2px solid #e4b95b;
+}
+
+#navbar ul {
+  display: flex;
+  gap: 15px;
+  margin-right: 100px;
+}
+
+#navbar ul li a {
+  padding: 15px 20px;
+  color: rgb(37, 36, 36);
+  font-weight: 600;
+  transition: border-bottom 0.3s ease-in-out;
+}
+
+#navbar ul li a:hover {
+  border-bottom: 2px solid #e4b95b;
+}
+
 
 /* Product Collection Styles */
 .product-container {
@@ -73,12 +118,12 @@ a:hover {
 .product-card h3 {
   margin: 15px 0 10px;
   font-size: 18px;
-  color: #9d8189; /* Dark muted pink for product names */
+  color: #6f515a; /* Dark muted pink for product names */
 }
 
 .product-card p {
   margin: 5px 0;
-  color: #9d8189; /* Dark muted pink for text */
+  color: #6f515a; /* Dark muted pink for text */
   font-size: 14px;
 }
 /* Button Styles */
@@ -205,6 +250,11 @@ input[type="number"] {
 .cart-item-details {
   flex-grow: 1;
   margin-left: 20px;
+}
+.cart-link .material-icons {
+  font-size: 20px;
+  vertical-align: middle;
+  margin-right: 5px;
 }
 
 .cart-item-name {
@@ -436,7 +486,7 @@ body.invoice-confirmation {
 .welcome-section {
   background-image: url("../static/welcome.jpg");
   background-size: cover;
-  background-position: center;
+  background-position: top;
   height: 300px; /* Adjust height as needed */
   display: flex;
   align-items: flex-end; /* Align slogan at the bottom */
@@ -446,7 +496,7 @@ body.invoice-confirmation {
 }
 
 .slogan {
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+  background-color: #f4f4f4;/* Semi-transparent background */
   padding: 20px;
   border-radius: 10px;
 }
@@ -1063,3 +1113,4 @@ blockquote em {
   margin: auto;
   overflow-x: auto;
 }
+

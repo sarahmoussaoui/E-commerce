@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Enchères</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cart.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div id="navbar">
+            <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}#about">About</a></li>
+                    <li><a href="{{ url_for('index_user') }}">Products</a></li>
+                    <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
+                    <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="cart-container">
+            <h1>Mes Enchères</h1>
+            <a href="{{ url_for('home') }}" class="back-link">Retour à l'accueil</a>
+    
+            {% if encheres %}
+                {% for enchere in encheres %}
+                <div class="cart-item">
+                    <img src="{{ url_for('static', filename=enchere[1]) }}" alt="Image de {{ enchere[0] }}">
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">{{ enchere[0] }}</div>
+                        <div class="cart-item-price">Prix proposé : {{ enchere[2] }} €</div>
+                        <div class="cart-item-quantity">État : {{ enchere[3] }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Vous n'avez pas encore placé d'enchères.</p>
+            {% endif %}
+        </div>
+    </header>
+
+   
+</body>
+</html>

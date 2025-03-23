@@ -1,0 +1,369 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
+* {
+
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: "Quicksand", sans-serif;
+}
+
+ul{
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container{
+  
+    max-width: 1180px;
+    margin: auto;
+}
+/* Logout Button */
+
+
+/* Utility classes  */
+.primary-text {
+    color: #e4b95b ;
+}
+.btn {
+    display: inline-block;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+}
+
+.btn-primary{
+    color: white;
+    border: 1px solid #fff;
+}
+.btn-secondary{
+    color:#fff;
+    background:rgb(65, 61, 62);
+    margin-top: 2rem;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover
+{
+    background: rgb(158, 100, 110);
+}
+
+/* header start  */
+header {
+    height: 100vh;
+    background: url("../static/welcome.jpg")  center center/cover no-repeat;
+    position: relative;
+}
+
+#navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+}
+
+.logout-text {
+    color: white;
+    font-weight: 600;
+    padding: 10px 20px;
+    margin-left: 10px;
+    transition: border-bottom 0.3s ease-in-out;
+}
+
+.logout-text:hover {
+    border-bottom: 2px solid #e4b95b;
+}
+
+#navbar ul {
+    display: flex;
+    gap: 15px;
+    margin-right: 100px;
+}
+
+#navbar ul li a {
+    padding: 15px 20px;
+    color: white;
+    font-weight: 600;
+    transition: border-bottom 0.3s ease-in-out;
+}
+
+#navbar ul li a:hover {
+    border-bottom: 2px solid #e4b95b;
+}
+
+header .content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 75vh;
+}
+
+header .content h1{
+    font-size: 40px;
+    color: white;
+}
+
+header .content p{
+    margin: 20px 0 40px;
+    color: white;
+}
+
+header::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgb(0, 0,0,0.6);
+
+}
+header * {
+    z-index: 10;
+}
+/* header end */
+
+main {
+    background-color: #f4f4f4; /* Change la couleur selon tes besoins */
+    padding: 50px 0; /* Ajoute un peu d'espace autour du contenu */
+}
+/* about start  */
+
+#about {
+    height:80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f4f4f4;
+    margin-bottom: 100px;
+
+}
+
+#about .title {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+#about h2{
+    
+    color:#9d8189;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    font-size: 3em;
+}
+
+#about  .title p{
+    font-size: 14px;
+    color: #9d8189;
+    font-weight: 600;
+}
+
+#about .about-content {
+display: flex;
+justify-content: space-between;
+background:  #f4f4f4;
+align-items: center;
+gap: 8rem;
+
+}
+
+#about .about-content img {
+  
+    width: 450px; /* Ensure the image takes up half the container */
+    max-height: 480px; /* Increase max-height for a larger image */
+    height: auto; /* Let the height adjust based on the image's aspect ratio */
+    object-fit: cover; /* Ensure the image covers the container without distortion */
+    border-radius: 12px;
+    flex: 1;
+
+}
+
+#about .about-content p{
+    color: #494545;
+    margin-right: 4rem;
+    font-weight: 500;
+    line-height: 1.6;
+    width: 90%; 
+
+}
+
+#about .about-content h2{
+    color: #9d8189;
+    font-size: 2em;
+    margin-bottom: 30px; /* Espacement sous le titre */
+    border-bottom: 2px solid #d8e2dc;
+    padding-bottom: 20px; /* Ajoute un espace entre le texte et la bordure */
+    width: 90%;
+    margin-right: 4rem;
+
+}
+
+
+#about .about-content a {
+    margin-top: 2rem;
+  }
+
+
+/* about end */
+
+/* Our Story Section */
+
+#our-story {
+    margin-top: 200px; /* Ajuste selon ton design */
+    padding-top: 50px;
+    background:  #f4f4f4;
+
+}
+
+#our-story .about-story {
+    display: flex;
+    align-items: center; /* Aligner verticalement */
+    justify-content: space-between; /* Séparer image et texte */
+    gap: 3rem; /* Espacement entre image et texte */
+}
+#our-story .about-story img {
+    width: 40%; /* Réduit la taille de l’image */
+    max-height: 400px; 
+    height: auto;
+    object-fit: cover;
+    border-radius: 12px;
+    flex: 1;
+}
+    
+#our-story .about-story p {
+    color: #494545;
+    font-weight: 500;
+    line-height: 1.6;
+    width: 100%; /* Ajuste la largeur du texte */
+    /*margin-left: 0; /* Enlève le gros margin-left */
+    margin-left: 6rem;
+    margin-right: 10rem;
+}
+ #our-story .about-story a {
+        margin-top: 2rem;
+      }
+
+ #our-story .about-story .text-content {
+        flex: 1;
+        margin-right: 2rem;
+    }
+    
+ #our-story .about-story h2 {
+        color: #9d8189;
+        font-size: 2em;
+        margin-bottom: 30px; /* Espacement sous le titre */
+        margin-left: 6rem;
+        border-bottom: 2px solid #d8e2dc;
+        padding-bottom: 20px; /* Ajoute un espace entre le texte et la bordure */
+        width: 90%;
+    }
+
+
+
+/* ou team section */
+.section {
+    margin-bottom: 40px;
+    margin-top: 100px;
+  }
+  
+.section h2 {
+    border-bottom: 2px solid #d8e2dc;
+    padding-bottom: 25px;
+    margin-bottom: 20px;
+    font-size: 2em;
+    color: #9d8189;
+  }
+
+  .team-members {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .team-member {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .team-member img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #d8e2dc;
+    margin-bottom: 15px;
+  }
+  
+  .team-member h3 {
+    margin: 10px 0 5px;
+    font-size: 1.3em;
+    color: #9d8189;
+  }
+  
+  .team-member .role {
+    margin: 0;
+    font-size: 0.9em;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  .team-member .description {
+    margin: 10px 0 0;
+    font-size: 0.9em;
+    color: #9e8484;
+    line-height: 1.6;
+    
+  }
+
+  /* Customer Testimonials */
+.customer-testimonials {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .customer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .customer img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #d8e2dc;
+  }
+  
+  .customer-info {
+    flex: 1;
+  }
+  
+  .customer-info h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #9d8189;
+  }
+  
+  .customer-info .job-title {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #6c757d;
+  }
+  
+

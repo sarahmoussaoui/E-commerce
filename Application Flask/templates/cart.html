@@ -3,25 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <title>Panier</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='cart.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   </head>
   <body>
-    <nav class="navbar">
-      <a href="{{ url_for('logout') }}" class="logout-btn">
-          <img
+    <header>
+    <div id="navbar">
+      <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
+          <!-- <img
             src="{{ url_for('static', filename='img/logout.png') }}"
-            alt="Logout" />
+            alt="Logout" /> -->
         </a>
-      <ul class="nav-links">
-          <li><a href="{{ url_for('about_us') }}">About us</a></li>
+      <nav>
+        <ul >
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('home') }}#about">About</a></li>
           <li><a href="{{ url_for('index_user') }}">Products</a></li>
           <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
           <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
       </ul>
   </nav>
+  </div>
     <div class="cart-container">
-      <h1>Votre Panier</h1>
+      <h1>My Cart</h1>
       {% if products %}
         {% for product in products %}
         <div class="cart-item">
@@ -35,7 +39,7 @@
           <!-- Add a delete button -->
           <form action="{{ url_for('remove_from_cart') }}" method="POST" style="display: inline;">
             <input type="hidden" name="product_id" value="{{ product.id }}" />
-            <button type="submit" class="delete-button">Supprimer</button>
+            <button type="submit" class="delete-button">delete</button>
           </form>
         </div>
         {% endfor %}
@@ -80,13 +84,13 @@
               data-currency="EUR"></script>
           </form>
         </div>
-
+      
 
       {% else %}
         <p>Votre panier est vide.</p>
       {% endif %}
     </div>
-
+  </header>
     <!-- JavaScript to Update Total and Address -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
@@ -121,5 +125,6 @@
         });
       });
     </script>
+    
   </body>
 </html>
