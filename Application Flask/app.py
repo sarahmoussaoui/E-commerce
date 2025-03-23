@@ -1010,11 +1010,12 @@ def update_order_status(order_id):
     return redirect(url_for("admin_orders"))
 
 @app.route("/encherir", methods=["POST"])
+@app.route("/encherir", methods=["POST"])
 def encherir():
     try:
         data = request.json
         enchere_id = data.get("id_enchere")
-        prix = data.get("prix")
+        prix = float(data.get("prix"))  # Convertir en float
         first_name = data.get("firstName")
         last_name = data.get("lastName")
         email = data.get("email")
@@ -1023,7 +1024,7 @@ def encherir():
         db = get_db()
         cursor = db.cursor()
 
-        # Vérifier si l'utilisateur existe déjà
+        # Vérifier si l'utilisateur existe
         cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
         user = cursor.fetchone()
 
@@ -1040,12 +1041,24 @@ def encherir():
             """,
             (enchere_id, user_id, prix),
         )
+
+        # Mettre à jour le prix de départ dans enchere
+        cursor.execute(
+            """
+            UPDATE enchere
+            SET prix = ?
+            WHERE id_enchere = ?
+            """,
+            (prix, enchere_id),
+        )
+
         db.commit()
 
         return jsonify({"message": "Enchère enregistrée avec succès !"})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/admin/historique_encheres", methods=["GET"])
 def historique_encheres():
