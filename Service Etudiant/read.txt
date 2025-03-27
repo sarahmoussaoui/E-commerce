@@ -1,0 +1,13 @@
+Requêtes pour invoquer le service :
+Obtenir les informations du major de la section
+  curl -X GET http://localhost:5000/students/major
+Supprimer les étudiants ayant la mention "Passable" :
+ curl -X DELETE http://localhost:5000/students/remove-passable
+Afficher le nombre d'étudiants ayant la mention "Bien" :
+ curl -X GET http://localhost:5000/students/count-bien
+
+
+
+
+
+
