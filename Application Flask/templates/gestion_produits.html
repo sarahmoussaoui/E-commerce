@@ -1,5 +1,3 @@
-<!-- @format -->
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,80 +10,205 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    
   </head>
   <body>
-    <nav class="navbar">
-      <a href="{{ url_for('logout') }}" class="logout-btn">
-        <img
-          src="{{ url_for('static', filename='img/logout.png') }}"
-          alt="Logout" />
-      </a>
-      <ul class="nav-links">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+        <button class="toggle-sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      <ul class="sidebar-menu">
         <li>
-          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+          <a href="{{ url_for('home_admin') }}">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+          </a>
         </li>
 
-        <li><a href="{{ url_for('admin_orders') }}">Commandes</a></li>
-        <!-- must change to historique_commandes later -->
-        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
-        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
-        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
-        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
-      </ul>
-    </nav>
-    <h1>Product List</h1>
-
-    <a href="{{ url_for('add_product') }}"><button>Add Product</button></a>
-
-    <div class="product-container">
-      {% for product in products %}
-      <div class="product-card">
-        <img
-          src="{{ url_for('static', filename= product.image_url ) }}"
-          alt="{{ product.name }}" />
-        <h3>{{ product.name }}</h3>
-        <p>Price: ${{ product.price }}</p>
-        <p>Stock: {{ product.stock }}</p>
-        <div class="product-actions">
-          <a href="{{ url_for('update_product', product_id=product.id) }}">
-            <button class="update-btn">Update</button>
+        <li class="has-submenu">
+          <a href="#" class="submenu-toggle">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
           </a>
+          <ul class="submenu">
+            <li>
+              <a href="{{ url_for('gestion_produits') }}">All Products</a>
+            </li>
+            <li><a href="#">Add New Product</a></li>
+            <li><a href="#">Categories</a></li>
+            <li><a href="#">Inventory</a></li>
+          </ul>
+        </li>
 
-          <!-- Delete Button triggers the modal -->
-          <button
-            type="button"
-            class="delete-btn"
-            onclick="document.getElementById('delete-modal-{{ product.id }}').showModal();">
-            Delete
-          </button>
+        <li class="has-submenu active">
+          <a href="#" class="submenu-toggle">
+            <i class="fas fa-gavel"></i>
+            <span>Auctions</span>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="{{ url_for('gestion_encheres') }}">Active Auctions</a>
+            </li>
+            <li><a href="#">Schedule Auction</a></li>
+            <li>
+              <a href="{{ url_for('historique_encheres') }}">Auction History</a>
+            </li>
+            <li><a href="#">Bid Management</a></li>
+          </ul>
+        </li>
 
-          <!-- Delete Confirmation Modal -->
+        <li class="has-submenu">
+          <a href="#" class="submenu-toggle">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Orders</span>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+          <ul class="submenu">
+            <li><a href="{{ url_for('admin_orders') }}">All Orders</a></li>
+            <li><a href="#">Pending Orders</a></li>
+            <li><a href="#">Completed Orders</a></li>
+            <li><a href="#">Shipping</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="{{ url_for('admin_messages') }}">
+            <i class="fas fa-envelope"></i>
+            <span>Messages</span>
+            <span class="badge">{{ message_count }}</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            <i class="fas fa-chart-line"></i>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <img
+            src="{{ url_for('static', filename='img/admin-avatar.jpg') }}"
+            alt="Admin"
+          />
+          <div class="user-info">
+            <h4>{{ current_user.FirstName }} {{ current_user.LastName }}</h4>
+            <small>Admin</small>
+          </div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="products-header">
+        <h1>Product Management</h1>
+        <div class="header-actions">
+          <a href="{{ url_for('add_product') }}" class="add-product-btn">
+            <i class="fas fa-plus"></i> Add Product
+          </a>
+          <div class="search-box">
+            <input type="text" placeholder="Search products...">
+            <button><i class="fas fa-search"></i></button>
+          </div>
+        </div>
+      </div>
+
+     
+      <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+          <div class="product-badge">{{ 'Sale' if product.discount else 'New' }}</div>
+          <div class="product-image-container">
+            <img
+              src="{{ url_for('static', filename=product.image_url) }}"
+              alt="{{ product.name }}"
+              class="product-image" />
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">{{ product.name }}</h3>
+            <div class="price-container">
+              {% if product.discount %}
+                <span class="original-price">${{ product.price }}</span>
+                <span class="discounted-price">${{ product.price * (1 - product.discount/100) }}</span>
+              {% else %}
+                <span class="current-price">${{ product.price }}</span>
+              {% endif %}
+            </div>
+            <div class="stock-status {{ 'in-stock' if product.stock > 0 else 'out-of-stock' }}">
+              {{ product.stock }} in stock
+            </div>
+            <div class="product-actions">
+              <a 
+                href="{{ url_for('update_product', product_id=product.id) }}" 
+                class="action-btn update">
+                <i class="fas fa-pencil-alt"></i> Edit
+              </a>
+              <button 
+                onclick="document.getElementById('delete-modal-{{ product.id }}').showModal()"
+                class="action-btn delete">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- Delete Modal -->
           <dialog id="delete-modal-{{ product.id }}" class="delete-modal">
-            <form
-              method="POST"
-              action="{{ url_for('delete_product', product_id=product.id) }}">
+            <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}">
               <h2>Confirm Deletion</h2>
-              <p>
-                Are you sure you want to delete "<strong
-                  >{{ product.name }}</strong
-                >"?
-              </p>
+              <p>Are you sure you want to delete "{{ product.name }}"?</p>
               <div class="modal-buttons">
-                <button type="submit" class="confirm-delete">
-                  Yes, Delete
-                </button>
-                <button
-                  type="button"
-                  onclick="this.closest('dialog').close();"
-                  class="cancel-delete">
+                <button type="button" onclick="this.closest('dialog').close()" class="cancel-delete">
                   Cancel
+                </button>
+                <button type="submit" class="confirm-delete">
+                  Delete
                 </button>
               </div>
             </form>
           </dialog>
         </div>
+        {% endfor %}
       </div>
-      {% endfor %}
-    </div>
+
+
+    </main>
+
+    <script>
+      // Ensure delete modals work properly
+      document.querySelectorAll('.action-btn.delete').forEach(button => {
+        button.addEventListener('click', function() {
+          const productId = this.closest('.product-card').querySelector('dialog').id;
+          document.getElementById(productId).showModal();
+        });
+      });
+    </script>
   </body>
 </html>

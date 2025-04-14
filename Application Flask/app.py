@@ -819,13 +819,30 @@ def delete_product(product_id):
 #  Encheres
 
 
+from datetime import datetime
+
+
 @app.route("/gestion_encheres")
 @login_required
 def gestion_encheres():
     conn = get_db()
     encheres = conn.execute("SELECT * FROM enchere").fetchall()
+
+    # Convert date strings to datetime objects
+    processed_encheres = []
+    for enchere in encheres:
+        enchere_dict = dict(enchere)
+        enchere_dict["date_fin"] = datetime.strptime(
+            enchere_dict["date_fin"], "%Y-%m-%d"
+        )
+        processed_encheres.append(enchere_dict)
+
     conn.close()
-    return render_template("gestion_encheres.html", encheres=encheres)
+    return render_template(
+        "gestion_encheres.html",
+        encheres=processed_encheres,
+        current_date=datetime.now(),
+    )
 
 
 @app.route("/add_enchere", methods=["GET", "POST"])
@@ -880,12 +897,13 @@ def update_enchere(enchere_id):
 
         cursor.execute(
             """
-            UPDATE enchere 
-            SET name=?, description=?, image_url=?, prix=?, date_fin=?,adresse=?
-            WHERE id_enchere=?
-            """,
-            (name, description, image_url, prix, date_fin, enchere_id, adresse),
+    UPDATE enchere 
+    SET name=?, description=?, image_url=?, prix=?, date_fin=?, adresse=?
+    WHERE id_enchere=?
+    """,
+            (name, description, image_url, prix, date_fin, adresse, enchere_id),
         )
+
         conn.commit()
         conn.close()
 

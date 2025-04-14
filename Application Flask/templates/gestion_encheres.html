@@ -1,99 +1,231 @@
-<!-- @format -->
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Encheres Management</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='admin_enchere.css') }}" />
+    <meta name="viewport" content="width=d
+    evice-width, initial-scale=1.0" />
+
+    <title>Auction Management</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_enchere.css') }}" />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   </head>
   <body>
-    <nav class="navbar">
-      <a href="{{ url_for('logout') }}" class="logout-btn">
-        <img
-          src="{{ url_for('static', filename='img/logout.png') }}"
-          alt="Logout" />
-      </a>
-      <ul class="nav-links">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+        <button class="toggle-sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      <ul class="sidebar-menu">
         <li>
-          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
+          <a href="{{ url_for('home_admin') }}">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+          </a>
         </li>
 
-        <li><a href="{{ url_for('admin_orders') }}">Commandes</a></li>
-        <!-- must change to historique_commandes later -->
-        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
-        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
-        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
-        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
-      </ul>
-    </nav>
-
-    <h1>Enchères List</h1>
-
-    <a href="{{ url_for('add_enchere') }}"><button>Add Enchère</button></a>
-
-    <div class="product-container">
-      {% for enchere in encheres %}
-      <div class="product-card">
-        <img
-          src="{{ url_for('static', filename=enchere.image_url) }}"
-          alt="{{ enchere.name }}" />
-        <h3>{{ enchere.name }}</h3>
-        <!-- <p>Description: {{ enchere.description }}</p> -->
-        <p>Prix: ${{ enchere.prix }}</p>
-        <p>Date de fin: {{ enchere.date_fin }}</p>
-
-        <div class="product-actions">
-          <a
-            href="{{ url_for('update_enchere', enchere_id=enchere.id_enchere) }}">
-            <button class="update-btn">Update</button>
+        <li class="has-submenu">
+          <a href="#" class="submenu-toggle">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
           </a>
+          <ul class="submenu">
+            <li>
+              <a href="{{ url_for('gestion_produits') }}">All Products</a>
+            </li>
+            <li><a href="#">Add New Product</a></li>
+            <li><a href="#">Categories</a></li>
+            <li><a href="#">Inventory</a></li>
+          </ul>
+        </li>
 
-          <!-- Delete Button that triggers the modal -->
-          <button
-            type="button"
-            class="delete-btn"
-            onclick="document.getElementById('delete-modal-{{ enchere.id_enchere }}').showModal();">
-            Delete
-          </button>
+        <li class="has-submenu active">
+          <a href="#" class="submenu-toggle">
+            <i class="fas fa-gavel"></i>
+            <span>Auctions</span>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="{{ url_for('gestion_encheres') }}">Active Auctions</a>
+            </li>
+            <li><a href="#">Schedule Auction</a></li>
+            <li>
+              <a href="{{ url_for('historique_encheres') }}">Auction History</a>
+            </li>
+            <li><a href="#">Bid Management</a></li>
+          </ul>
+        </li>
 
-          <!-- Delete Confirmation Modal -->
-          <dialog
-            id="delete-modal-{{ enchere.id_enchere }}"
-            class="delete-modal">
-            <form
-              method="POST"
-              action="{{ url_for('delete_enchere', enchere_id=enchere.id_enchere) }}">
+        <li class="has-submenu">
+          <a href="#" class="submenu-toggle">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Orders</span>
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+          <ul class="submenu">
+            <li><a href="{{ url_for('admin_orders') }}">All Orders</a></li>
+            <li><a href="#">Pending Orders</a></li>
+            <li><a href="#">Completed Orders</a></li>
+            <li><a href="#">Shipping</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="{{ url_for('admin_messages') }}">
+            <i class="fas fa-envelope"></i>
+            <span>Messages</span>
+            <span class="badge">{{ message_count }}</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            <i class="fas fa-chart-line"></i>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="#">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <img
+            src="{{ url_for('static', filename='img/admin-avatar.jpg') }}"
+            alt="Admin"
+          />
+          <div class="user-info">
+            <h4>{{ current_user.FirstName }} {{ current_user.LastName }}</h4>
+            <small>Admin</small>
+          </div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="auctions-header">
+        <h1>Auction Management</h1>
+        <div class="header-actions">
+          <a href="{{ url_for('add_enchere') }}" class="add-auction-btn">
+            <i class="fas fa-plus"></i> Add Auction
+          </a>
+          <div class="search-box">
+            <input type="text" placeholder="Search auctions...">
+            <button><i class="fas fa-search"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="auction-grid">
+        {% for enchere in encheres %}
+        <div class="auction-card">
+          <div class="auction-status {{ 'active' if enchere.date_fin > current_date else 'ended' }}">
+            {{ 'Active' if enchere.date_fin > current_date else 'Ended' }}
+          </div>
+          <div class="auction-image-container">
+            <img
+              src="{{ url_for('static', filename=enchere.image_url) }}"
+              alt="{{ enchere.name }}"
+              class="auction-image" />
+          </div>
+          <div class="auction-info">
+            <h3 class="auction-title">{{ enchere.name }}</h3>
+            <div class="price-container">
+              <span class="current-price">${{ enchere.prix }}</span>
+            </div>
+            <div class="end-date">
+              <i class="far fa-clock"></i> Ends: {{ enchere.date_fin }}
+            </div>
+            <div class="auction-actions">
+              <a 
+                href="{{ url_for('update_enchere', enchere_id=enchere.id_enchere) }}" 
+                class="action-btn update">
+                <i class="fas fa-pencil-alt"></i> Edit
+              </a>
+              <button 
+                onclick="document.getElementById('delete-modal-{{ enchere.id_enchere }}').showModal()"
+                class="action-btn delete">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- Delete Modal -->
+          <dialog id="delete-modal-{{ enchere.id_enchere }}" class="delete-modal">
+            <form method="POST" action="{{ url_for('delete_enchere', enchere_id=enchere.id_enchere) }}">
               <h2>Confirm Deletion</h2>
-              <p>
-                Are you sure you want to delete "<strong
-                  >{{ enchere.name }}</strong
-                >"?
-              </p>
+              <p>Are you sure you want to delete "{{ enchere.name }}"?</p>
               <div class="modal-buttons">
-                <button type="submit" class="confirm-delete">
-                  Yes, Delete
-                </button>
-                <button
-                  type="button"
-                  onclick="this.closest('dialog').close();"
-                  class="cancel-delete">
+                <button type="button" onclick="this.closest('dialog').close()" class="cancel-delete">
                   Cancel
+                </button>
+                <button type="submit" class="confirm-delete">
+                  Delete
                 </button>
               </div>
             </form>
           </dialog>
         </div>
+        {% else %}
+        <div class="no-auctions">
+          <i class="fas fa-gavel fa-3x"></i>
+          <p>No auctions available</p>
+          <a href="{{ url_for('add_enchere') }}" class="add-auction-btn">
+            <i class="fas fa-plus"></i> Add Your First Auction
+          </a>
+        </div>
+        {% endfor %}
       </div>
-      {% else %}
-      <p>No auctions available.</p>
-      {% endfor %}
-    </div>
+    </main>
+
+    <script>
+      // Toggle sidebar on mobile
+      document.querySelector('.toggle-sidebar').addEventListener('click', function() {
+        document.querySelector('.sidebar-menu').classList.toggle('active');
+      });
+
+      // Toggle submenus
+      document.querySelectorAll('.submenu-toggle').forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const submenu = this.nextElementSibling;
+          const parent = this.parentElement;
+          
+          parent.classList.toggle('active');
+          submenu.style.maxHeight = parent.classList.contains('active') ? submenu.scrollHeight + 'px' : '0';
+        });
+      });
+
+      // Initialize submenus
+      document.querySelectorAll('.has-submenu.active .submenu').forEach(submenu => {
+        submenu.style.maxHeight = submenu.scrollHeight + 'px';
+      });
+    </script>
   </body>
 </html>
