@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_oreders_details.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home_admin.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>Admin Panel</h2>
+          <button class="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+        <ul class="sidebar-menu">
+          <li class="active">
+            <a href="{{ url_for('home_admin') }}">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          <li class="has-submenu">
+            <a href="#" class="submenu-toggle">
+              <i class="fas fa-box-open"></i>
+              <span>Products</span>
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="{{ url_for('gestion_produits') }}">All Products</a>
+              </li>
+              <li><a href="#">Add New Product</a></li>
+              <li><a href="#">Categories</a></li>
+              <li><a href="#">Inventory</a></li>
+            </ul>
+          </li>
+
+          <li class="has-submenu">
+            <a href="#" class="submenu-toggle">
+              <i class="fas fa-gavel"></i>
+              <span>Auctions</span>
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="{{ url_for('gestion_encheres') }}">Active Auctions</a>
+              </li>
+              <li><a href="#">Schedule Auction</a></li>
+              <li>
+                <a href="{{ url_for('historique_encheres') }}">Auction History</a>
+              </li>
+              <li><a href="#">Bid Management</a></li>
+            </ul>
+          </li>
+
+          <li class="has-submenu">
+            <a href="#" class="submenu-toggle">
+              <i class="fas fa-shopping-cart"></i>
+              <span>Orders</span>
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+            </a>
+            <ul class="submenu">
+              <li><a href="{{ url_for('admin_orders') }}">All Orders</a></li>
+              <li><a href="#">Pending Orders</a></li>
+              <li><a href="#">Completed Orders</a></li>
+              <li><a href="#">Shipping</a></li>
+            </ul>
+          </li>
+
+          <li>
+            <a href="{{ url_for('admin_messages') }}">
+              <i class="fas fa-envelope"></i>
+              <span>Messages</span>
+              <span class="badge">{{ message_count }}</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="#">
+              <i class="fas fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="#">
+              <i class="fas fa-chart-line"></i>
+              <span>Reports</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="#">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+        <div class="sidebar-footer">
+          <div class="user-profile">
+            <img
+              src="{{ url_for('static', filename='img/admin-avatar.jpg') }}"
+              alt="Admin"
+            />
+            <div class="user-info">
+              <h4>{{ current_user.FirstName }} {{ current_user.LastName }}</h4>
+              <small>Admin</small>
+            </div>
+          </div>
+          <a href="{{ url_for('logout') }}" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="main-header">
+                <div>
+                    <h1>Order #{{ order.id }}</h1>
+                    <nav class="breadcrumb">
+                        <a href="{{ url_for('home_admin') }}">Dashboard</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="{{ url_for('admin_orders') }}">Orders</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Order Details</span>
+                    </nav>
+                </div>
+                <div class="header-actions">
+                    <a href="{{ url_for('admin_orders') }}" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Orders
+                    </a>
+                </div>
+            </header>
+
+            <!-- Order Summary Section -->
+            <div class="order-summary">
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <h3><i class="fas fa-info-circle"></i> Order Information</h3>
+                    </div>
+                    <div class="summary-body">
+                        <div class="summary-row">
+                            <span class="summary-label">Order Date:</span>
+                            <span class="summary-value">{{ order.order_date }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Order Status:</span>
+                            <span class="status {{ order.status }}">{{ order.status|capitalize }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Payment Method:</span>
+                            <span class="summary-value">Credit Card</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Total Amount:</span>
+                            <span class="summary-value">${{ "%.2f"|format(order.total_amount) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <h3><i class="fas fa-user"></i> Customer Information</h3>
+                    </div>
+                    <div class="summary-body">
+                        <div class="summary-row">
+                            <span class="summary-label">Name:</span>
+                            <span class="summary-value">{{ order.FirstName }} {{ order.LastName }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Email:</span>
+                            <span class="summary-value">{{ order.Email }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Phone:</span>
+                            <span class="summary-value">(123) 456-7890</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-header">
+                        <h3><i class="fas fa-truck"></i> Shipping Information</h3>
+                    </div>
+                    <div class="summary-body">
+                        <div class="summary-row">
+                            <span class="summary-label">Address:</span>
+                            <span class="summary-value">{{ order.address }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Delivery Option:</span>
+                            <span class="summary-value">{{ order.delivery_option }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Delivery Cost:</span>
+                            <span class="summary-value">${{ "%.2f"|format(order.delivery_cost) }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Tracking Number:</span>
+                            <span class="summary-value">USPS 1234567890</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items Section -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>Order Items</h2>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>
+                                    <div class="product-info">
+                                        <img src="{{ url_for('static', filename= item.product_img) }}" alt="{{ item.product_name }}" class="product-img">
+                                        <div>
+                                            <h4>{{ item.product_name }}</h4>
+                                            <small>SKU: {{ item.product_id }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${{ "%.2f"|format(item.price_per_unit) }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ "%.2f"|format(item.price_per_unit * item.quantity) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-right">Subtotal:</td>
+                                <td>${{ "%.2f"|format(order.total_amount - order.delivery_cost) }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-right">Shipping:</td>
+                                <td>${{ "%.2f"|format(order.delivery_cost) }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-right total">Total:</td>
+                                <td class="total">${{ "%.2f"|format(order.total_amount) }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Order Actions Section -->
+            <div class="order-actions">
+                <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="POST" class="status-form">
+                    <div class="form-group">
+                        <label for="status">Update Status:</label>
+                        <select name="status" id="status">
+                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                            <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="update-btn">
+                        <i class="fas fa-sync-alt"></i> Update Status
+                    </button>
+                </form>
+
+                <div class="action-buttons">
+                    <button class="print-btn">
+                        <i class="fas fa-print"></i> Print Invoice
+                    </button>
+                    <button class="email-btn">
+                        <i class="fas fa-envelope"></i> Email Customer
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Toggle sidebar (same as dashboard)
+        document.querySelectorAll(".submenu-toggle").forEach((item) => {
+            item.addEventListener("click", function (e) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle("active");
+
+                const icon = this.querySelector(".dropdown-icon");
+                if (parent.classList.contains("active")) {
+                    icon.classList.remove("fa-chevron-down");
+                    icon.classList.add("fa-chevron-up");
+                } else {
+                    icon.classList.remove("fa-chevron-up");
+                    icon.classList.add("fa-chevron-down");
+                }
+            });
+        });
+
+        document.querySelector(".toggle-sidebar").addEventListener("click", function () {
+            document.querySelector(".sidebar").classList.toggle("collapsed");
+        });
+    </script>
+</body>
+</html>

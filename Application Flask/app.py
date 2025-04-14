@@ -7,6 +7,7 @@ from flask import (
     session,
     send_file,
     flash,
+    jsonify,
 )
 from datetime import datetime
 import time
@@ -25,34 +26,27 @@ from flask_login import (
     login_required,
     current_user,
 )
-from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from flask import jsonify
 
-
-load_dotenv()  # Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY")  # Use the correct key
-app.config["SESSION_PERMANENT"] = False  # Optional: Prevents permanent sessions
-app.config["SESSION_TYPE"] = "filesystem"  # Ensures sessions are stored properly
+app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY")
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
 bcrypt = Bcrypt(app)
 
 # Flask-Login Setup
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
-login_manager.login_message_category = "warning"  # Show flash message on redirect
-
+login_manager.login_message_category = "warning"
 
 # Stripe Configuration
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 stripe_public_key = os.getenv("STRIPE_PUBLIC_KEY")
-
-# SQLite Database Path
-DATABASE = "database.db"
 
 
 # User Model
@@ -70,7 +64,6 @@ class User(UserMixin):
         return str(self.id)
 
 
-# Load User for Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_db()
@@ -86,21 +79,135 @@ def load_user(user_id):
             user["password"],
             user["is_admin"],
         )
-    return None  # Explicitly return None if the user is not found
+    return None
 
 
-# Function to get database connection
 def get_db():
-    db_path = "database.db"  # Assure-toi que c'est bien le bon fichier
-    print(f"Using database: {os.path.abspath(db_path)}")  # Ajout du print
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect("database.db")
     conn.row_factory = sqlite3.Row
     return conn
 
-# Initialize Database
+
+def init_db():
+    with app.app_context():
+        conn = get_db()
+        cursor = conn.cursor()
+
+        # Create users table
+        cursor.execute(
+            """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            FirstName TEXT NOT NULL,
+            LastName TEXT NOT NULL,
+            Email TEXT UNIQUE NOT NULL,
+            phoneNum TEXT NOT NULL,
+            password TEXT NOT NULL,
+            is_admin INTEGER DEFAULT 0
+        )
+        """
+        )
+
+        # Create products table
+        cursor.execute(
+            """
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            price REAL NOT NULL,
+            stock INTEGER NOT NULL,
+            image_url TEXT
+        )
+        """
+        )
+
+        # Create enchere table
+        cursor.execute(
+            """
+        CREATE TABLE IF NOT EXISTS enchere (
+            id_enchere INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT,
+            image_url TEXT,
+            prix REAL NOT NULL,
+            date_fin TEXT NOT NULL,
+            adresse TEXT,
+            etat TEXT DEFAULT 'active'
+        )
+        """
+        )
+
+        # Create historique_enchere table
+        cursor.execute(
+            """
+        CREATE TABLE IF NOT EXISTS historique_enchere (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_enchere INTEGER NOT NULL,
+            id_user INTEGER NOT NULL,
+            proposed_price REAL NOT NULL,
+            date TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (id_enchere) REFERENCES enchere(id_enchere),
+            FOREIGN KEY (id_user) REFERENCES users(id)
+        )
+        """
+        )
+
+        # Create commande table
+        cursor.execute(
+            """
+        CREATE TABLE IF NOT EXISTS commande (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            address TEXT NOT NULL,
+            delivery_option TEXT NOT NULL,
+            delivery_cost REAL NOT NULL,
+            total_amount REAL NOT NULL,
+            order_date TEXT DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'pending',
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+        """
+        )
+
+        # Create commande_items table
+        cursor.execute(
+            """
+        CREATE TABLE IF NOT EXISTS commande_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            commande_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            price_per_unit REAL NOT NULL,
+            FOREIGN KEY (commande_id) REFERENCES commande(id),
+            FOREIGN KEY (product_id) REFERENCES products(id)
+        )
+        """
+        )
+
+        # Create messages table
+        cursor.execute(
+            """
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            objet TEXT NOT NULL,
+            message TEXT NOT NULL,
+            date TEXT DEFAULT CURRENT_TIMESTAMP,
+            is_treated INTEGER DEFAULT 0,
+            admin_response TEXT,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+        """
+        )
+
+        conn.commit()
+        conn.close()
 
 
-# Route: Register
+# Initialize database tables
+init_db()
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -110,11 +217,6 @@ def register():
         phone_num = request.form.get("phoneNum")
         password = request.form.get("password")
 
-        print(
-            f"Received Data: {first_name}, {last_name}, {email}, {phone_num}, {password}"
-        )
-
-        # Validate input fields
         if not all([first_name, last_name, email, phone_num, password]):
             flash("All fields are required.", "warning")
             return render_template("register.html")
@@ -124,10 +226,7 @@ def register():
         conn = get_db()
         try:
             conn.execute(
-                """
-                INSERT INTO users (FirstName, LastName, Email, phoneNum, password) 
-                VALUES (?, ?, ?, ?, ?)
-                """,
+                "INSERT INTO users (FirstName, LastName, Email, phoneNum, password) VALUES (?, ?, ?, ?, ?)",
                 (first_name, last_name, email, phone_num, hashed_password),
             )
             conn.commit()
@@ -148,19 +247,12 @@ def login():
         password = request.form.get("password")
 
         conn = get_db()
-        cursor = conn.cursor()
-        user = cursor.execute(
-            "SELECT * FROM users WHERE Email = ?", (email,)
-        ).fetchone()
+        user = conn.execute("SELECT * FROM users WHERE Email = ?", (email,)).fetchone()
         conn.close()
 
-        if user is None:  # Handle missing user
+        if user is None:
             flash("User not found. Please register.", "danger")
             return render_template("login.html")
-
-        print("Stored Hashed Password:", user["password"])
-        print("Entered Password:", password)
-        print("Password Match:", bcrypt.check_password_hash(user["password"], password))
 
         if bcrypt.check_password_hash(user["password"], password):
             user_obj = User(
@@ -173,11 +265,8 @@ def login():
                 user["is_admin"],
             )
             login_user(user_obj, remember=True)
-            
-            # ✅ Ajout de l'ID utilisateur dans la session
-            session["user_id"] = user["id"]  
-            session["email"] = email  
-
+            session["user_id"] = user["id"]
+            session["email"] = email
             flash("Login successful!", "success")
 
             if user["is_admin"] == 1:
@@ -193,9 +282,7 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
-    print("Logging out. Session before:", session)
     logout_user()
-    print("Session after logout:", session)
     flash("Logged out successfully!", "info")
     return redirect(url_for("login"))
 
@@ -203,7 +290,91 @@ def logout():
 @app.route("/home_admin")
 @login_required
 def home_admin():
-    return render_template("home_admin.html")
+    if not current_user.is_admin:
+        return redirect(url_for("home"))
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Existing counts
+    cursor.execute("SELECT COUNT(*) FROM products")
+    product_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM enchere WHERE etat = 'active'")
+    auction_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM commande WHERE status = 'pending'")
+    order_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM messages WHERE is_treated = 0")
+    message_count = cursor.fetchone()[0]
+
+    # NEW: Get recent orders (last 5 orders)
+    cursor.execute(
+        """
+        SELECT 
+            c.id, 
+            u.FirstName, 
+            u.LastName, 
+            c.total_amount, 
+            c.order_date, 
+            c.status
+        FROM commande c
+        JOIN users u ON c.user_id = u.id
+        ORDER BY c.order_date DESC
+        LIMIT 5
+    """
+    )
+    recent_orders = cursor.fetchall()
+
+    conn.close()
+
+    return render_template(
+        "home_admin.html",
+        product_count=product_count,
+        auction_count=auction_count,
+        order_count=order_count,
+        message_count=message_count,
+        recent_orders=recent_orders,  # NEW: Pass recent orders to template
+    )
+
+
+@app.route("/order_details/<int:order_id>")
+@login_required
+def order_details(order_id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Get order details
+    cursor.execute(
+        """
+        SELECT c.*, u.FirstName, u.LastName 
+        FROM commande c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.id = ?
+    """,
+        (order_id,),
+    )
+    order = cursor.fetchone()
+
+    # Get order items
+    cursor.execute(
+        """
+        SELECT ci.*, p.name as product_name , p.image_url as product_img
+        FROM commande_items ci
+        JOIN products p ON ci.product_id = p.id
+        WHERE ci.commande_id = ?
+    """,
+        (order_id,),
+    )
+    items = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("admin_orders_details.html", order=order, items=items)
+
+
+# ... (Additional routes would continue here with the same pattern of fixes)
 
 
 # Home Page: Display Products
@@ -221,8 +392,6 @@ def index_user():
     conn.close()
     products = [dict(product) for product in products]
     return render_template("index.html", products=products)
-
-
 
 
 # Add Product to Cart
@@ -659,7 +828,6 @@ def gestion_encheres():
     return render_template("gestion_encheres.html", encheres=encheres)
 
 
-
 @app.route("/add_enchere", methods=["GET", "POST"])
 @login_required
 def add_enchere():
@@ -676,7 +844,7 @@ def add_enchere():
 
         cursor.execute(
             "INSERT INTO enchere (name, description, image_url, prix, date_fin,adresse) VALUES (?, ?, ?, ?, ?,?)",
-            (name, description, image_url, prix, date_fin,adresse),
+            (name, description, image_url, prix, date_fin, adresse),
         )
         conn.commit()
         conn.close()
@@ -692,7 +860,7 @@ def add_enchere():
 def update_enchere(enchere_id):
     conn = get_db()
     cursor = conn.cursor()
-    
+
     # Fetch the auction details
     enchere = cursor.execute(
         "SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)
@@ -716,7 +884,7 @@ def update_enchere(enchere_id):
             SET name=?, description=?, image_url=?, prix=?, date_fin=?,adresse=?
             WHERE id_enchere=?
             """,
-            (name, description, image_url, prix, date_fin, enchere_id,adresse),
+            (name, description, image_url, prix, date_fin, enchere_id, adresse),
         )
         conn.commit()
         conn.close()
@@ -735,7 +903,7 @@ def delete_enchere(enchere_id):
 
     # Delete bids associated with this auction first
     cursor.execute("DELETE FROM historique_enchere WHERE id_enchere = ?", (enchere_id,))
-    
+
     # Then delete the auction itself
     cursor.execute("DELETE FROM enchere WHERE id_enchere = ?", (enchere_id,))
 
@@ -746,11 +914,9 @@ def delete_enchere(enchere_id):
     return redirect(url_for("gestion_encheres"))
 
 
-
 @app.route("/home_page")
 def home():
     return render_template("home.html")
-
 
 
 @app.route("/aboutus")
@@ -761,8 +927,6 @@ def about_us():
 @app.route("/contactus")
 def contact_us():
     return render_template("contact_us.html")
-
-
 
 
 @app.route("/contact", methods=["GET", "POST"])
@@ -905,7 +1069,7 @@ def admin_messages():
     cursor.execute(query, params)
     messages = cursor.fetchall()
     conn.close()
-   
+
     # Convert the result to a list of dictionaries
     messages_list = [
         {
@@ -1005,9 +1169,10 @@ def update_order_status(order_id):
 
     conn.commit()
     conn.close()
-    
+
     flash("Order status updated successfully!", "success")
     return redirect(url_for("admin_orders"))
+
 
 @app.route("/encherir", methods=["POST"])
 @app.route("/encherir", methods=["POST"])
@@ -1064,9 +1229,10 @@ def encherir():
 def historique_encheres():
     conn = get_db()
     cursor = conn.cursor()
-    
+
     # SQL Query to join historique_enchere, enchere, and users tables
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT 
             e.image_url, 
             e.name AS enchere_name, 
@@ -1079,8 +1245,9 @@ def historique_encheres():
         JOIN enchere e ON h.id_enchere = e.id_enchere
         JOIN users u ON h.id_user = u.id
         ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
-    """)
-    
+    """
+    )
+
     historique = cursor.fetchall()
     conn.close()
 
@@ -1097,33 +1264,33 @@ def encher_user():
     return render_template("encher_user.html", encheres=encheres)
 
 
-
 @app.route("/enchere/<int:enchere_id>")
 @login_required
 def enchere_detail(enchere_id):
     db = get_db()
-    enchere = db.execute("SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)).fetchone()
+    enchere = db.execute(
+        "SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)
+    ).fetchone()
     if not enchere:
         return "Enchère non trouvée", 404
     return render_template("enchere_detail.html", enchere=enchere, user=current_user)
 
 
-@app.route('/ajouter_enchere', methods=['POST'])
+@app.route("/ajouter_enchere", methods=["POST"])
 def ajouter_enchere():
     data = request.json
-    id_enchere = data.get('id_enchere')
-    prix = data.get('prix')
-    nom = data.get('nom')
-    email = data.get('email')
-    
+    id_enchere = data.get("id_enchere")
+    prix = data.get("prix")
+    nom = data.get("nom")
+    email = data.get("email")
 
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
     # Récupérer l'utilisateur basé sur l'email
     cursor.execute("SELECT id FROM users WHERE Email = ?", (email,))
     user = cursor.fetchone()
-    
+
     if user:
         id_user = user[0]
     else:
@@ -1132,7 +1299,7 @@ def ajouter_enchere():
     # Insérer l'enchère dans la table historique_enchere
     cursor.execute(
         "INSERT INTO historique_enchere (id_enchere, id_user, proposed_price) VALUES (?, ?, ?)",
-        (id_enchere, id_user, prix)
+        (id_enchere, id_user, prix),
     )
 
     conn.commit()
@@ -1140,54 +1307,66 @@ def ajouter_enchere():
 
     return jsonify({"message": "Votre enchère a été enregistrée avec succès!"})
 
-#fonction pour afficher mes encheres 
 
-@app.route('/mes_encheres')
-@login_required 
+# fonction pour afficher mes encheres
+
+
+@app.route("/mes_encheres")
+@login_required
 def mes_encheres():
-    user_id = session.get('user_id')
+    user_id = session.get("user_id")
 
     if not user_id:
-        return redirect(url_for('login'))  # Redirige vers la page de connexion si l'utilisateur n'est pas connecté
+        return redirect(
+            url_for("login")
+        )  # Redirige vers la page de connexion si l'utilisateur n'est pas connecté
 
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect("database.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT e.name, e.image_url, he.proposed_price, e.etat 
         FROM historique_enchere he
         JOIN enchere e ON he.id_enchere = e.id_enchere
         WHERE he.id_user = ?
-    """, (user_id,))
+    """,
+        (user_id,),
+    )
 
     encheres = cursor.fetchall()
     conn.close()
 
-    return render_template('mes_encheres.html', encheres=encheres)
+    return render_template("mes_encheres.html", encheres=encheres)
 
 
-#fonction pour supprimer un enchere cote user 
-@app.route('/supprimer_enchere', methods=['POST'])
+# fonction pour supprimer un enchere cote user
+@app.route("/supprimer_enchere", methods=["POST"])
 @login_required
 def supprimer_enchere():
-    enchere_id = request.form.get('enchere_id')
-    user_id = session.get('user_id')
+    enchere_id = request.form.get("enchere_id")
+    user_id = session.get("user_id")
 
     if not enchere_id or not user_id:
         flash("Erreur lors de la suppression.", "danger")
-        return redirect(url_for('mes_encheres'))
+        return redirect(url_for("mes_encheres"))
 
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
     # Supprimer uniquement si l'enchère appartient à l'utilisateur
-    cursor.execute("DELETE FROM historique_enchere WHERE id = ? AND id_user = ?", (enchere_id, user_id))
+    cursor.execute(
+        "DELETE FROM historique_enchere WHERE id = ? AND id_user = ?",
+        (enchere_id, user_id),
+    )
     conn.commit()
     conn.close()
 
     flash("L'enchère a été supprimée avec succès.", "success")
-    return redirect(url_for('mes_encheres'))
+    return redirect(url_for("mes_encheres"))
+
+
 # @app.route("/encherir", methods=["POST"])
 # def encherir():
 #     try:
@@ -1230,14 +1409,14 @@ def supprimer_enchere():
 # def historique_encheres():
 #     conn = get_db()
 #     cursor = conn.cursor()
-    
+
 #     # SQL Query to join historique_enchere, enchere, and users tables
 #     cursor.execute("""
-#         SELECT 
-#             e.image_url, 
-#             e.name AS enchere_name, 
-#             e.date_fin, 
-#             u.FirstName || ' ' || u.LastName AS user_full_name, 
+#         SELECT
+#             e.image_url,
+#             e.name AS enchere_name,
+#             e.date_fin,
+#             u.FirstName || ' ' || u.LastName AS user_full_name,
 #             u.phoneNum,
 #             h.proposed_price,
 #             e.etat
@@ -1246,11 +1425,11 @@ def supprimer_enchere():
 #         JOIN users u ON h.id_user = u.id
 #         ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
 #     """)
-    
+
 #     historique = cursor.fetchall()
 #     conn.close()
 
 #     return render_template("historique_encheres.html", historique=historique)
-    
+
 if __name__ == "__main__":
     app.run(debug=True)
