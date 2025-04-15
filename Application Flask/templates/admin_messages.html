@@ -1,202 +1,517 @@
-<!-- @format -->
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Messages</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet" />
-  </head>
-  <body>
-    <nav class="navbar">
-      <a href="{{ url_for('logout') }}" class="logout-btn">
-        <img
-          src="{{ url_for('static', filename='img/logout.png') }}"
-          alt="Logout" />
-      </a>
-      <ul class="nav-links">
-        <li>
-          <a href="{{ url_for('historique_encheres') }}">Historique Encheres</a>
-        </li>
-
-        <li><a href="{{ url_for('admin_orders') }}">Commandes</a></li>
-        <!-- must change to historique_commandes later -->
-        <li><a href="{{ url_for('home_admin') }}">Dashboard</a></li>
-        <li><a href="{{ url_for('gestion_produits') }}">Produits</a></li>
-        <li><a href="{{ url_for('gestion_encheres') }}">Enchères</a></li>
-        <li><a href="{{ url_for('admin_messages') }}">Messages</a></li>
-      </ul>
-    </nav>
-
-    <h1>Admin Messages</h1>
-
-    <div class="filters">
-      <label for="filter-status">Status:</label>
-      <select id="filter-status">
-        <option value="pending">Pending</option>
-        <option value="treated">Treated</option>
-        <option value="all">All</option>
-      </select>
-
-      <label for="filter-date">Date:</label>
-      <select id="filter-date">
-        <option value="">All</option>
-        <option value="last_day">Last Day</option>
-        <option value="last_week">Last Week</option>
-        <option value="last_month">Last Month</option>
-      </select>
-
-      <label for="filter-email">Email:</label>
-      <input type="text" id="filter-email" placeholder="Search by email..." />
-
-      <button id="apply-filters">Apply Filters</button>
-      <button id="reset-filters">Reset Filters</button>
-    </div>
-
-    <div class="messages-container">
-      {% for msg in messages %}
-      <div class="message-item">
-        <strong>{{ msg.objet }}</strong>
-        <p>{{ msg.message }}</p>
-        <div class="date">{{ msg.date }}</div>
-        <div class="user-info">
-          From: {{ msg.user_name }} ({{ msg.user_email }})
-        </div>
-        <div class="status">
-          Status: {{ "Treated" if msg.is_treated else "Pending" }}
-        </div>
-
-        <!-- Reply Form (only for pending messages) -->
-        {% if not msg.is_treated %}
-        <form class="reply-form" onsubmit="sendReply(event, '{{ msg.id }}')">
-          <textarea
-            name="response"
-            placeholder="Your response..."
-            required></textarea>
-          <button type="submit">Send Reply</button>
-        </form>
-        {% elif msg.admin_response %}
-        <div class="admin-response">
-          <strong>Admin Response:</strong>
-          <p>{{ msg.admin_response }}</p>
-        </div>
-        {% endif %}
-      </div>
-      {% endfor %}
-    </div>
-
-    <!-- Messages Table -->
-    <table class="messages-table">
-      <thead>
-        <tr>
-          <th>Subject</th>
-          <th>Message</th>
-          <th>Date</th>
-          <th>User</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for msg in messages %}
-        <tr>
-          <td>{{ msg.objet }}</td>
-          <td>{{ msg.message }}</td>
-          <td>{{ msg.date }}</td>
-          <td>{{ msg.user_name }} ({{ msg.user_email }})</td>
-          <td>{{ "Treated" if msg.is_treated else "Pending" }}</td>
-          <td>
-            {% if not msg.is_treated %}
-            <form
-              class="reply-form"
-              onsubmit="sendReply(event, '{{ msg.id }}')">
-              <textarea
-                name="response"
-                placeholder="Your response..."
-                required></textarea>
-              <button type="submit">Send Reply</button>
-            </form>
-            {% elif msg.admin_response %}
-            <div class="admin-response">
-              <strong>Admin Response:</strong>
-              <p>{{ msg.admin_response }}</p>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_orders.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    <style>
+        /* Additional styles for messages */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 50%;
+            max-width: 600px;
+        }
+        
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+        }
+        
+        .form-actions {
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-cancel {
+            background-color: #f1f1f1;
+            color: #333;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .success-message {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+                <button class="toggle-sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="{{ url_for('home_admin') }}">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
 
+                <li class="has-submenu">
+                    <a href="#" class="submenu-toggle">
+                        <i class="fas fa-box-open"></i>
+                        <span>Products</span>
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{{ url_for('gestion_produits') }}">All Products</a>
+                        </li>
+                        <li><a href="#">Add New Product</a></li>
+                        <li><a href="#">Categories</a></li>
+                        <li><a href="#">Inventory</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#" class="submenu-toggle">
+                        <i class="fas fa-gavel"></i>
+                        <span>Auctions</span>
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="{{ url_for('gestion_encheres') }}">Active Auctions</a>
+                        </li>
+                        <li><a href="#">Schedule Auction</a></li>
+                        <li>
+                            <a href="{{ url_for('historique_encheres') }}">Auction History</a>
+                        </li>
+                        <li><a href="#">Bid Management</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#" class="submenu-toggle">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Orders</span>
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="{{ url_for('admin_orders') }}">All Orders</a></li>
+                        <li><a href="#">Pending Orders</a></li>
+                        <li><a href="#">Completed Orders</a></li>
+                        <li><a href="#">Shipping</a></li>
+                    </ul>
+                </li>
+
+                <li class="active">
+                    <a href="{{ url_for('admin_messages') }}">
+                        <i class="fas fa-envelope"></i>
+                        <span>Messages</span>
+                        <span class="badge">{{ message_count }}</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="{{ url_for('static', filename='img/admin-avatar.jpg') }}" alt="Admin" />
+                    <div class="user-info">
+                        <h4>{{ current_user.FirstName }} {{ current_user.LastName }}</h4>
+                        <small>Admin</small>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+        
+        <div class="content-wrapper">
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Messages</h1>
+                    <div class="order-summary">
+                        <span class="summary-item"><strong>{{ messages|length }}</strong> total messages</span>
+                        <span class="summary-item"><strong>{{ pending_messages }}</strong> pending</span>
+                        <span class="summary-item"><strong>{{ today_messages }}</strong> today</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Filter messages..." onkeyup="filterMessages()">
+                    </div>
+                </div>
+            </header>
+            
+            <main class="main-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <div class="orders-container">
+                    <div class="table-toolbar">
+                        <div class="view-options">
+                            <button class="view-option active" onclick="filterByStatus('all')">All</button>
+                            <button class="view-option" onclick="filterByStatus('pending')">Pending</button>
+                            <button class="view-option" onclick="filterByStatus('treated')">Treated</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th width="40px"><input type="checkbox" id="selectAll"></th>
+                                    <th width="120px">Subject</th>
+                                    <th width="200px">Message</th>
+                                    <th width="120px">Customer</th>
+                                    <th width="100px">Date</th>
+                                    <th width="100px">Status</th>
+                                    <th width="150px">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for msg in messages %}
+                                <tr class="message-row" data-id="{{ msg.id }}" data-status="{{ 'treated' if msg.is_treated else 'pending' }}" data-admin-response="{{ msg.admin_response if msg.admin_response else '' }}">
+                                    <td><input type="checkbox" class="message-checkbox"></td>
+                                    <td>{{ msg.objet }}</td>
+                                    <td>{{ msg.message|truncate(50) }}</td>
+                                    <td>
+                                        <div class="customer-cell">
+                                            <div class="customer-name">{{ msg.user_name }}</div>
+                                            <div class="customer-email">{{ msg.user_email }}</div>
+                                        </div>
+                                    </td>
+                                    <td>{{ msg.date }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ 'treated' if msg.is_treated else 'pending' }}">
+                                            {{ "Treated" if msg.is_treated else "Pending" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            {% if not msg.is_treated %}
+                                            <button class="btn quick-edit" title="Reply" onclick="openReplyModal('{{ msg.id }}', '{{ msg.objet }}')">
+                                                <i class="fas fa-reply"></i>
+                                            </button>
+                                            {% endif %}
+                                            <button class="btn quick-view" title="View Details" onclick="viewMessageDetails('{{ msg.id }}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-footer">
+                        <div class="table-pagination">
+                            <button class="btn pagination-btn" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="page-info">1-{{ messages|length }} of {{ messages|length }}</span>
+                            <button class="btn pagination-btn">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Reply Modal -->
+    <div id="replyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3>Reply to Message</h3>
+            <form id="replyForm">
+                <input type="hidden" id="messageId" name="message_id">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="replySubject" name="subject" required>
+                </div>
+                <div class="form-group">
+                    <label>Your Response</label>
+                    <textarea id="replyMessage" name="response" rows="5" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Reply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Message Details Modal -->
+    <div id="messageDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3>Message Details</h3>
+            <div class="message-details">
+                <div class="detail-row">
+                    <label>From:</label>
+                    <span id="detailFrom"></span>
+                </div>
+                <div class="detail-row">
+                    <label>Date:</label>
+                    <span id="detailDate"></span>
+                </div>
+                <div class="detail-row">
+                    <label>Subject:</label>
+                    <span id="detailSubject"></span>
+                </div>
+                <div class="detail-row">
+                    <label>Message:</label>
+                    <p id="detailMessage"></p>
+                </div>
+                <div id="adminResponseContainer" class="detail-row" style="display: none;">
+                    <label>Admin Response:</label>
+                    <p id="detailAdminResponse"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Success Message -->
     <div id="success-message" class="success-message">
-      Reply sent successfully!
+        Reply sent successfully!
     </div>
 
     <script>
-      // Function to send a reply
-      function sendReply(event, messageId) {
-        event.preventDefault(); // Prevent form submission
-
-        const form = event.target;
-        const response = form.querySelector("textarea").value;
-
-        // Send the reply to the server
-        fetch("/admin/reply", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: `message_id=${messageId}&response=${encodeURIComponent(
-            response
-          )}`,
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              // Show the success message
-              const successMessage = document.getElementById("success-message");
-              successMessage.style.display = "block";
-
-              // Hide the message after 3 seconds
-              setTimeout(() => {
-                successMessage.style.display = "none";
-              }, 3000);
-
-              // Reload the page to update the message status
-              setTimeout(() => {
-                location.reload();
-              }, 1000);
+        // Toggle sidebar
+        document.querySelector('.toggle-sidebar').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.content-wrapper').classList.toggle('expanded');
+        });
+        
+        // Filter messages by status
+        function filterByStatus(status) {
+            const rows = document.querySelectorAll('.message-row');
+            const buttons = document.querySelectorAll('.view-option');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            rows.forEach(row => {
+                if (status === 'all' || row.dataset.status === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Search/filter messages
+        function filterMessages() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const rows = document.querySelectorAll('.message-row');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toUpperCase();
+                if (text.includes(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Open reply modal
+        function openReplyModal(messageId, subject) {
+            document.getElementById('messageId').value = messageId;
+            document.getElementById('replySubject').value = "Re: " + subject;
+            document.getElementById('replyModal').style.display = 'block';
+        }
+        
+        // View message details
+        function viewMessageDetails(messageId) {
+            const row = document.querySelector(`tr[data-id="${messageId}"]`);
+            
+            if (row) {
+                document.getElementById('detailFrom').textContent = 
+                    row.querySelector('.customer-name').textContent + 
+                    ' (' + row.querySelector('.customer-email').textContent + ')';
+                document.getElementById('detailDate').textContent = row.cells[4].textContent;
+                document.getElementById('detailSubject').textContent = row.cells[1].textContent;
+                document.getElementById('detailMessage').textContent = row.cells[2].textContent;
+                
+                const adminResponse = row.dataset.adminResponse;
+                if (adminResponse && adminResponse !== '') {
+                    document.getElementById('detailAdminResponse').textContent = adminResponse;
+                    document.getElementById('adminResponseContainer').style.display = 'block';
+                } else {
+                    document.getElementById('adminResponseContainer').style.display = 'none';
+                }
+                
+                document.getElementById('messageDetailsModal').style.display = 'block';
             }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
-      }
-
-      // Function to apply filters
-      document.getElementById("apply-filters").addEventListener("click", () => {
-        const status = document.getElementById("filter-status").value;
-        const date = document.getElementById("filter-date").value;
-        const email = document.getElementById("filter-email").value;
-
-        // Redirect to the filtered page
-        window.location.href = `/admin/messages?status=${status}&date=${date}&email=${email}`;
-      });
-
-      // Function to reset filters
-      document.getElementById("reset-filters").addEventListener("click", () => {
-        document.getElementById("filter-status").value = "pending";
-        document.getElementById("filter-date").value = "";
-        document.getElementById("filter-email").value = "";
-        window.location.href = "/admin/messages"; // Reload the page with default filters
-      });
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('replyModal').style.display = 'none';
+            document.getElementById('messageDetailsModal').style.display = 'none';
+        }
+        
+        // Handle reply form submission
+        document.getElementById('replyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const messageId = document.getElementById('messageId').value;
+            const subject = document.getElementById('replySubject').value;
+            const response = document.getElementById('replyMessage').value;
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('message_id', messageId);
+            formData.append('subject', subject);
+            formData.append('response', response);
+            
+            // Send the reply to the server
+            fetch("/admin/reply", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const successMessage = document.getElementById('success-message');
+                    successMessage.style.display = 'block';
+                    
+                    // Hide after 3 seconds
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                    
+                    // Close modal and reload
+                    closeModal();
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to send reply'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending the reply');
+            });
+        });
+        
+        // Initialize select all checkbox
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.message-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
