@@ -1134,11 +1134,16 @@ def admin_orders():
         JOIN commande_items ON commande.id = commande_items.commande_id
         JOIN products ON commande_items.product_id = products.id
         """
-    ).fetchall()  # Use .fetchall() instead of .fetchone()
+    ).fetchall()
 
-    cursor.close()
+    # Calculate summary statistics
+    from datetime import datetime, timedelta
 
-    # Organize orders by order_id
+    # Initialize counters
+    pending_count = 0
+    today_count = 0
+    today = datetime.now().date()
+
     orders_dict = {}
     for order in orders:
         order_id = order["order_id"]
@@ -1152,10 +1157,26 @@ def admin_orders():
                 "delivery_option": order["delivery_option"],
                 "delivery_cost": order["delivery_cost"],
                 "total_amount": order["total_amount"],
-                "order_date": order["order_date"],
+                "order_date": (
+                    datetime.strptime(order["order_date"], "%Y-%m-%d %H:%M:%S").date()
+                    if isinstance(order["order_date"], str)
+                    else order["order_date"]
+                ),
                 "status": order["status"],
-                "order_items": [],  # Renamed to avoid conflict with dict.items()
+                "order_items": [],
             }
+
+            # Count pending orders
+            if order["status"].lower() == "pending":
+                pending_count += 1
+
+            # Count today's orders
+            order_date = orders_dict[order_id]["order_date"]
+            if isinstance(order_date, str):
+                order_date = datetime.strptime(order_date, "%Y-%m-%d %H:%M:%S").date()
+            if order_date == today:
+                today_count += 1
+
         orders_dict[order_id]["order_items"].append(
             {
                 "product_id": order["product_id"],
@@ -1164,9 +1185,16 @@ def admin_orders():
                 "price_per_unit": order["price_per_unit"],
             }
         )
-    print(orders_dict)  # Add this before returning the template
 
-    return render_template("admin_orders.html", orders=orders_dict)
+    cursor.close()
+
+    return render_template(
+        "admin_orders.html",
+        orders=orders_dict,
+        total_orders=len(orders_dict),
+        pending_orders=pending_count,
+        today_orders=today_count,
+    )
 
 
 @app.route("/admin/update_order_status/<int:order_id>", methods=["POST"])
