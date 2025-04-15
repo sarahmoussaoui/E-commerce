@@ -4,17 +4,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Historique des Enchères</title>
+    <title>Gagnants des Enchères</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
       /* ============================================= */
-      /* Admin Auction History - Complete CSS           */
-      /* Cleaned and Optimized                         */
+      /* Admin Auction Winners - Complete CSS           */
+      /* Matching style to Auction History             */
       /* ============================================= */
 
       /* Base Styles & Reset */
@@ -334,119 +335,45 @@
           padding: 2rem;
       }
 
-      /* Auctions Container */
-      .auctions-container {
+      /* Winners Container */
+      .winners-container {
           background-color: white;
           border-radius: 10px;
           box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-          overflow: hidden;
+          padding: 1.5rem;
       }
 
-      /* Table Toolbar */
-      .table-toolbar {
+      /* Winner Card */
+      .winner-card {
+          border: 1px solid #eee;
+          border-radius: 8px;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          background: white;
+          transition: all 0.3s;
+      }
+
+      .winner-card:hover {
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .winner-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 1rem 1.5rem;
           border-bottom: 1px solid #eee;
+          padding-bottom: 1rem;
+          margin-bottom: 1.5rem;
       }
 
-      .view-options {
-          display: flex;
-          gap: 0.5rem;
+      .winner-header h3 {
+          font-size: 1.25rem;
+          color: #2c3e50;
+          margin-bottom: 0.5rem;
       }
 
-      .view-option {
-          padding: 0.5rem 1rem;
-          border-radius: 4px;
-          background: none;
-          border: 1px solid #ddd;
-          font-family: 'Poppins', sans-serif;
-          font-size: 0.85rem;
-          cursor: pointer;
-          transition: all 0.2s;
-      }
-
-      .view-option.active {
-          background-color: #f4acb7;
-          color: white;
-          border-color: #f4acb7;
-      }
-
-      .table-actions {
-          display: flex;
-          gap: 0.5rem;
-          align-items: center;
-      }
-
-      .bulk-actions {
-          padding: 0.5rem;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-family: 'Poppins', sans-serif;
-          font-size: 0.85rem;
-          min-width: 150px;
-      }
-
-      .apply-btn {
-          background-color: #f4acb7;
-          color: white;
-      }
-
-      .apply-btn:hover {
-          background-color: #e08e9b;
-      }
-
-      /* Table Styles */
-      .table-responsive {
-          overflow-x: auto;
-          -webkit-overflow-scrolling: touch;
-      }
-
-      .auctions-table {
-          width: 100%;
-          min-width: 1000px;
-          border-collapse: collapse;
-      }
-
-      .auctions-table th {
-          padding: 1rem 1.25rem;
-          text-align: left;
-          color: #7f8c8d;
-          font-weight: 600;
-          font-size: 0.85rem;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          border-bottom: 2px solid #eee;
-      }
-
-      .auctions-table td {
-          padding: 1.25rem;
-          border-bottom: 1px solid #eee;
-          vertical-align: middle;
-      }
-
-      .auctions-table tr:last-child td {
-          border-bottom: none;
-      }
-
-      .auctions-table tr:hover {
-          background-color: #f9f9f9;
-      }
-
-      /* Table Cells */
-      .user-cell {
-          display: flex;
-          flex-direction: column;
-      }
-
-      .user-name {
-          font-weight: 500;
-          margin-bottom: 0.25rem;
-      }
-
-      .user-phone {
-          font-size: 0.85rem;
+      .winner-header .text-muted {
+          font-size: 0.9rem;
           color: #7f8c8d;
       }
 
@@ -478,54 +405,49 @@
 
       /* Product Image */
       .product-image {
-          width: 60px;
-          height: 60px;
+          width: 80px;
+          height: 80px;
           object-fit: cover;
           border-radius: 4px;
           border: 1px solid #eee;
       }
 
-      /* Table Footer */
-      .table-footer {
-          padding: 1rem 1.5rem;
-          border-top: 1px solid #eee;
-          display: flex;
-          justify-content: flex-end;
+      /* Winner Info */
+      .winner-info h4 {
+          font-size: 1rem;
+          color: #2c3e50;
+          margin-bottom: 0.75rem;
       }
 
-      .table-pagination {
-          display: flex;
-          gap: 0.5rem;
-          align-items: center;
+      .winner-info p {
+          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
       }
 
-      .pagination-btn {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background: none;
-          border: 1px solid #ddd;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+      .winner-info i {
+          color: #7f8c8d;
+          margin-right: 0.5rem;
+          width: 16px;
+          text-align: center;
+      }
+
+      /* Winning Bid */
+      .winning-bid {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #28a745;
+      }
+
+      /* Contact Button */
+      .contact-btn {
+          background-color: #f4acb7;
+          color: white;
+          border: none;
           transition: all 0.2s;
       }
 
-      .pagination-btn:hover:not(:disabled) {
-          background: #f4acb7;
-          color: white;
-          border-color: #f4acb7;
-      }
-
-      .pagination-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-      }
-
-      .page-info {
-          font-size: 0.85rem;
-          color: #7f8c8d;
+      .contact-btn:hover {
+          background-color: #e08e9b;
       }
 
       /* Flash Messages */
@@ -543,22 +465,10 @@
           font-size: 1.2rem;
       }
 
-      .alert-success {
-          background-color: #d4edda;
-          color: #155724;
-          border: 1px solid #c3e6cb;
-      }
-
-      .alert-error {
-          background-color: #f8d7da;
-          color: #721c24;
-          border: 1px solid #f5c6cb;
-      }
-
-      .alert-warning {
-          background-color: #fff3cd;
-          color: #856404;
-          border: 1px solid #ffeeba;
+      .alert-info {
+          background-color: #d1ecf1;
+          color: #0c5460;
+          border: 1px solid #bee5eb;
       }
 
       /* Empty State */
@@ -574,6 +484,32 @@
           color: #bdc3c7;
       }
 
+      /* Modal Styles */
+      .modal-content {
+          border-radius: 10px;
+          border: none;
+          box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .modal-header {
+          border-bottom: 1px solid #eee;
+          padding: 1.25rem 1.5rem;
+      }
+
+      .modal-title {
+          font-weight: 600;
+          color: #2c3e50;
+      }
+
+      .modal-body {
+          padding: 1.5rem;
+      }
+
+      .modal-footer {
+          border-top: 1px solid #eee;
+          padding: 1rem 1.5rem;
+      }
+
       /* Responsive Adjustments */
       @media (max-width: 1200px) {
           .main-header {
@@ -582,11 +518,6 @@
           
           .main-content {
               padding: 1.5rem;
-          }
-          
-          .auctions-table th,
-          .auctions-table td {
-              padding: 1rem;
           }
       }
 
@@ -609,18 +540,6 @@
           
           .toggle-sidebar {
               display: block;
-          }
-          
-          .table-toolbar {
-              flex-direction: column;
-              align-items: flex-start;
-              gap: 1rem;
-          }
-          
-          .view-options {
-              width: 100%;
-              overflow-x: auto;
-              padding-bottom: 0.5rem;
           }
       }
 
@@ -651,22 +570,26 @@
               padding: 1rem;
           }
           
-          .auctions-table th,
-          .auctions-table td {
-              padding: 0.75rem;
+          .winner-card .row > div {
+              margin-bottom: 1rem;
           }
       }
 
       @media (max-width: 576px) {
-          .auctions-container {
+          .winners-container {
               border-radius: 0;
               margin: 0 -1rem;
               width: calc(100% + 2rem);
           }
           
-          .table-toolbar,
-          .table-footer {
-              padding: 1rem;
+          .winner-header {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 1rem;
+          }
+          
+          .winner-card .row {
+              flex-direction: column;
           }
       }
     </style>
@@ -717,9 +640,11 @@
                     </li>
                     <li><a href="#">Schedule Auction</a></li>
                     <li>
-                        <a href="{{ url_for('historique_encheres') }}" class="active">Auction History</a>
+                        <a href="{{ url_for('historique_encheres') }}">Auction History</a>
                     </li>
-                    <li><a href="#">Bid Management</a></li>
+                    <li>
+                        <a href="{{ url_for('auction_winners') }}" class="active">Auction Winners</a>
+                    </li>
                 </ul>
             </li>
 
@@ -785,13 +710,10 @@
       <div class="content-wrapper">
         <header class="main-header">
           <div class="header-title">
-            <h1>Historique des Enchères</h1>
+            <h1>Gagnants des Enchères</h1>
             <div class="auction-summary">
               <div class="summary-item">
-                Total: <strong>{{ historique|length }} enchères</strong>
-              </div>
-              <div class="summary-item">
-                Terminées: <strong>{{ completed_count }}</strong>
+                Total: <strong>{{ winners|length }} gagnants</strong>
               </div>
             </div>
           </div>
@@ -808,98 +730,102 @@
         </header>
 
         <main class="main-content">
-          <div class="auctions-container">
-            <div class="table-toolbar">
-              <div class="view-options">
-                <button class="view-option active">Toutes</button>
-                <button class="view-option">Terminées</button>
-                <button class="view-option">Annulées</button>
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              {% for message in messages %}
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                {{ message }}
               </div>
-              <div class="table-actions">
-                <select class="bulk-actions">
-                  <option>Actions groupées</option>
-                  <option>Exporter sélection</option>
-                  <option>Supprimer</option>
-                </select>
-                <button class="btn apply-btn">Appliquer</button>
-              </div>
-            </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
 
-            <div class="table-responsive">
-              <table class="auctions-table">
-                <thead>
-                  <tr>
-                    <th>Image</th>
-                    <th>Nom de l'Enchère</th>
-                    <th>Utilisateur</th>
-                    <th>Téléphone</th>
-                    <th>Prix Proposé</th>
-                    <th>Date de Fin</th>
-                    <th>Statut</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% if historique|length > 0 %}
-                    {% for item in historique %}
-                    <tr>
-                      <td>
-                        <img
-                          src="{{ url_for('static', filename=item.image_url) }}"
-                          alt="{{ item.enchere_name }}"
-                          class="product-image" />
-                      </td>
-                      <td>{{ item.enchere_name }}</td>
-                      <td class="user-cell">
-                        <span class="user-name">{{ item.user_full_name }}</span>
-                        <span class="user-phone">{{ item.phoneNum }}</span>
-                      </td>
-                      <td>{{ item.phoneNum }}</td>
-                      <td>{{ item.proposed_price }} €</td>
-                      <td>{{ item.date_fin }}</td>
-                      <td>
-                          {% if item.calculated_etat == 'Terminée' %}
-                            <span class="status-badge status-completed">{{ item.calculated_etat }}</span>
-                          {% elif item.calculated_etat == 'Annulée' %}
-                            <span class="status-badge status-canceled">{{ item.calculated_etat }}</span>
-                          {% else %}
-                            <span class="status-badge status-active">{{ item.calculated_etat }}</span>
-                          {% endif %}
-                      </td>
-                    </tr>
-                    {% endfor %}
-                  {% else %}
-                    <tr>
-                      <td colspan="7">
-                        <div class="empty-state">
-                          <i class="fas fa-gavel"></i>
-                          <h3>Aucun historique d'enchères disponible</h3>
-                          <p>Aucune enchère n'a été terminée ou annulée pour le moment.</p>
-                        </div>
-                      </td>
-                    </tr>
-                  {% endif %}
-                </tbody>
-              </table>
-            </div>
+          <div class="winners-container">
+            {% if winners|length > 0 %}
+              {% for winner in winners %}
+              <div class="winner-card">
+                <div class="winner-header">
+                  <div>
+                    <h3>{{ winner.auction_name }}</h3>
+                    <p class="text-muted">Terminé le: {{ winner.date_fin }}</p>
+                  </div>
+                  <div>
+                    <span class="status-badge 
+                      {% if winner.auction_status == 'Terminée' %}status-completed
+                      {% elif winner.auction_status == 'Annulée' %}status-canceled
+                      {% else %}status-active{% endif %}">
+                      {{ winner.auction_status }}
+                    </span>
+                  </div>
+                </div>
 
-            {% if historique|length > 0 %}
-            <div class="table-footer">
-              <div class="table-pagination">
-                <button class="pagination-btn" disabled>
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <span class="page-info">Page 1 sur 1</span>
-                <button class="pagination-btn" disabled>
-                  <i class="fas fa-chevron-right"></i>
-                </button>
+                <div class="row">
+                  <div class="col-md-2">
+                    <img src="{{ url_for('static', filename=winner.image_url) }}" 
+                         alt="{{ winner.auction_name }}" class="product-image">
+                  </div>
+                  <div class="col-md-5 winner-info">
+                    <h4>Gagnant</h4>
+                    <p><i class="fas fa-user"></i> {{ winner.winner_name }}</p>
+                    <p><i class="fas fa-envelope"></i> {{ winner.winner_email }}</p>
+                    <p><i class="fas fa-phone"></i> {{ winner.winner_phone }}</p>
+                  </div>
+                  <div class="col-md-3 winner-info">
+                    <h4>Offre Gagnante</h4>
+                    <p class="winning-bid">{{ winner.winning_bid }} €</p>
+                  </div>
+                  <div class="col-md-2 d-flex align-items-center">
+                    <button class="btn contact-btn" 
+                            onclick="openEmailModal('{{ winner.winner_email }}')">
+                      <i class="fas fa-envelope"></i> Contacter
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state">
+                <i class="fas fa-trophy"></i>
+                <h3>Aucun gagnant d'enchère trouvé</h3>
+                <p>Aucune enchère n'a été terminée avec un gagnant pour le moment.</p>
+              </div>
             {% endif %}
           </div>
         </main>
       </div>
     </div>
 
+    <!-- Email Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Envoyer un email</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form method="POST">
+            <div class="modal-body">
+              <input type="hidden" id="recipientEmail" name="recipient_email">
+              <div class="mb-3">
+                <label for="messageSubject" class="form-label">Sujet</label>
+                <input type="text" class="form-control" id="messageSubject" name="message_subject" required>
+              </div>
+              <div class="mb-3">
+                <label for="messageBody" class="form-label">Message</label>
+                <textarea class="form-control" id="messageBody" name="message_body" rows="5" required></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="submit" class="btn contact-btn">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       // Toggle sidebar on mobile
       document.querySelector('.toggle-sidebar').addEventListener('click', function() {
@@ -924,15 +850,15 @@
         });
       });
 
-      // View options toggle
-      document.querySelectorAll('.view-option').forEach(function(option) {
-        option.addEventListener('click', function() {
-          document.querySelectorAll('.view-option').forEach(function(opt) {
-            opt.classList.remove('active');
-          });
-          this.classList.add('active');
-        });
-      });
+      // Open email modal with prefilled content
+      function openEmailModal(email) {
+        document.getElementById('recipientEmail').value = email;
+        document.getElementById('messageSubject').value = "Félicitations - Vous avez gagné l'enchère";
+        document.getElementById('messageBody').value = "Cher client,\n\nFélicitations ! Vous avez remporté notre enchère.\n\nCordialement,\nL'équipe des enchères";
+        
+        var modal = new bootstrap.Modal(document.getElementById('emailModal'));
+        modal.show();
+      }
     </script>
   </body>
 </html>

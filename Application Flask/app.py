@@ -26,6 +26,8 @@ from flask_login import (
     login_required,
     current_user,
 )
+from flask_mail import Mail, Message
+
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
@@ -1271,10 +1273,16 @@ def encherir():
         return jsonify({"error": str(e)}), 500
 
 
+from datetime import datetime
+
+
 @app.route("/admin/historique_encheres", methods=["GET"])
 def historique_encheres():
     conn = get_db()
     cursor = conn.cursor()
+
+    # Get current date
+    current_date = datetime.now().date()
 
     # SQL Query to join historique_enchere, enchere, and users tables
     cursor.execute(
@@ -1286,18 +1294,34 @@ def historique_encheres():
             u.FirstName || ' ' || u.LastName AS user_full_name, 
             u.phoneNum,
             h.proposed_price,
-            e.etat
+            e.etat,
+            CASE 
+                WHEN e.etat = 'Annulée' THEN 'Annulée'
+                WHEN e.date_fin < ? THEN 'Terminée'
+                ELSE 'En cours'
+            END AS calculated_etat
         FROM historique_enchere h
         JOIN enchere e ON h.id_enchere = e.id_enchere
         JOIN users u ON h.id_user = u.id
         ORDER BY e.name, h.proposed_price DESC, e.date_fin DESC
-    """
+    """,
+        (current_date,),
     )
 
     historique = cursor.fetchall()
+
+    # Count completed auctions
+    completed_count = sum(
+        1 for item in historique if item["calculated_etat"] == "Terminée"
+    )
+
     conn.close()
 
-    return render_template("historique_encheres.html", historique=historique)
+    return render_template(
+        "historique_encheres.html",
+        historique=historique,
+        completed_count=completed_count,
+    )
 
 
 @app.route("/encheres")
@@ -1355,6 +1379,62 @@ def ajouter_enchere():
 
 
 # fonction pour afficher mes encheres
+@app.route("/admin/auction_winners", methods=["GET", "POST"])
+def auction_winners():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # Handle email sending
+    if request.method == "POST":
+        recipient_email = request.form["recipient_email"]
+        message_subject = request.form["message_subject"]
+        message_body = request.form["message_body"]
+
+        try:
+            # Create and send the email
+            msg = Message(
+                subject=message_subject, recipients=[recipient_email], body=message_body
+            )
+            mail.send(msg)
+            flash(f"Email sent successfully to {recipient_email}", "success")
+        except Exception as e:
+            app.logger.error(f"Failed to send email: {str(e)}")
+            flash(f"Failed to send email: {str(e)}", "error")
+
+        return redirect(url_for("auction_winners"))
+
+    # Get auctions with their highest bids and bidder info
+    cursor.execute(
+        """
+        SELECT 
+            e.id_enchere,
+            e.name AS auction_name,
+            e.image_url,
+            e.date_fin,
+            MAX(h.proposed_price) AS winning_bid,
+            u.id AS winner_id,
+            u.FirstName || ' ' || u.LastName AS winner_name,
+            u.Email AS winner_email,
+            u.phoneNum AS winner_phone,
+            e.etat,
+            CASE 
+                WHEN e.etat = 'Annulée' THEN 'Annulée'
+                WHEN e.date_fin < date('now') THEN 'Terminée'
+                ELSE 'En cours'
+            END AS auction_status
+        FROM enchere e
+        JOIN historique_enchere h ON e.id_enchere = h.id_enchere
+        JOIN users u ON h.id_user = u.id
+        GROUP BY e.id_enchere
+        HAVING winning_bid = h.proposed_price
+        ORDER BY e.date_fin DESC
+        """
+    )
+
+    winners = cursor.fetchall()
+    conn.close()
+
+    return render_template("winner_enchere.html", winners=winners)
 
 
 @app.route("/mes_encheres")
@@ -1476,6 +1556,7 @@ def supprimer_enchere():
 #     conn.close()
 
 #     return render_template("historique_encheres.html", historique=historique)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
