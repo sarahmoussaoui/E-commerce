@@ -2,90 +2,238 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
-    <title>Détails de l'Enchère</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='encher_user.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin_enchere.css') }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ enchere.name }} | Handmade Creations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='encher_details.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_products.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='products_details.css') }}" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    {% set end_date = datetime.datetime.strptime(enchere.date_fin, '%Y-%m-%d').date() %}
+    {% set is_ended = end_date < today_date %}
+    
+
     <!-- Navigation Menu -->
-    <div id="navbar">
-        <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
-        <nav>
-          <ul >
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('home') }}#about">About</a></li>
-            <li><a href="{{ url_for('index_user') }}">Products</a></li>
-            <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-        </ul>
-    </nav>
-    </div>
-
-
-
-    <!-- Wrapper principal -->
-    <div class="enchere-wrapper">
-        <!-- Image et description -->
-        <div class="enchere-left">
-            <div class="enchere-image-box">
-                <img src="{{ url_for('static', filename=enchere.image_url) }}" alt="{{ enchere.name }}" />
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">Handmade<span>Creations</span></a>
             </div>
             
-        </div>
-
-        <!-- Détails de l'enchère -->
-        <div class="enchere-info-box">
-            <h1>{{ enchere.name }}</h1>
-            <div class="info-container">
-            <p class="titre"><strong>Prix de départ </strong> {{ enchere.prix }} EUR</p>
-            <p class="titre"><strong>Fin de l'enchère </strong> {{ enchere.date_fin }}</p></div>
-            <p style="text-align: left;"><strong>📍</strong> {{ enchere.adresse }}</p>
-            <p class="enchere-description"><strong>Description :</strong> {{ enchere.description }}</p>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}#about">About</a></li>
+                    <li><a href="{{ url_for('index_user') }}">Products</a></li>
+                    <li><a href="{{ url_for('encher_user') }}">Auctions</a></li>
+                    <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+                </ul>
+            </nav>
             
-            <a href="#" class="encherir-btn" onclick="openModal('modalConfirmation')">Enchérir</a>
+            <div class="header-actions">
+                <a href="{{ url_for('mes_encheres') }}" class="cart-icon">
+                    <i class="material-icons">gavel</i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-icon">
+                    <i class="material-icons">account_circle</i>
+                </a>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Fenêtre Modale : Confirmation des informations utilisateur -->
+    <!-- Main Content -->
+    <main class="auction-detail-container">
+        <div class="breadcrumb-nav">
+            <a href="{{ url_for('encher_user') }}">Auctions</a> / <span>{{ enchere.name }}</span>
+        </div>
+
+        <div class="auction-detail-wrapper">
+            <!-- Auction Images -->
+            <div class="auction-gallery">
+                <div class="main-image">
+                    <img src="{{ url_for('static', filename=enchere.image_url) }}" alt="{{ enchere.name }}" />
+                </div>
+            </div>
+
+            <!-- Auction Info -->
+            <div class="auction-info">
+                <h1 class="auction-title">{{ enchere.name }}</h1>
+                
+                <div class="auction-meta">
+                    <div class="auction-price">
+                        <span class="current-bid">{{ enchere.prix }} EUR</span>
+                        <span class="starting-bid">{% if is_ended %}Winning bid{% else %}Current bid{% endif %}</span>
+                    </div>
+                    
+                    <div class="auction-time">
+                        <i class="material-icons">schedule</i>
+                        <span class="time-remaining">
+                            {% if is_ended %}
+                                Auction ended on {{ enchere.date_fin }}
+                            {% else %}
+                                Ends: {{ enchere.date_fin }} ({{ (end_date - today_date).days }} days left)
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="auction-location">
+                    <i class="material-icons">location_on</i>
+                    <span>{{ enchere.adresse }}</span>
+                </div>
+
+                <div class="auction-description">
+                    <h3>Description</h3>
+                    <p>{{ enchere.description }}</p>
+                </div>
+
+                <div class="auction-bid-form">
+                    {% if is_ended %}
+                        <button class="place-bid-btn" disabled>
+                            <i class="material-icons">lock</i> Bidding Closed
+                        </button>
+                    {% else %}
+                        <button class="place-bid-btn" onclick="openModal('modalConfirmation')">
+                            <i class="material-icons">gavel</i> Place Bid
+                        </button>
+                    {% endif %}
+                    
+                    <div class="product-actions">
+                        <a href="{{ url_for('encher_user') }}" class="back-to-products">
+                            <i class="material-icons">arrow_back</i> Back To Auctions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Confirmation Modal -->
     <div id="modalConfirmation" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('modalConfirmation')">&times;</span>
-            <h2>Placer votre enchère</h2>
-            <form id="confirmationForm">
-                <label for="firstName">FirstName:</label>
-                <input type="text" id="firstName" required value="{{ user['FirstName'] if user is defined and user['FirstName'] else 'TestPrenom' }}" readonly disabled>
-
-                <label for="lastName">LastName :</label>
-                <input type="text" id="lastName" required value="{{ user.LastName if user is defined else '' }}" readonly disabled>
-
-                <label for="email">Email :</label>
-                <input type="email" id="email" required value="{{ user.Email if user is defined else '' }}" readonly disabled>
-
-                <label for="phone">Phone number :</label>
-                <input type="tel" id="phone" required value="{{ user.phoneNum if user is defined else '' }}" readonly disabled>
-
-                <label for="proposed_price_confirm">Proposed Price (€):</label>
-                <input type="number" id="proposed_price_confirm" required min="{{ enchere.prix }}" step="0.01" onblur="checkPrice(this)">
+            <span class="close-btn" onclick="closeModal('modalConfirmation')">&times;</span>
+            <h2>Place Your Bid</h2>
+            <form id="confirmationForm" class="bid-form">
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" required value="{{ user['FirstName'] if user is defined and user['FirstName'] else 'TestPrenom' }}" readonly>
+                </div>
                 
-                <button type="button" class="btn-confirmer" onclick="openModal('modalConfirmFinal')">Submit</button>
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" required value="{{ user.LastName if user is defined else '' }}" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required value="{{ user.Email if user is defined else '' }}" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" required value="{{ user.phoneNum if user is defined else '' }}" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="proposed_price_confirm">Your Bid (EUR):</label>
+                    <div class="bid-input-container">
+                        <span class="currency">EUR</span>
+                        <input type="number" id="proposed_price_confirm" required min="{{ enchere.prix }}" step="0.01" onblur="checkPrice(this)">
+                    </div>
+                    <p class="min-bid">Minimum bid: {{ enchere.prix }} EUR</p>
+                </div>
+                
+                <button type="button" class="submit-btn" onclick="openModal('modalConfirmFinal')">
+                    Continue
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- Fenêtre Modale : Confirmation finale -->
+    <!-- Final Confirmation Modal -->
     <div id="modalConfirmFinal" class="modal">
         <div class="modal-content">
-            <h2>Confirmez-vous votre enchère ?</h2>
-            <p>Votre enchère de <strong><span id="confirmPrice"></span> €</strong> sera soumise.</p>
-            <div class="modal-buttons">
-                <button class="btn-confirm" onclick="submitBid()">Confirmer</button>
-                <button class="btn-cancel" onclick="closeModal('modalConfirmFinal')">Annuler</button>
+            <span class="close-btn" onclick="closeModal('modalConfirmFinal')">&times;</span>
+            <div class="confirmation-body">
+                <i class="material-icons confirmation-icon">gavel</i>
+                <h2>Confirm Your Bid</h2>
+                <p>You are about to place a bid of <strong><span id="confirmPrice"></span> EUR</strong> for:</p>
+                <p class="item-name">{{ enchere.name }}</p>
+                
+                <div class="confirmation-buttons">
+                    <button class="confirm-btn" onclick="submitBid()">Confirm Bid</button>
+                    <button class="cancel-btn" onclick="closeModal('modalConfirmFinal')">Cancel</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript pour gérer les modales et l'enchère -->
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="#">All Products</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Best Sellers</a></li>
+                    <li><a href="#">Sale Items</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Artisans</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Help</h4>
+                <ul>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-amex"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 Handmade Creations. All rights reserved.</p>
+            <div class="legal-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
+
     <script>
         function openModal(id) {
             if (id === 'modalConfirmFinal') {
@@ -93,28 +241,42 @@
                 let confirmedPriceValue = parseFloat(proposedPriceConfirmInput.value);
                 let minConfirmedPrice = parseFloat(proposedPriceConfirmInput.min);
 
-                if (isNaN(confirmedPriceValue) || confirmedPriceValue < minConfirmedPrice) {
-                    alert("❌ Le prix proposé ne peut pas être inférieur à " + minConfirmedPrice + " EUR.");
-                    return; // Bloque l'affichage du modal si le prix est invalide
+                if (isNaN(confirmedPriceValue)) {
+                    showAlert("Please enter a valid bid amount");
+                    return;
                 }
 
-                document.getElementById("confirmPrice").innerText = confirmedPriceValue;
+                if (confirmedPriceValue < minConfirmedPrice) {
+                    showAlert(`Your bid must be at least ${minConfirmedPrice} EUR`);
+                    return;
+                }
+
+                document.getElementById("confirmPrice").innerText = confirmedPriceValue.toFixed(2);
             }
-            document.getElementById(id).classList.add("show");
+            document.getElementById(id).style.display = "flex";
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.remove("show");
+            document.getElementById(id).style.display = "none";
         }
 
         function checkPrice(input) {
             let minPrice = parseFloat(input.min);
             let enteredPrice = parseFloat(input.value);
 
-            if (isNaN(enteredPrice) || enteredPrice < minPrice) {
-                alert("⚠️ Veuillez entrer un prix supérieur ou égal à " + minPrice + " EUR.");
-                input.value = ""; // Vide le champ pour forcer l'utilisateur à entrer un prix valide
+            if (isNaN(enteredPrice)) {
+                input.value = "";
+                return;
             }
+
+            if (enteredPrice < minPrice) {
+                showAlert(`Your bid must be at least ${minPrice} EUR`);
+                input.value = minPrice;
+            }
+        }
+
+        function showAlert(message) {
+            alert(message);
         }
 
         function submitBid() {
@@ -122,8 +284,13 @@
             let confirmedPriceValue = parseFloat(proposedPriceConfirmInput.value);
             let minConfirmedPrice = parseFloat(proposedPriceConfirmInput.min);
 
-            if (isNaN(confirmedPriceValue) || confirmedPriceValue < minConfirmedPrice) {
-                alert("Le prix confirmé ne peut pas être inférieur à " + minConfirmedPrice + " EUR.");
+            if (isNaN(confirmedPriceValue) ){
+                showAlert("Please enter a valid bid amount");
+                return;
+            }
+
+            if (confirmedPriceValue < minConfirmedPrice) {
+                showAlert(`Your bid must be at least ${minConfirmedPrice} EUR`);
                 return;
             }
 
@@ -132,6 +299,11 @@
             let lastName = document.getElementById('lastName').value;
             let email = document.getElementById('email').value;
             let phone = document.getElementById('phone').value;
+
+            // Show loading state
+            const confirmBtn = document.querySelector('.confirm-btn');
+            confirmBtn.innerHTML = '<i class="material-icons">hourglass_empty</i> Processing...';
+            confirmBtn.disabled = true;
 
             fetch('/encherir', {
                 method: 'POST',
@@ -150,20 +322,30 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    alert("Erreur : " + data.error);
+                    showAlert("Error: " + data.error);
                 } else {
-                    alert("✅ Enchère enregistrée avec succès !");
+                    showAlert("✅ Your bid has been placed successfully!");
                     closeModal('modalConfirmFinal');
                     closeModal('modalConfirmation');
                     location.reload();
                 }
             })
             .catch(error => {
-                console.error("Erreur:", error);
-                alert("❌ Une erreur est survenue. Veuillez réessayer.");
+                console.error("Error:", error);
+                showAlert("❌ An error occurred. Please try again.");
+            })
+            .finally(() => {
+                confirmBtn.innerHTML = 'Confirm Bid';
+                confirmBtn.disabled = false;
             });
         }
-    </script>
 
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,392 @@
+/* ========== Auction Detail Styles ========== */
+.auction-detail-container {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 40px;
+}
+
+.auction-detail-wrapper {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.auction-gallery {
+    flex: 1;
+    max-width: 600px;
+}
+
+.main-image {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.main-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.auction-info {
+    flex: 1;
+    max-width: 600px;
+}
+
+.auction-title {
+    font-size: 32px;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.auction-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.current-bid {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.starting-bid {
+    font-size: 14px;
+    color: var(--light-text);
+    display: block;
+    margin-top: 5px;
+}
+
+.auction-time {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.auction-time i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+.auction-location {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.auction-location i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+.auction-description {
+    margin-bottom: 30px;
+    line-height: 1.7;
+    color: var(--text-color);
+}
+
+.auction-description h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.place-bid-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.place-bid-btn:hover {
+    background-color: var(--dark-color);
+}
+
+/* Bidding History */
+.bidding-history {
+    margin-top: 60px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 40px;
+}
+
+.bidding-history h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+    color: var(--dark-color);
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.bidding-history h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.bids-list {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.bid-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bid-item:last-child {
+    border-bottom: none;
+}
+
+.bidder-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.bidder-name {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.bid-time {
+    font-size: 14px;
+    color: var(--light-text);
+}
+
+.bid-amount {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Bid Form Modal */
+.bid-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.bid-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.bid-form input[type="text"],
+.bid-form input[type="email"],
+.bid-form input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9f9f9;
+    color: var(--light-text);
+}
+
+.bid-input-container {
+    position: relative;
+}
+
+.bid-input-container .currency {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 500;
+    color: var(--light-text);
+}
+
+.bid-input-container input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+}
+
+.min-bid {
+    font-size: 14px;
+    color: var(--light-text);
+    margin-top: 5px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background-color: var(--dark-color);
+}
+
+/* Confirmation Modal */
+.confirmation-body {
+    text-align: center;
+    padding: 20px;
+}
+
+.confirmation-icon {
+    font-size: 48px !important;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.confirmation-body h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.confirmation-body p {
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.item-name {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+}
+
+.confirmation-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.confirm-btn:hover {
+    background-color: var(--dark-color);
+}
+
+.cancel-btn {
+    flex: 1;
+    padding: 12px;
+    background-color: #f5f5f5;
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+    .auction-detail-wrapper {
+        flex-direction: column;
+    }
+    
+    .auction-gallery {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .auction-detail-container {
+        padding: 0 20px;
+    }
+    
+    .auction-title {
+        font-size: 24px;
+    }
+    
+    .current-bid {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 576px) {
+    .auction-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .confirmation-buttons {
+        flex-direction: column;
+    }
+    
+    .confirm-btn, .cancel-btn {
+        width: 100%;
+    }
+}
+
+
+/* Add to your existing CSS */
+.add-to-cart-btn:disabled,
+.place-bid-btn:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.auction-status {
+    margin: 10px 0;
+    font-weight: 500;
+    color: #333;
+}
+
+.auction-status i {
+    vertical-align: middle;
+    margin-right: 5px;
+}

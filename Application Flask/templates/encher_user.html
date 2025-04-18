@@ -2,58 +2,205 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
-    <title>Produits</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auctions | Handmade Creations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_products.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='encher_user.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin_enchere.css') }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .badge.ended {
+            background-color: #ff5252;
+            color: white;
+        }
+        .badge.ending-soon {
+            background-color: #ff9800;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation Menu with Logo -->
-     <!-- Navigation Menu with Logo -->
-     <header class="welcome-section">
-        <div id="navbar">
-          <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
-              <!-- <img
-                src="{{ url_for('static', filename='img/logout.png') }}"
-                alt="Logout" /> -->
-            </a>
-          <nav>
-            <ul >
-              <li><a href="{{ url_for('home') }}">Home</a></li>
-              <li><a href="{{ url_for('home') }}#about">About</a></li>
-              <li><a href="{{ url_for('index_user') }}">Products</a></li>
-              <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-              <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-          </ul>
-      </nav>
-      </div>
-    
-        <!-- Welcome Section with Background Image and Slogan -->
-        
-    
-        </header>
-    
-    <div class="slogan">
-        <p>It's time to discover our vintage products up for auction.</p>
-    </div>
-
-    <!-- Lien "Voir le panier" en haut -->
-    <div class="cart-container">
-        <a href="{{ url_for('mes_encheres') }}" class="cart-link">View my bids</a>
-    </div> 
-
-    <!-- Liste des enchères -->
-    <div class="product-container">
-        {% for enchere in encheres %}
-        <div class="product-card">
-            <a href="{{ url_for('enchere_detail', enchere_id=enchere.id_enchere) }}">
-            <img src="{{ url_for('static', filename= enchere.image_url ) }}" alt="{{ enchere.name }}" />
-            <h3>{{ enchere.name }}</h3>
-            <p>{{ enchere.prix }} EUR</p>
-            <p>Fin de l'enchère : {{ enchere.date_fin }}</p>
-        </a>
+    <!-- Navigation Menu -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">Handmade<span>Creations</span></a>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}#about">About</a></li>
+                    <li><a href="{{ url_for('index_user') }}">Products</a></li>
+                    <li><a href="{{ url_for('encher_user') }}" class="active">Auctions</a></li>
+                    <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="{{ url_for('mes_encheres') }}" class="cart-icon">
+                    <i class="material-icons">gavel</i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-icon">
+                    <i class="material-icons">account_circle</i>
+                </a>
+            </div>
         </div>
-        {% endfor %}
-    </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Vintage Treasures Auction</h1>
+            <p>Bid on unique, one-of-a-kind handmade items</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2>Current Auctions</h2>
+                <div class="breadcrumbs">
+                    <a href="{{ url_for('home') }}">Home</a> / <span>Auctions</span>
+                </div>
+            </div>
+
+            <!-- Auction Grid -->
+            <div class="auction-grid">
+                {% for enchere in encheres %}
+                <div class="auction-card">
+                    <div class="auction-badge">
+                        {% set end_date = datetime.datetime.strptime(enchere.date_fin, '%Y-%m-%d').date() %}
+                        {% if end_date > today %}
+                            {% if (end_date - today).days <= 1 %}
+                                <span class="badge ending-soon">Ending Soon!</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge ended">Ended</span>
+                        {% endif %}
+                    </div>
+                    
+                    <a href="{{ url_for('enchere_detail', enchere_id=enchere.id_enchere) }}" class="auction-image">
+                        <img src="{{ url_for('static', filename=enchere.image_url) }}" alt="{{ enchere.name }}" />
+                        <div class="auction-overlay">
+                            <span>View Details</span>
+                        </div>
+                    </a>
+                    
+                    <div class="auction-info">
+                        <h3 class="auction-title">{{ enchere.name }}</h3>
+                        
+                        <div class="auction-price">
+                            <span class="current-bid">{{ enchere.prix }} EUR</span>
+                        </div>
+                        
+                        <div class="auction-time">
+                            <i class="material-icons">schedule</i>
+                            <span class="time-remaining">
+                                {% set end_date = datetime.datetime.strptime(enchere.date_fin, '%Y-%m-%d').date() %}
+                                {% if end_date > today %}
+                                    {% set time_left = end_date - today %}
+                                    {% if time_left.days > 0 %}
+                                        {{ time_left.days }}d left
+                                    {% else %}
+                                        Ending today!
+                                    {% endif %}
+                                {% else %}
+                                    Auction ended on {{ enchere.date_fin }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="auction-actions">
+                            {% set end_date = datetime.datetime.strptime(enchere.date_fin, '%Y-%m-%d').date() %}
+                            {% if end_date > today %}
+                                <a href="{{ url_for('enchere_detail', enchere_id=enchere.id_enchere) }}" class="bid-now-btn">
+                                    <i class="material-icons">gavel</i> Place Bid
+                                </a>
+                            {% else %}
+                                <button class="bid-now-btn" disabled>
+                                    <i class="material-icons">gavel</i> Bidding Closed
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a href="#" class="page-nav disabled"><i class="material-icons">chevron_left</i></a>
+                <a href="#" class="page-number active">1</a>
+                <a href="#" class="page-number">2</a>
+                <a href="#" class="page-number">3</a>
+                <a href="#" class="page-nav"><i class="material-icons">chevron_right</i></a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="#">All Products</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Best Sellers</a></li>
+                    <li><a href="#">Sale Items</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Artisans</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Help</h4>
+                <ul>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-amex"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 Handmade Creations. All rights reserved.</p>
+            <div class="legal-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

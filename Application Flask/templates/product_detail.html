@@ -1,144 +1,372 @@
-<!-- @format -->
-
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <title>Détails du Produit</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet" />
-  </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} | Handmade Creations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_products.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='products_details.css') }}" />
 
-  <body>
-    <!-- Navigation Menu with Logo -->
-    <div id="navbar">
-      <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
-      <nav>
-          <ul>
-              <li><a href="{{ url_for('home') }}">Home</a></li>
-              <li><a href="{{ url_for('home') }}#about">About</a></li>
-              <li><a href="{{ url_for('index_user') }}">Products</a></li>
-              <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-              <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-          </ul>
-      </nav>
-  </div>
-    <h1>{{ product.name }}</h1>
-    <img
-      src="{{ url_for('static', filename= product.image_url ) }}"
-      alt="{{ product.name }}"
-      class="product-image" />
-    <p>Prix: {{ product.price }} EUR</p>
-    <p>Stock: {{ product.stock }}</p>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">Handmade<span>Creations</span></a>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}#about">About</a></li>
+                    <li><a href="{{ url_for('index_user') }}">Shop</a></li>
+                    <li><a href="{{ url_for('encher_user') }}">Auctions</a></li>
+                    <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="{{ url_for('view_cart') }}" class="cart-icon">
+                    <i class="material-icons">shopping_cart</i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-icon">
+                    <i class="material-icons">account_circle</i>
+                </a>
+            </div>
+        </div>
+    </header>
 
-    <form onsubmit="addToCart(event)">
-      <label for="quantity">Quantité:</label>
-      <input
-        type="number"
-        id="quantity"
-        name="quantity"
-        value="1"
-        required
-        oninput="checkQuantity()" />
-      <button type="submit" id="add-to-cart-btn">Ajouter au panier</button>
-    </form>
+    <!-- Main Content -->
+    <main class="product-detail-container">
+        <div class="breadcrumb-nav">
+            <a href="{{ url_for('index_user') }}">Products</a> / <span>{{ product.name }}</span>
+        </div>
 
-    <a href="{{ url_for('index_user') }}" class="back-link"
-      >Retour aux produits</a
-    >
+        <div class="product-detail-wrapper">
+            <!-- Product Images -->
+            <div class="product-gallery">
+                <div class="main-image">
+                    <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" />
+                </div>
+                <div class="thumbnail-container">
+                    <!-- You could add thumbnails here if you have multiple images -->
+                    <div class="thumbnail active">
+                        <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="product-info">
+                <h1 class="product-title">{{ product.name }}</h1>
+                
+                <div class="product-meta">
+                  <div class="product-price">
+                      <span class="current-price">{{ product.price }} EUR</span>
+                      {% if product.original_price %}
+                      <span class="original-price">{{ product.original_price }} EUR</span>
+                      {% endif %}
+                  </div>
+                  
+                  <!-- Add auction status if this is an auction product -->
+                  {% if product.is_auction %}
+                  <div class="auction-status">
+                      {% set end_date = datetime.datetime.strptime(product.date_fin, '%Y-%m-%d').date() %}
+                      {% if end_date > today %}
+                          <i class="material-icons">schedule</i> 
+                          {% set time_left = end_date - today %}
+                          {% if time_left.days > 0 %}
+                              {{ time_left.days }}d left
+                          {% else %}
+                              Ending today!
+                          {% endif %}
+                      {% else %}
+                          <i class="material-icons">gavel</i> Auction ended
+                      {% endif %}
+                  </div>
+                  {% else %}
+                  <!-- Regular stock status for non-auction products -->
+                  <div class="product-stock {% if product.stock == 0 %}out-of-stock{% else %}in-stock{% endif %}">
+                      {% if product.stock == 0 %}
+                      <i class="material-icons">highlight_off</i> Sold Out
+                      {% elif product.stock <= 5 %}
+                      <i class="material-icons">warning</i> Only {{ product.stock }} left in stock!
+                      {% else %}
+                      <i class="material-icons">check_circle</i> In Stock
+                      {% endif %}
+                  </div>
+                  {% endif %}
+              </div>
+
+                <div class="product-description">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+                    <!-- You would replace this with your actual product description -->
+                </div>
+
+                <form class="add-to-cart-form" onsubmit="addToCart(event)">
+                  {% if product.is_auction %}
+                      {% set end_date = datetime.datetime.strptime(product.date_fin, '%Y-%m-%d').date() %}
+                      <div class="quantity-selector">
+                          <label for="quantity">Bid Amount:</label>
+                          <div class="quantity-controls">
+                              <input
+                                  type="number"
+                                  id="quantity"
+                                  name="quantity"
+                                  value="{{ product.price + 1 }}"  <!-- Default to current price + 1 -->
+                                  min="{{ product.price + 1 }}"
+                                  step="1"
+                                  required />
+                          </div>
+                      </div>
+              
+                      <button type="submit" id="place-bid-btn" class="add-to-cart-btn" {% if end_date <= today %}disabled{% endif %}>
+                          <i class="material-icons">gavel</i> 
+                          {% if end_date > today %}Place Bid{% else %}Bidding Closed{% endif %}
+                      </button>
+                  {% else %}
+                      <!-- Regular product form -->
+                      <div class="quantity-selector">
+                          <label for="quantity">Quantity:</label>
+                          <div class="quantity-controls">
+                              <button type="button" class="quantity-btn minus" onclick="adjustQuantity(-1)">-</button>
+                              <input
+                                  type="number"
+                                  id="quantity"
+                                  name="quantity"
+                                  value="1"
+                                  min="1"
+                                  max="{{ product.stock }}"
+                                  oninput="checkQuantity()" />
+                              <button type="button" class="quantity-btn plus" onclick="adjustQuantity(1)">+</button>
+                          </div>
+                      </div>
+              
+                      <button type="submit" id="add-to-cart-btn" class="add-to-cart-btn" {% if product.stock == 0 %}disabled{% endif %}>
+                          <i class="material-icons">add_shopping_cart</i> Add to Cart
+                      </button>
+                  {% endif %}
+              </form>
+
+                <div class="product-actions">
+                    <a href="{{ url_for('index_user') }}" class="back-to-products">
+                        <i class="material-icons">arrow_back</i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        
+    </main>
 
     <!-- Custom Modal -->
     <div id="custom-modal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">×</span>
-        <div class="modal-body">
-          <p id="modal-message"></p>
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <div class="modal-body">
+                <i class="material-icons modal-icon" id="modal-icon">info</i>
+                <p id="modal-message"></p>
+                <button class="modal-close-btn" onclick="closeModal()">OK</button>
+            </div>
         </div>
-      </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="#">All Products</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Best Sellers</a></li>
+                    <li><a href="#">Sale Items</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Artisans</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Help</h4>
+                <ul>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-amex"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 Handmade Creations. All rights reserved.</p>
+            <div class="legal-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
+
     <script>
-      function addToCart(event) {
-        event.preventDefault(); // Prevent default form submission
+        function addToCart(event) {
+            event.preventDefault(); // Prevent default form submission
 
-        const quantity = document.getElementById("quantity").value;
-        const productStock = parseInt("{{ product.stock }}");
+            const quantity = document.getElementById("quantity").value;
+            const productStock = parseInt("{{ product.stock }}");
 
-        // Check if stock is 0
-        if (productStock === 0) {
-          showModal("Produit en rupture de stock");
-          return; // Exit the function early
-        }
-
-        // Check if quantity exceeds stock
-        if (parseInt(quantity) > productStock) {
-          showModal(
-            `Quantité non disponible! La quantité maximale que vous pouvez commander est ${productStock}.`
-          );
-          return;
-        }
-
-        // Proceed with form submission if quantity is valid
-        const productId = "{{ product.id }}";
-        const url =
-          "{{ url_for('add_to_cart', product_id=product.id, quantity=0, stock=product.stock) }}".replace(
-            "0",
-            quantity
-          );
-
-        // Use Fetch API to submit the form data
-        fetch(url, {
-          method: "GET", // Use GET since your route is a GET request
-        })
-          .then((response) => response.json()) // Parse the JSON response
-          .then((data) => {
-            if (data.success) {
-              // Redirect to the index page if the product is added successfully
-              window.location.href = "{{ url_for('index_user') }}";
-            } else {
-              // Show the error message in the modal
-              showModal(data.message);
+            // Check if stock is 0
+            if (productStock === 0) {
+                showModal("error", "This product is currently out of stock");
+                return; // Exit the function early
             }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            showModal("Une erreur s'est produite. Veuillez réessayer.");
-          });
-      }
-      function showModal(message) {
-        const modal = document.getElementById("custom-modal");
-        const modalMessage = document.getElementById("modal-message");
 
-        modalMessage.textContent = message; // Set the message
-        modal.style.display = "flex"; // Show the modal
-      }
+            // Check if quantity exceeds stock
+            if (parseInt(quantity) > productStock) {
+                showModal(
+                    "error",
+                    `The requested quantity is not available! Maximum quantity available is ${productStock}.`
+                );
+                return;
+            }
 
-      function closeModal() {
-        const modal = document.getElementById("custom-modal");
-        modal.style.display = "none"; // Hide the modal
-      }
+            // Proceed with form submission if quantity is valid
+            const productId = "{{ product.id }}";
+            const url =
+                "{{ url_for('add_to_cart', product_id=product.id, quantity=0, stock=product.stock) }}".replace(
+                    "0",
+                    quantity
+                );
 
-      function checkQuantity() {
-        const quantityInput = document.getElementById("quantity");
-        const addToCartBtn = document.getElementById("add-to-cart-btn");
-        const productStock = parseInt("{{ product.stock }}");
+            // Show loading state
+            const addToCartBtn = document.getElementById("add-to-cart-btn");
+            addToCartBtn.innerHTML = '<i class="material-icons">hourglass_empty</i> Adding...';
+            addToCartBtn.disabled = true;
 
-        addToCartBtn.disabled = false;
-
-        // Add blur effect if quantity exceeds stock
-        if (parseInt(quantityInput.value) > productStock) {
-          addToCartBtn.classList.add("blurred");
-        } else {
-          addToCartBtn.classList.remove("blurred");
+            // Use Fetch API to submit the form data
+            fetch(url, {
+                method: "GET", // Use GET since your route is a GET request
+            })
+                .then((response) => response.json()) // Parse the JSON response
+                .then((data) => {
+                    if (data.success) {
+                        // Update cart count
+                        const cartCount = document.querySelector('.cart-count');
+                        if (cartCount) {
+                            const currentCount = parseInt(cartCount.textContent) || 0;
+                            cartCount.textContent = currentCount + parseInt(quantity);
+                        }
+                        
+                        showModal("success", "Product successfully added to your cart!");
+                        
+                        // Reset button after short delay
+                        setTimeout(() => {
+                            addToCartBtn.innerHTML = '<i class="material-icons">add_shopping_cart</i> Add to Cart';
+                            addToCartBtn.disabled = false;
+                        }, 1500);
+                    } else {
+                        // Show the error message in the modal
+                        showModal("error", data.message);
+                        addToCartBtn.innerHTML = '<i class="material-icons">add_shopping_cart</i> Add to Cart';
+                        addToCartBtn.disabled = false;
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    showModal("error", "An error occurred. Please try again.");
+                    addToCartBtn.innerHTML = '<i class="material-icons">add_shopping_cart</i> Add to Cart';
+                    addToCartBtn.disabled = false;
+                });
         }
-      }
 
-      // Initial check when the page loads
-      document.addEventListener("DOMContentLoaded", checkQuantity);
+        function adjustQuantity(change) {
+            const quantityInput = document.getElementById("quantity");
+            let newValue = parseInt(quantityInput.value) + change;
+            
+            // Ensure quantity doesn't go below 1 or above available stock
+            newValue = Math.max(1, Math.min(newValue, parseInt("{{ product.stock }}")));
+            
+            quantityInput.value = newValue;
+            checkQuantity();
+        }
+
+        function checkQuantity() {
+            const quantityInput = document.getElementById("quantity");
+            const addToCartBtn = document.getElementById("add-to-cart-btn");
+            const productStock = parseInt("{{ product.stock }}");
+            const currentQuantity = parseInt(quantityInput.value);
+
+            if (currentQuantity > productStock) {
+                quantityInput.value = productStock;
+            }
+        }
+
+        function showModal(type, message) {
+            const modal = document.getElementById("custom-modal");
+            const modalMessage = document.getElementById("modal-message");
+            const modalIcon = document.getElementById("modal-icon");
+
+            // Set icon based on type
+            if (type === "error") {
+                modalIcon.textContent = "error";
+                modalIcon.style.color = "#e53935";
+            } else if (type === "success") {
+                modalIcon.textContent = "check_circle";
+                modalIcon.style.color = "#43a047";
+            } else {
+                modalIcon.textContent = "info";
+                modalIcon.style.color = "#1976d2";
+            }
+
+            modalMessage.textContent = message;
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("custom-modal");
+            modal.style.display = "none";
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById("custom-modal");
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Initial check when the page loads
+        document.addEventListener("DOMContentLoaded", function() {
+            checkQuantity();
+        });
     </script>
-  </body>
+</body>
 </html>

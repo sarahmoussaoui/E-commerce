@@ -2,57 +2,201 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
-    <title>Produits</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin_enchere.css') }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Products | Handmade Creations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_products.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Navigation Menu with Logo -->
-    <header class="welcome-section">
-    <div id="navbar">
-      <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
-          <!-- <img
-            src="{{ url_for('static', filename='img/logout.png') }}"
-            alt="Logout" /> -->
-        </a>
-      <nav>
-        <ul >
-          <li><a href="{{ url_for('home') }}">Home</a></li>
-          <li><a href="{{ url_for('home') }}#about">About</a></li>
-          <li><a href="{{ url_for('index_user') }}">Products</a></li>
-          <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-          <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-      </ul>
-  </nav>
-  </div>
-
-    <!-- Welcome Section with Background Image and Slogan -->
-    
-
-    </header>
-    <div class="slogan">
-      <p>Decorate your world with unique, handmade creations.</p>
-  </div>
-    <!-- Lien "Voir le panier" en haut -->
-    <div class="cart-container">
-      <a href="{{ url_for('view_cart') }}" class="cart-link">
-        View my cart  <span class="material-icons">shopping_cart</span> 
-    </a>
-    </div> 
-
-    <!-- Product Display -->
-    <div class="product-container">
-        {% for product in products %}
-        <div class="product-card {% if product.stock == 0 %}out-of-stock{% endif %}">       
-          <a href="{{ url_for('product_detail', product_id=product.id) }}">
-            <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" />
-            <h3>{{ product.name }}</h3>
-            <p>{{ product.price }} EUR</p>
-          </a>
+    <!-- Navigation Menu -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">Handmade<span>Creations</span></a>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}#about">About</a></li>
+                    <li><a href="{{ url_for('index_user') }}" class="active">Shop</a></li>
+                    <li><a href="{{ url_for('encher_user') }}">Auctions</a></li>
+                    <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="{{ url_for('view_cart') }}" class="cart-icon">
+                    <i class="material-icons">shopping_cart</i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-icon">
+                    <i class="material-icons">account_circle</i>
+                </a>
+            </div>
         </div>
-        {% endfor %}
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Handcrafted Treasures</h1>
+            <p>Discover unique, artisan-made products that tell a story</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2>Our Collection</h2>
+                <div class="breadcrumbs">
+                    <a href="{{ url_for('home') }}">Home</a> / <span>Products</span>
+                </div>
+            </div>
+
+            
+
+            <!-- Product Grid -->
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card {% if product.stock == 0 %}out-of-stock{% endif %}">
+                    <div class="product-badge">
+                        {% if product.stock <= 5 and product.stock > 0 %}
+                        <span class="badge low-stock">Only {{ product.stock }} left!</span>
+                        {% endif %}
+                        {% if product.stock == 0 %}
+                        <span class="badge out-of-stock">Sold Out</span>
+                        {% endif %}
+                    </div>
+                    
+                    <a href="{{ url_for('product_detail', product_id=product.id) }}" class="product-image">
+                        <img src="{{ url_for('static', filename= product.image_url ) }}" alt="{{ product.name }}" />
+                    </a>
+                    
+                    <div class="product-info">
+                        <h3 class="product-title">{{ product.name }}</h3>
+                        <div class="product-price">
+                            <span class="current-price">{{ product.price }} EUR</span>
+                            {% if product.original_price %}
+                            <span class="original-price">{{ product.original_price }} EUR</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="quick-view" data-id="{{ product.id }}">
+                                <i class="material-icons">visibility</i> Quick View
+                            </button>
+                            <button class="add-to-cart" data-id="{{ product.id }}" {% if product.stock == 0 %}disabled{% endif %}>
+                                <i class="material-icons">add_shopping_cart</i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a href="#" class="page-nav disabled"><i class="material-icons">chevron_left</i></a>
+                <a href="#" class="page-number active">1</a>
+                <a href="#" class="page-number">2</a>
+                <a href="#" class="page-number">3</a>
+                <a href="#" class="page-nav"><i class="material-icons">chevron_right</i></a>
+            </div>
+        </div>
+    </main>
+
+
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="#">All Products</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Best Sellers</a></li>
+                    <li><a href="#">Sale Items</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Artisans</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Help</h4>
+                <ul>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-amex"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 Handmade Creations. All rights reserved.</p>
+            <div class="legal-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Quick View Modal -->
+    <div class="modal" id="quickViewModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-product">
+                <div class="modal-product-image">
+                    <img src="" alt="Product Image" id="modalProductImage">
+                </div>
+                <div class="modal-product-info">
+                    <h3 id="modalProductTitle"></h3>
+                    <div class="product-price">
+                        <span class="current-price" id="modalProductPrice"></span>
+                    </div>
+                    <p id="modalProductDescription"></p>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn minus">-</button>
+                        <input type="number" value="1" min="1" id="productQuantity">
+                        <button class="quantity-btn plus">+</button>
+                    </div>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

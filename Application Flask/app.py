@@ -32,6 +32,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from datetime import datetime  # This imports the datetime class
+import datetime as dt_module
 
 load_dotenv()
 
@@ -818,9 +820,6 @@ def delete_product(product_id):
 #  Encheres
 
 
-from datetime import datetime
-
-
 @app.route("/gestion_encheres")
 @login_required
 def gestion_encheres():
@@ -1132,7 +1131,6 @@ def admin_orders():
     ).fetchall()
 
     # Calculate summary statistics
-    from datetime import datetime, timedelta
 
     # Initialize counters
     pending_count = 0
@@ -1322,20 +1320,67 @@ def encher_user():
     conn = get_db()
     encheres = conn.execute("SELECT * FROM enchere").fetchall()
     conn.close()
+    today = datetime.now().date()
     encheres = [dict(enchere) for enchere in encheres]
-    return render_template("encher_user.html", encheres=encheres)
+    return render_template(
+        "encher_user.html", encheres=encheres, today=today, datetime=dt_module
+    )
 
 
 @app.route("/enchere/<int:enchere_id>")
 @login_required
 def enchere_detail(enchere_id):
     db = get_db()
+
+    # Get auction details
     enchere = db.execute(
         "SELECT * FROM enchere WHERE id_enchere = ?", (enchere_id,)
     ).fetchone()
+
     if not enchere:
-        return "Enchère non trouvée", 404
-    return render_template("enchere_detail.html", enchere=enchere, user=current_user)
+        abort(404, "Auction not found")
+
+    # Get highest bid
+    highest_bid = (
+        db.execute(
+            "SELECT MAX(proposed_price) FROM historique_enchere WHERE id_enchere = ?",
+            (enchere_id,),
+        ).fetchone()[0]
+        or enchere["prix"]
+    )  # Default to starting price if no bids
+
+    # Calculate auction status
+    try:
+        end_date = datetime.strptime(enchere["date_fin"], "%Y-%m-%d").date()
+        today = datetime.now().date()
+        is_ended = end_date < today
+    except ValueError as e:
+        abort(500, f"Invalid date format in database: {str(e)}")
+
+    # Get bid count and bid history
+    bid_count = db.execute(
+        "SELECT COUNT(*) FROM historique_enchere WHERE id_enchere = ?", (enchere_id,)
+    ).fetchone()[0]
+
+    # Get all bids for this auction (sorted by price descending)
+    bids = db.execute(
+        "SELECT * FROM historique_enchere WHERE id_enchere = ? ORDER BY proposed_price DESC",
+        (enchere_id,),
+    ).fetchall()
+
+    return render_template(
+        "enchere_detail.html",
+        enchere=enchere,
+        user=current_user,
+        highest_bid=highest_bid,
+        is_ended=is_ended,
+        bid_count=bid_count,
+        bids=bids,
+        today_date=today,  # Pass as date object for Python comparisons
+        today_str=today.strftime("%Y-%m-%d"),  # Pass as string for display/JS
+        datetime=dt_module,  # Pass datetime module for template usage
+        end_date_str=enchere["date_fin"],  # Original string from DB
+    )
 
 
 @app.route("/ajouter_enchere", methods=["POST"])
