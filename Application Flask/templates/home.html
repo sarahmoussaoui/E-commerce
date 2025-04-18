@@ -5,7 +5,9 @@
     <title>Handmade Product</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='user_products.css') }}" />
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     
 </head>
@@ -19,7 +21,7 @@
             
             <nav class="main-nav">
                 <ul>
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
                     <li><a href="{{ url_for('home') }}#about">About</a></li>
                     <li><a href="{{ url_for('index_user') }}">Shop</a></li>
                     <li><a href="{{ url_for('encher_user') }}">Auctions</a></li>
@@ -28,13 +30,19 @@
             </nav>
             
             <div class="header-actions">
-                <a href="{{ url_for('view_cart') }}" class="cart-icon">
-                    <i class="material-icons">shopping_cart</i>
-                    <span class="cart-count">0</span>
-                </a>
-                <a href="{{ url_for('logout') }}" class="user-icon">
-                    <i class="material-icons">account_circle</i>
-                </a>
+                <div class="header-actions">
+                    <a href="{{ url_for('view_cart') }}" class="cart-icon">
+                        <i class="material-icons">shopping_cart</i>
+                    </a>
+                    <a href="{{ url_for('mes_encheres') }}" class="cart-icon">
+                        <i class="material-icons">gavel</i>
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="cart-icon">
+                        <i class="material-icons">logout</i>
+                    </a>
+                </div>
+
+
             </div>
         </div>
     </header>
@@ -185,4 +193,63 @@
         
      </main>
 </body>
+ <!-- Footer -->
+ <footer class="main-footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <h4>Shop</h4>
+            <ul>
+                <li><a href="#">All Products</a></li>
+                <li><a href="#">New Arrivals</a></li>
+                <li><a href="#">Best Sellers</a></li>
+                <li><a href="#">Sale Items</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-col">
+            <h4>About</h4>
+            <ul>
+                <li><a href="#">Our Story</a></li>
+                <li><a href="#">Artisans</a></li>
+                <li><a href="#">Sustainability</a></li>
+                <li><a href="#">Blog</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-col">
+            <h4>Help</h4>
+            <ul>
+                <li><a href="#">FAQs</a></li>
+                <li><a href="#">Shipping</a></li>
+                <li><a href="#">Returns</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-col">
+            <h4>Connect</h4>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+            <div class="payment-methods">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-cc-paypal"></i>
+                <i class="fab fa-cc-amex"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; 2023 Handmade Creations. All rights reserved.</p>
+        <div class="legal-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Cookie Policy</a>
+        </div>
+    </div>
+</footer>
 </html>

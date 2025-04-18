@@ -9,12 +9,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='contact_us.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
 </head>
 <body>
-    <!-- Navigation Menu with Logo -->
-     <!-- Navigation Menu -->
-     <header class="main-header">
+    <header class="main-header">
         <div class="header-container">
             <div class="logo">
                 <a href="{{ url_for('home') }}">Handmade<span>Creations</span></a>
@@ -22,22 +23,28 @@
             
             <nav class="main-nav">
                 <ul>
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
                     <li><a href="{{ url_for('home') }}#about">About</a></li>
-                    <li><a href="{{ url_for('index_user') }}">Products</a></li>
-                    <li><a href="{{ url_for('encher_user') }}" >Auctions</a></li>
-                    <li><a href="{{ url_for('contact_us') }}" class="active">Contact</a></li>
+                    <li><a href="{{ url_for('index_user') }}">Shop</a></li>
+                    <li><a href="{{ url_for('encher_user') }}">Auctions</a></li>
+                    <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
                 </ul>
             </nav>
             
             <div class="header-actions">
-                <a href="{{ url_for('mes_encheres') }}" class="cart-icon">
-                    <i class="material-icons">gavel</i>
-                    <span class="cart-count">0</span>
-                </a>
-                <a href="{{ url_for('logout') }}" class="user-icon">
-                    <i class="material-icons">account_circle</i>
-                </a>
+                <div class="header-actions">
+                    <a href="{{ url_for('view_cart') }}" class="cart-icon">
+                        <i class="material-icons">shopping_cart</i>
+                    </a>
+                    <a href="{{ url_for('mes_encheres') }}" class="cart-icon">
+                        <i class="material-icons">gavel</i>
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="cart-icon">
+                        <i class="material-icons">logout</i>
+                    </a>
+                </div>
+
+
             </div>
         </div>
     </header>

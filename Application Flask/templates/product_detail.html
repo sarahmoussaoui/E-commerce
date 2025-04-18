@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Navigation Menu -->
     <header class="main-header">
         <div class="header-container">
             <div class="logo">
@@ -21,7 +20,7 @@
             
             <nav class="main-nav">
                 <ul>
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
                     <li><a href="{{ url_for('home') }}#about">About</a></li>
                     <li><a href="{{ url_for('index_user') }}">Shop</a></li>
                     <li><a href="{{ url_for('encher_user') }}">Auctions</a></li>
@@ -30,13 +29,19 @@
             </nav>
             
             <div class="header-actions">
-                <a href="{{ url_for('view_cart') }}" class="cart-icon">
-                    <i class="material-icons">shopping_cart</i>
-                    <span class="cart-count">0</span>
-                </a>
-                <a href="{{ url_for('logout') }}" class="user-icon">
-                    <i class="material-icons">account_circle</i>
-                </a>
+                <div class="header-actions">
+                    <a href="{{ url_for('view_cart') }}" class="cart-icon">
+                        <i class="material-icons">shopping_cart</i>
+                    </a>
+                    <a href="{{ url_for('mes_encheres') }}" class="cart-icon">
+                        <i class="material-icons">gavel</i>
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="cart-icon">
+                        <i class="material-icons">logout</i>
+                    </a>
+                </div>
+
+
             </div>
         </div>
     </header>
