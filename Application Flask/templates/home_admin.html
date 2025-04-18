@@ -201,37 +201,7 @@
                         </div>
                     </div>
 
-                    <!-- Active Auctions Section -->
-                    <div class="content-card">
-                        <div class="card-header">
-                            <h2>Active Auctions</h2>
-                            <a href="{{ url_for('gestion_encheres') }}" class="view-all">View All</a>
-                        </div>
-                        <div class="auctions-grid">
-                            {% for auction in active_auctions %}
-                            <div class="auction-item">
-                                <div class="auction-img">
-                                    <img src="{{ auction.image_url or url_for('static', filename='img/default-auction.jpg') }}" alt="Auction Item" />
-                                </div>
-                                <div class="auction-info">
-                                    <h3>{{ auction.name }}</h3>
-                                    <div class="auction-meta">
-                                        <div class="bid-info">
-                                            <span class="current-bid">${{ "%.2f"|format(auction.prix) }}</span>
-                                            <span class="bid-count">{{ auction.bid_count }} bids</span>
-                                        </div>
-                                        <div class="time-left">
-                                            <i class="fas fa-clock"></i>
-                                            <span>Ends: {{ auction.date_fin }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: {{ auction.progress }}%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
+                    
                     </div>
 
                     

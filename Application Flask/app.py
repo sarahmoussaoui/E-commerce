@@ -34,6 +34,18 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from datetime import datetime  # This imports the datetime class
 import datetime as dt_module
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+    Image,
+    HRFlowable,
+)
+from reportlab.lib import colors
 
 load_dotenv()
 
@@ -650,29 +662,88 @@ def generate_invoice(cart, total, delivery_option, delivery_cost):
         os.makedirs(invoices_folder)
 
     # Generate unique invoice filename
-    invoice_filename = f"invoice_{int(time.time())}.pdf"
+    invoice_filename = f"handmade_invoice_{int(time.time())}.pdf"
     invoice_path = os.path.join(invoices_folder, invoice_filename)
 
-    # Create PDF
-    doc = SimpleDocTemplate(invoice_path, pagesize=A4)
+    # Create PDF with elegant styling
+    doc = SimpleDocTemplate(
+        invoice_path,
+        pagesize=A4,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=60,
+        bottomMargin=60,
+    )
     styles = getSampleStyleSheet()
+
+    # Add custom styles
+    styles.add(
+        ParagraphStyle(
+            name="HandmadeTitle",
+            fontSize=24,
+            leading=30,
+            textColor=colors.HexColor("#8B5A2B"),  # Warm brown
+            fontName="Helvetica-Bold",
+            alignment=TA_CENTER,
+        )
+    )
+
+    styles.add(
+        ParagraphStyle(
+            name="HandmadeSubtitle",
+            fontSize=12,
+            textColor=colors.HexColor("#555555"),
+            fontName="Helvetica-Oblique",
+            alignment=TA_CENTER,
+        )
+    )
+
+    styles.add(
+        ParagraphStyle(
+            name="HandmadeHeading",
+            fontSize=14,
+            textColor=colors.HexColor("#8B5A2B"),
+            fontName="Helvetica-Bold",
+            spaceAfter=10,
+        )
+    )
+
     story = []
 
-    # Company Information
-    company_name = "Tech Solutions Inc."
-    company_address = "123 Innovation Street, Tech City, TC 45678"
-    company_phone = "+1 (555) 123-4567"
-    company_email = "support@techsolutions.com"
+    # Beautiful Header with Handmade Theme
+    logo_path = "path_to_your_logo.png"  # Add your logo here
+    if os.path.exists(logo_path):
+        story.append(Image(logo_path, width=100, height=100))
+        story.append(Spacer(1, 10))
 
-    story.append(Paragraph(company_name, styles["Title"]))
-    story.append(Paragraph(company_address, styles["Normal"]))
-    story.append(Paragraph(f"Phone: {company_phone}", styles["Normal"]))
-    story.append(Paragraph(f"Email: {company_email}", styles["Normal"]))
-    story.append(Spacer(1, 20))
+    story.append(Paragraph("Artisan's Touch Collections", styles["HandmadeTitle"]))
+    story.append(Paragraph("Handcrafted with Love & Care", styles["HandmadeSubtitle"]))
+    story.append(Spacer(1, 5))
 
-    # Invoice Title
-    story.append(Paragraph("INVOICE", styles["Heading1"]))
-    story.append(Spacer(1, 20))
+    # Company Information with elegant styling
+    company_address = "123 Crafters Lane, Artisan Valley, AV 98765"
+    company_phone = "+1 (555) 987-6543"
+    company_email = "hello@artisanstouch.com"
+    company_social = "@ArtisansTouch"
+
+    contact_info = f"""
+    <font color='#555555'>{company_address}</font><br/>
+    <font color='#555555'>Phone: {company_phone}</font><br/>
+    <font color='#555555'>Email: {company_email}</font><br/>
+    <font color='#8B5A2B'>Follow us: {company_social}</font>
+    """
+
+    story.append(Paragraph(contact_info, styles["Normal"]))
+    story.append(Spacer(1, 30))
+
+    # Invoice Title with decorative line
+    story.append(Paragraph("INVOICE", styles["HandmadeTitle"]))
+    story.append(
+        HRFlowable(
+            width="100%", thickness=1, lineCap="round", color=colors.HexColor("#D2B48C")
+        )
+    )  # Tan color
+    story.append(Spacer(1, 30))
 
     # Fetch User Details
     user_id = current_user.get_id()
@@ -687,15 +758,18 @@ def generate_invoice(cart, total, delivery_option, delivery_cost):
     user_email = user["Email"]
     user_phone = user["phoneNum"]
 
-    # User Information
-    story.append(Paragraph("Bill To:", styles["Heading2"]))
-    story.append(Paragraph(f"Name: {user_name}", styles["Normal"]))
-    story.append(Paragraph(f"Email: {user_email}", styles["Normal"]))
-    story.append(Paragraph(f"Phone: {user_phone}", styles["Normal"]))
-    story.append(Spacer(1, 20))
+    # User Information with beautiful formatting
+    customer_info = f"""
+    <b><font color='#8B5A2B'>Bill To:</font></b><br/>
+    <font color='#555555'>{user_name}</font><br/>
+    <font color='#555555'>{user_email}</font><br/>
+    <font color='#555555'>{user_phone}</font>
+    """
+    story.append(Paragraph(customer_info, styles["Normal"]))
+    story.append(Spacer(1, 30))
 
-    # Purchased Items Table
-    data = [["Product", "Quantity", "Unit Price", "Total"]]
+    # Purchased Items Table with handmade aesthetic
+    data = [["Handmade Item", "Quantity", "Unit Price", "Total"]]
     conn = get_db()
     for item in cart:
         product = conn.execute(
@@ -713,36 +787,66 @@ def generate_invoice(cart, total, delivery_option, delivery_cost):
     conn.close()
 
     # Add Delivery Option to the Table
-    data.append(["Livraison", "", "", f"{delivery_cost / 100:.2f} EUR"])
+    # Simple delivery line
+    data.append(["", "", "Delivery", f"{delivery_cost / 100:.2f} EUR"])
 
-    # Create the table
-    table = Table(data)
+    # Create the table with beautiful styling
+    table = Table(data, colWidths=[200, 60, 80, 80])
     table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    colors.HexColor("#D2B48C"),
+                ),  # Header color
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                 ("ALIGN", (0, 0), (-1, -1), "CENTER"),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, -1), 10),
                 ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
-                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
-                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                (
+                    "BACKGROUND",
+                    (0, 1),
+                    (-1, -2),
+                    colors.HexColor("#FAF0E6"),
+                ),  # Light beige
+                ("BACKGROUND", (-1, -1), (-1, -1), colors.HexColor("#FAF0E6")),
+                ("TEXTCOLOR", (0, 1), (-1, -1), colors.HexColor("#555555")),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#D2B48C")),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ]
         )
     )
 
     story.append(table)
-    story.append(Spacer(1, 20))
+    story.append(Spacer(1, 30))
 
-    # Total Amount
-    story.append(Paragraph(f"Total: {total / 100:.2f} EUR", styles["Heading2"]))
+    # Total Amount with emphasis
+    total_text = f"""
+    <b><font color='#8B5A2B' size=14>Total Amount:</font></b>
+    <font size=14 color='#8B5A2B'> {total / 100:.2f} EUR</font>
+    """
+    story.append(Paragraph(total_text, styles["Normal"]))
     story.append(Spacer(1, 40))
+
+    # Thank You Message
+    appreciation = """
+    <i><font color='#8B5A2B'>
+    Thank you for supporting handmade craftsmanship!<br/>
+    Each item is lovingly created by our artisans.<br/>
+    We hope it brings you as much joy as it did us to make it.
+    </font></i>
+    """
+    story.append(Paragraph(appreciation, styles["HandmadeSubtitle"]))
+    story.append(Spacer(1, 20))
 
     # Build the PDF
     doc.build(story)
 
-    print(f"Invoice saved at: {invoice_path}")
-    return invoice_path  # Return the saved file path
+    print(f"Beautiful invoice saved at: {invoice_path}")
+    return invoice_path
 
 
 # Home Page: Display Products

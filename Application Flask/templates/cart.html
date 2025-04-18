@@ -4,26 +4,48 @@
     <meta charset="UTF-8" />
     <title>Panier</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='cart.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_products.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   </head>
   <body>
-    <header>
-    <div id="navbar">
-      <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
-          <!-- <img
-            src="{{ url_for('static', filename='img/logout.png') }}"
-            alt="Logout" /> -->
-        </a>
-      <nav>
-        <ul >
-          <li><a href="{{ url_for('home') }}">Home</a></li>
-          <li><a href="{{ url_for('home') }}#about">About</a></li>
-          <li><a href="{{ url_for('index_user') }}">Products</a></li>
-          <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-          <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-      </ul>
-  </nav>
-  </div>
+    <header class="main-header">
+      <div class="header-container">
+          <div class="logo">
+              <a href="{{ url_for('home') }}">Handmade<span>Creations</span></a>
+          </div>
+          
+          <nav class="main-nav">
+              <ul>
+                  <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+                  <li><a href="{{ url_for('home') }}#about">About</a></li>
+                  <li><a href="{{ url_for('index_user') }}">Shop</a></li>
+                  <li><a href="{{ url_for('encher_user') }}">Auctions</a></li>
+                  <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+              </ul>
+          </nav>
+          
+          <div class="header-actions">
+              <div class="header-actions">
+                  <a href="{{ url_for('view_cart') }}" class="cart-icon">
+                      <i class="material-icons">shopping_cart</i>
+                  </a>
+                  <a href="{{ url_for('mes_encheres') }}" class="cart-icon">
+                      <i class="material-icons">gavel</i>
+                  </a>
+                  <a href="{{ url_for('logout') }}" class="cart-icon">
+                      <i class="material-icons">logout</i>
+                  </a>
+              </div>
+
+
+          </div>
+      </div>
+  </header>
+  <div class="cont">
+
     <div class="cart-container">
       <h1>My Cart</h1>
       {% if products %}
@@ -90,8 +112,21 @@
         <p>Votre panier est vide.</p>
       {% endif %}
     </div>
-  </header>
+  </div>
     <!-- JavaScript to Update Total and Address -->
+    <!-- Purchase Confirmation Modal -->
+    <div id="purchaseModal" class="modal">
+      <div class="modal-content">
+        <div class="invoice-confirmation">
+          <h1>Merci pour votre achat !</h1>
+          <p>Votre paiement a été traité avec succès.</p>
+          <a href="/download_invoice" class="btn">Télécharger votre facture</a>
+          <br>
+          <a href="/home_user" class="btn" style="background-color: #6c757d;">Retour à l'accueil</a>
+        </div>
+      </div>
+    </div>
+
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const deliveryOptions = document.querySelectorAll('input[name="delivery"]');
@@ -101,8 +136,9 @@
         const deliveryCostInput = document.getElementById('deliveryCost');
         const deliveryAddressInput = document.getElementById('deliveryAddressInput');
         const deliveryAddressTextarea = document.getElementById('deliveryAddress');
-        const baseTotal = parseFloat("{{ total }}"); // Base total without delivery cost
-      
+        const baseTotal = parseFloat("{{ total }}");
+        const modal = document.getElementById('purchaseModal');
+
         // Initialize total display
         totalElement.textContent = baseTotal.toFixed(2);
         stripeTotalInput.value = baseTotal.toFixed(2);
@@ -111,11 +147,11 @@
         deliveryOptions.forEach(option => {
           option.addEventListener('change', function() {
             const deliveryCost = parseFloat(this.value);
-            const newTotal = baseTotal + deliveryCost; // Display total with delivery cost
+            const newTotal = baseTotal + deliveryCost;
             totalElement.textContent = newTotal.toFixed(2);
-            stripeTotalInput.value = baseTotal.toFixed(2); // Send base total to backend
-            deliveryOptionInput.value = this.nextSibling.textContent.trim(); // Set delivery option name
-            deliveryCostInput.value = deliveryCost.toFixed(2); // Set delivery cost
+            stripeTotalInput.value = baseTotal.toFixed(2);
+            deliveryOptionInput.value = this.nextSibling.textContent.trim();
+            deliveryCostInput.value = deliveryCost.toFixed(2);
           });
         });
       
@@ -123,8 +159,86 @@
         deliveryAddressTextarea.addEventListener('input', function() {
           deliveryAddressInput.value = this.value;
         });
+
+        // Handle successful payment (this would be called after Stripe payment succeeds)
+        function showPurchaseConfirmation() {
+          modal.style.display = 'block';
+          document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+          if (event.target == modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+          }
+        });
+
+        // For testing - you would call showPurchaseConfirmation() after successful payment
+        // document.querySelector('.stripe-button button').addEventListener('click', function() {
+        //   setTimeout(showPurchaseConfirmation, 1500); // Simulate payment processing
+        // });
       });
     </script>
-    
+
+      <!-- Footer -->
+      <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="#">All Products</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Best Sellers</a></li>
+                    <li><a href="#">Sale Items</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Artisans</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Help</h4>
+                <ul>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-amex"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 Handmade Creations. All rights reserved.</p>
+            <div class="legal-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
   </body>
 </html>
