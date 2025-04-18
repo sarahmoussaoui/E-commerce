@@ -501,3 +501,62 @@ html, body {
         padding: 1rem;
     }
 }
+
+/* Add to your admin_orders.css */
+/* Update your CSS for the view button */
+.view-details {
+    color: #555; /* Dark gray color for the icon */
+    background: transparent; /* No background */
+    padding: 6px;
+}
+
+.view-details:hover {
+    color: #333; /* Slightly darker on hover */
+    background: transparent; /* Keep transparent on hover */
+}
+
+/* Keep the rest of your action button styles */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn {
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    background: #f0f0f0;
+    color: #555;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    background: #e0e0e0;
+}
+
+.quick-edit {
+    color: #6c757d;
+}
+
+.status-form {
+    display: inline;
+}
+
+.status-select {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: white;
+}
+.status-form {
+    display: inline;
+}
+
+.status-select {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: white;
+}

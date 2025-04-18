@@ -173,6 +173,9 @@
                                     </td>
                                     <td>
                                         <div class="action-buttons">
+                                            <a href="{{ url_for('order_details', order_id=order_id) }}" class="btn view-details" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
                                             <button class="btn quick-edit" title="Quick Edit">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
@@ -182,8 +185,6 @@
                                                     <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
                                                     <option value="canceled" {% if order.status == 'canceled' %}selected{% endif %}>Canceled</option>
                                                 </select>
-
-                                                
                                             </form>
                                         </div>
                                     </td>
