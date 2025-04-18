@@ -4,35 +4,49 @@
     <meta charset="UTF-8" />
     <title>Handmade Product</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}" />
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_products.css') }}" />
+
     
     
 </head>
 <body>
-    <!-- header start -->
-     <header>
-        <div id="navbar">
-            <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
-                <!-- <img
-                  src="{{ url_for('static', filename='img/logout.png') }}"
-                  alt="Logout" /> -->
-              </a>
-            <nav>
-              <ul >
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('home') }}#about">About</a></li>
-                <li><a href="{{ url_for('index_user') }}">Products</a></li>
-                <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-                <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-            </ul>
-        </nav>
+ <!-- Navigation Menu -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">Handmade<span>Creations</span></a>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}#about">About</a></li>
+                    <li><a href="{{ url_for('index_user') }}">Shop</a></li>
+                    <li><a href="{{ url_for('encher_user') }}">Auctions</a></li>
+                    <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="{{ url_for('view_cart') }}" class="cart-icon">
+                    <i class="material-icons">shopping_cart</i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-icon">
+                    <i class="material-icons">account_circle</i>
+                </a>
+            </div>
         </div>
-        <div class="content">
-            <h1>Welcome to <span class ="primary-text"> Handmade Wonders </span>Store </h1>
+    </header>
+
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to <span class="primary-text"> Handmade Wonders </span>Store </h1>
             <p> Here you can find most beautiful handmad Products </p>
             <a href="#about" class="btn btn-primary">Learn more</a>
         </div>
-     </header>
+    </section>
 
      <!-- header end  -->
 

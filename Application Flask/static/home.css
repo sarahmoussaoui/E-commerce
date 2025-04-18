@@ -1,141 +1,116 @@
-@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap");
-* {
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
+:root {
+    --primary-color: #9d8189;
+    --secondary-color: #f4acb7;
+    --accent-color: #ffcad4;
+    --dark-color: #5a3741;
+    --light-color: #fff9fb;
+    --text-color: #333;
+    --light-text: #777;
+    --border-color: #e0e0e0;
+}
+
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
 
-body{
-    font-family: "Quicksand", sans-serif;
+body {
+    font-family: "Poppins", sans-serif;
+    color: var(--text-color);
+    background-color: #f9f9f9;
+    line-height: 1.6;
 }
 
-ul{
+ul {
     list-style: none;
 }
 
 a {
     text-decoration: none;
+    color: inherit;
 }
 
-.container{
-  
-    max-width: 1180px;
+.container {
+    max-width: 1200px;
     margin: auto;
+    padding: 0 15px;
 }
-/* Logout Button */
-
-
-/* Utility classes  */
-.primary-text {
-    color: #e4b95b ;
-}
-.btn {
-    display: inline-block;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 15px;
-}
-
-.btn-primary{
-    color: white;
-    border: 1px solid #fff;
-}
-.btn-secondary{
-    color:#fff;
-    background:rgb(65, 61, 62);
-    margin-top: 2rem;
-}
-
-.btn-primary:hover,
-.btn-secondary:hover
-{
-    background: rgb(158, 100, 110);
-}
-
-/* header start  */
-header {
+/* ========== Hero Section ========== */
+.hero {
     height: 100vh;
-    background: url("../static/welcome.jpg")  center center/cover no-repeat;
+    background: url("../static/welcome.jpg") center center/cover no-repeat;
     position: relative;
-}
-
-#navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    width: 100%;
-}
-
-.logout-text {
-    color: white;
-    font-weight: 600;
-    padding: 10px 20px;
-    margin-left: 10px;
-    transition: border-bottom 0.3s ease-in-out;
-}
-
-.logout-text:hover {
-    border-bottom: 2px solid #e4b95b;
-}
-
-#navbar ul {
-    display: flex;
-    gap: 15px;
-    margin-right: 100px;
-}
-
-#navbar ul li a {
-    padding: 15px 20px;
-    color: white;
-    font-weight: 600;
-    transition: border-bottom 0.3s ease-in-out;
-}
-
-#navbar ul li a:hover {
-    border-bottom: 2px solid #e4b95b;
-}
-
-header .content{
-    display: flex;
-    flex-direction: column;
     justify-content: center;
-    align-items: center;
-    height: 75vh;
-}
-
-header .content h1{
-    font-size: 40px;
+    text-align: center;
     color: white;
 }
 
-header .content p{
-    margin: 20px 0 40px;
-    color: white;
-}
-
-header::before{
+.hero::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
     width: 100%;
-    background: rgb(0, 0,0,0.6);
-
+    background: rgba(0, 0, 0, 0.6); /* Slightly cleaner than rgb() */
 }
-header * {
+
+.hero-content {
+    position: relative;
     z-index: 10;
+    padding: 0 20px;
 }
-/* header end */
 
-main {
-    background-color: #f4f4f4; /* Change la couleur selon tes besoins */
-    padding: 50px 0; /* Ajoute un peu d'espace autour du contenu */
+.hero-content h1 {
+    font-size: 48px;
+    margin-bottom: 15px;
+    font-weight: 700;
 }
-/* about start  */
 
+.hero-content p {
+    font-size: 20px;
+    max-width: 700px;
+    margin: 0 auto 30px;
+}
+/* ========== Rest of your existing styles ========== */
+.primary-text {
+    color: var(--primary-color);
+}
+
+.btn {
+    display: inline-block;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    color: white;
+    border: 1px solid #fff;
+    background-color: transparent;
+}
+
+.btn-secondary {
+    color: #fff;
+    background: var(--dark-color);
+    margin-top: 2rem;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* About section styles */
 #about {
     height:80vh;
     display: flex;

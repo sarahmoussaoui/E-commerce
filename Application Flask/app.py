@@ -944,33 +944,57 @@ def contact_us():
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
-        # Get form data
+        # Get form data and user info
         user_id = session.get("_user_id")
-        objet = request.form["email"]
-        message_text = request.form["message"]
+        if not user_id:
+            return jsonify({"success": False, "message": "User not logged in"}), 401
+
+        # Get the subject and message from form
+        subject = request.form.get("subject")
+        message_text = request.form.get("message")
+
+        if not subject or not message_text:
+            return (
+                jsonify(
+                    {"success": False, "message": "Subject and message are required"}
+                ),
+                400,
+            )
+
+        # Get current datetime
         current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Insert data into the database
         conn = get_db()
-        conn.execute(
-            """
-            INSERT INTO messages (user_id, objet, message, date, is_treated)
-            VALUES (?, ?, ?, ?, ?)
-        """,
-            (user_id, objet, message_text, current_date, 0),
-        )
-        conn.commit()
-        conn.close()
+        try:
+            conn.execute(
+                """
+                INSERT INTO messages (user_id, objet, message, date, is_treated)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (user_id, subject, message_text, current_date, 0),
+            )
+            conn.commit()
+            return jsonify(
+                {
+                    "success": True,
+                    "message": "Thank you! We will respond to your message soon.",
+                }
+            )
+        except Exception as e:
+            conn.rollback()
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "message": "Error saving your message. Please try again.",
+                    }
+                ),
+                500,
+            )
+        finally:
+            conn.close()
 
-        # Return a JSON response indicating success
-        return jsonify(
-            {
-                "success": True,
-                "message": "Thank you! We will treat your message in the nearest time.",
-            }
-        )
-
-    # If GET request, just render the contact page
     return render_template("contact_us.html")
 
 

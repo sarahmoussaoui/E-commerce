@@ -3,88 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Contact Us | Your Company Name</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_products.css') }}" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='contact_us.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
 </head>
 <body>
     <!-- Navigation Menu with Logo -->
-    <div id="navbar">
-        <a href="{{ url_for('logout') }}" class="logout-text">Logout</a>
-            <!-- <img
-              src="{{ url_for('static', filename='img/logout.png') }}"
-              alt="Logout" /> -->
-          </a>
-        <nav>
-          <ul >
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('home') }}#about">About</a></li>
-            <li><a href="{{ url_for('index_user') }}">Products</a></li>
-            <li><a href="{{ url_for('encher_user') }}">Enchères</a></li>
-            <li><a href="{{ url_for('contact_us') }}">Contact</a></li>
-        </ul>
-    </nav>
-    </div>
+     <!-- Navigation Menu -->
+     <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">Handmade<span>Creations</span></a>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('home') }}#about">About</a></li>
+                    <li><a href="{{ url_for('index_user') }}">Products</a></li>
+                    <li><a href="{{ url_for('encher_user') }}" >Auctions</a></li>
+                    <li><a href="{{ url_for('contact_us') }}" class="active">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="{{ url_for('mes_encheres') }}" class="cart-icon">
+                    <i class="material-icons">gavel</i>
+                    <span class="cart-count">0</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="user-icon">
+                    <i class="material-icons">account_circle</i>
+                </a>
+            </div>
+        </div>
+    </header>
 
     <!-- Contact Us Section -->
     <section class="contact-section">
+        <!-- Contact Information -->
+        <div class="contact-info">
+            <h2>Get in Touch</h2>
+            <p>Have questions or feedback? We're here to help and would love to hear from you.</p>
+            
+            <div class="contact-details">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-text">
+                        <h3>Our Location</h3>
+                        <p>123 Business Avenue, City, Country 12345</p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="contact-text">
+                        <h3>Phone Number</h3>
+                        <p><a href="tel:+1234567890">+1 (234) 567-890</a></p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-text">
+                        <h3>Email Address</h3>
+                        <p><a href="mailto:info@yourcompany.com">info@yourcompany.com</a></p>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="contact-text">
+                        <h3>Working Hours</h3>
+                        <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                        <p>Saturday: 10:00 AM - 4:00 PM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.215573291661!2d-73.98784492452516!3d40.74844097138965!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
         <div class="contact-container">
-            <h1>Contact Us</h1>
-            <p>We'd love to hear from you! Reach out to us for any inquiries or feedback.</p>
+            <h1>Send Us a Message</h1>
+            <p>Fill out the form below and we'll get back to you as soon as possible.</p>
+            
             <form id="contact-form" action="{{ url_for('contact') }}" method="POST">
-                <label for="email">Objet</label>
-                <input type="text" id="email" name="email" placeholder="Your email" required>
-            
-                <label for="message">Message</label>
-                <textarea id="message" name="message" placeholder="Your message" rows="5" required></textarea>
-            
-                <button type="submit">Send Message</button>
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" placeholder="John Doe" required>
+                </div>
+                
+
+                
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select id="subject" name="subject" required>
+                        <option value="" disabled selected>Select a subject</option>
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Product Support">Product Support</option>
+                        <option value="Billing Question">Billing Question</option>
+                        <option value="Partnership">Partnership</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">Your Message</label>
+                    <textarea id="message" name="message" placeholder="How can we help you?" rows="6" required></textarea>
+                </div>
+                
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i> Send Message
+                </button>
             </form>
         </div>
     </section>
-<!-- Add this button below your contact form -->
-<button id="show-messages-btn">Show My Messages</button>
 
-<!-- Container to display the list of message objects -->
-<div id="messages-container" style="margin-top: 20px;"></div>
+    <!-- Message History Section -->
+    <div class="back-link-container">
+        <button id="show-messages-btn">
+            <i class="fas fa-history"></i> View My Message History
+        </button>
+    </div>
 
-<!-- Modal Structure -->
-<div id="message-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <div class="modal-body">
-            <p><strong>Date:</strong> <span id="modal-date"></span></p>
-            <p><strong>Subject:</strong> <span id="modal-objet"></span></p>
-            <p><strong>Message:</strong> <span id="modal-message"></span></p>
-            <p><strong>Admin Response:</strong> <span id="modal-admin-response"></span></p>
+    <div id="messages-container"></div>
+
+    <!-- Modal Structure -->
+    <div id="message-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Message Details</h2>
+            <div class="modal-body">
+                <p><strong>Date:</strong> <span id="modal-date"></span></p>
+                <p><strong>Subject:</strong> <span id="modal-objet"></span></p>
+                <p><strong>Your Message:</strong> <span id="modal-message"></span></p>
+                <p><strong>Admin Response:</strong> <span id="modal-admin-response"></span></p>
+                <p><strong>Status:</strong> <span id="modal-status" class="status-badge"></span></p>
+            </div>
         </div>
     </div>
-</div>
 
+    <!-- Success Message -->
+<!-- Notification System -->
+<div id="notification-overlay" class="notification-overlay"></div>
+<div id="notification" class="notification">
+    <div class="notification-header">
+        <div class="notification-title">
+            <i class="fas fa-check-circle"></i>
+            <span>Success</span>
+        </div>
+        <button class="notification-close">&times;</button>
+    </div>
+    <div class="notification-body">
+        Your message has been sent successfully!
+    </div>
+</div>
     <!-- Back to Home Link -->
     <div class="back-link-container">
-        <a href="{{ url_for('index_user') }}" class="back-link">Back to Home</a>
+        <a href="{{ url_for('index_user') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
     </div>
 
-<!-- Success Message -->
-<div id="success-message" class="success-message">
-    <button class="close-btn" onclick="closeSuccessMessage()">&times;</button>
-    <p>Thank you! We will treat your message in the nearest time.</p>
-</div>
-
-    <!-- JavaScript to handle form submission -->
+    <!-- JavaScript -->
     <script>
-// Function to close the success message
-function closeSuccessMessage() {
-    const successMessage = document.getElementById("success-message");
-    successMessage.style.display = "none";
+        // Function to close the success message
+        function closeSuccessMessage() {
+            const successMessage = document.getElementById("success-message");
+            successMessage.classList.add('hiding');
+            setTimeout(() => {
+                successMessage.style.display = "none";
+                successMessage.classList.remove('hiding');
+            }, 300);
+        }
+    
+        // Form submission handler
+        document.getElementById("contact-form").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch("{{ url_for('contact') }}", {
+                    method: "POST",
+                    body: new FormData(this),
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || "Failed to send message");
+                }
+    
+                if (data.success) {
+                    // Show success message
+                    showSuccessMessage(data.message || "Thank you! Your message has been sent successfully.");
+                    
+                    // Reset form
+                    this.reset();
+                } else {
+                    showErrorMessage(data.message || "There was an error sending your message.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showErrorMessage(error.message || "There was an error sending your message. Please try again.");
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+    
+        // Modal functionality
+        function openModal(message) {
+            const modal = document.getElementById("message-modal");
+            const modalDate = document.getElementById("modal-date");
+            const modalObjet = document.getElementById("modal-objet");
+            const modalMessage = document.getElementById("modal-message");
+            const modalAdminResponse = document.getElementById("modal-admin-response");
+            const modalStatus = document.getElementById("modal-status");
+            
+            // Populate modal
+            modalDate.textContent = message.date || "N/A";
+            modalObjet.textContent = message.objet || "N/A";
+            modalMessage.textContent = message.message || "N/A";
+            modalAdminResponse.textContent = message.admin_response || "Not yet responded";
+            
+            // Set status badge
+            modalStatus.textContent = message.admin_response ? "Responded" : "Pending";
+            modalStatus.className = message.admin_response ? "status-badge responded" : "status-badge pending";
+            
+            // Show modal
+            modal.style.display = "flex";
+            document.body.style.overflow = "hidden";
+        }
+    
+        function closeModal() {
+            const modal = document.getElementById("message-modal");
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+    
+        // Fetch and display messages
+        async function fetchAndDisplayMessages() {
+            const btn = document.getElementById("show-messages-btn");
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch("{{ url_for('get_messages') }}");
+                const messages = await response.json();
+                
+                const container = document.getElementById("messages-container");
+                container.innerHTML = "";
+                
+                if (messages.length === 0) {
+                    container.innerHTML = `
+                        <div class="message-item no-messages">
+                            <p>You haven't sent any messages yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                messages.forEach(msg => {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = "message-item";
+                    messageDiv.innerHTML = `
+                        <div class="message-header">
+                            <strong>${msg.objet || "No Subject"}</strong>
+                            <span class="status-badge ${msg.admin_response ? 'responded' : 'pending'}">
+                                ${msg.admin_response ? 'Responded' : 'Pending'}
+                            </span>
+                        </div>
+                        <div class="message-date">${msg.date || "Date not available"}</div>
+                        <div class="message-preview">${
+                            msg.message.length > 100 ? 
+                            msg.message.substring(0, 100) + '...' : msg.message
+                        }</div>
+                    `;
+                    
+                    messageDiv.addEventListener("click", () => openModal(msg));
+                    container.appendChild(messageDiv);
+                });
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+                const container = document.getElementById("messages-container");
+                container.innerHTML = `
+                    <div class="message-item error">
+                        <p>There was an error loading your messages. Please try again later.</p>
+                    </div>
+                `;
+            } finally {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+        }
+    
+        // Show notification message functions
+        function showSuccessMessage(msg) {
+            const successElement = document.getElementById("success-message");
+            successElement.querySelector('p').innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+            successElement.style.display = "block";
+            successElement.classList.remove('hiding');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                closeSuccessMessage();
+            }, 5000);
+        }
+    
+        function showErrorMessage(msg) {
+            // Remove any existing error messages
+            const existingError = document.querySelector('.error-message');
+            if (existingError) existingError.remove();
+            
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            errorElement.innerHTML = `
+                <button class="close-btn" onclick="this.remove()">&times;</button>
+                <p><i class="fas fa-exclamation-circle"></i> ${msg}</p>
+            `;
+            
+            document.body.appendChild(errorElement);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                if (errorElement.parentNode) {
+                    errorElement.classList.add('hiding');
+                    setTimeout(() => errorElement.remove(), 300);
+                }
+            }, 5000);
+        }
+    
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector(".modal .close-btn").addEventListener("click", closeModal);
+            document.getElementById("message-modal").addEventListener("click", (event) => {
+                if (event.target === document.getElementById("message-modal")) {
+                    closeModal();
+                }
+            });
+            document.getElementById("show-messages-btn").addEventListener("click", fetchAndDisplayMessages);
+        });
+        // Notification System
+function showNotification(type, title, message, duration = 5000) {
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas ${icons[type]} notification-icon"></i>
+        <div class="notification-content">
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+            &times;
+        </button>
+    `;
+    
+    document.getElementById('notification-container').appendChild(notification);
+    
+    // Trigger animation
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Auto-remove after duration
+    if (duration > 0) {
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 400);
+        }, duration);
+    }
+    
+    return notification;
 }
 
-// Modify the form submission handler to show the success message
-document.getElementById("contact-form").addEventListener("submit", function (event) {
-    event.preventDefault(); // Prevent the default form submission
+// Notification System
+let notificationTimeout;
 
-    // Submit the form using Fetch API
+function showNotification(type, title, message, duration = 3000) {
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+    
+    const notification = document.getElementById('notification');
+    const overlay = document.getElementById('notification-overlay');
+    
+    // Set notification content
+    notification.className = `notification notification-${type}`;
+    notification.querySelector('.notification-title i').className = `fas ${icons[type]}`;
+    notification.querySelector('.notification-title span').textContent = title;
+    notification.querySelector('.notification-body').textContent = message;
+    
+    // Show elements
+    notification.classList.add('show');
+    overlay.classList.add('show');
+    
+    // Clear any existing timeout
+    clearTimeout(notificationTimeout);
+    
+    // Set close handlers
+    notification.querySelector('.notification-close').onclick = hideNotification;
+    overlay.onclick = hideNotification;
+    
+    // Auto-hide if duration is set
+    if (duration > 0) {
+        notificationTimeout = setTimeout(hideNotification, duration);
+    }
+}
+
+function hideNotification() {
+    const notification = document.getElementById('notification');
+    const overlay = document.getElementById('notification-overlay');
+    
+    notification.classList.remove('show');
+    overlay.classList.remove('show');
+    
+    clearTimeout(notificationTimeout);
+}
+
+// Specific notification functions
+function showSuccessMessage(message) {
+    showNotification('success', 'Success', message);
+}
+
+function showErrorMessage(message) {
+    showNotification('error', 'Error', message);
+}
+
+// Update your form submission handler
+document.getElementById("contact-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    submitBtn.disabled = true;
+    
     fetch("{{ url_for('contact') }}", {
         method: "POST",
         body: new FormData(this),
@@ -92,97 +480,81 @@ document.getElementById("contact-form").addEventListener("submit", function (eve
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show the success message
-            const successMessage = document.getElementById("success-message");
-            successMessage.style.display = "block";
-
-            // Hide the message after 5 seconds (optional)
-            setTimeout(() => {
-                successMessage.style.display = "none";
-            }, 5000);
-
-            // Optionally, reset the form
-            document.getElementById("contact-form").reset();
+            showSuccessMessage(data.message || "Your message has been sent successfully!");
+            this.reset();
+        } else {
+            showErrorMessage(data.message || "There was an error sending your message.");
         }
     })
     .catch(error => {
+        showErrorMessage("There was an error sending your message. Please try again.");
         console.error("Error:", error);
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
     });
 });
-// Function to open the modal and populate it with message details
-function openModal(message) {
-    const modal = document.getElementById("message-modal");
-    const modalDate = document.getElementById("modal-date");
-    const modalObjet = document.getElementById("modal-objet");
-    const modalMessage = document.getElementById("modal-message");
-    const modalAdminResponse = document.getElementById("modal-admin-response");
+    </script>
 
-    // Populate modal with message details
-    modalDate.textContent = message.date;
-    modalObjet.textContent = message.objet;
-    modalMessage.textContent = message.message;
-    modalAdminResponse.textContent = message.admin_response || "No response yet.";
-
-    // Display the modal
-    modal.style.display = "flex";
-}
-
-// Function to close the modal
-function closeModal() {
-    const modal = document.getElementById("message-modal");
-    modal.style.display = "none";
-}
-
-// Add event listeners to message items
-function fetchAndDisplayMessages() {
-    fetch("{{ url_for('get_messages') }}")
-        .then(response => response.json())
-        .then(messages => {
-            console.log("Messages received:", messages); // Debugging
-            const messagesContainer = document.getElementById("messages-container");
-            messagesContainer.innerHTML = ""; // Clear previous content
-
-            if (messages.length === 0) {
-                messagesContainer.innerHTML = "<p>No messages found.</p>";
-                return;
-            }
-
-            // Create a list of message objects
-            messages.forEach(msg => {
-                console.log("Processing message:", msg); // Debugging
-                const messageDiv = document.createElement("div");
-                messageDiv.className = "message-item";
-                messageDiv.innerHTML = `
-                    <strong>${msg.objet}</strong>
-                    <div class="message-date">${msg.date}</div>
-                `;
-
-                // Add click event to open the modal
-                messageDiv.addEventListener("click", () => {
-                    openModal(msg);
-                });
-
-                messagesContainer.appendChild(messageDiv);
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching messages:", error);
-        });
-}
-
-// Add event listener to the close button
-document.querySelector(".close-btn").addEventListener("click", closeModal);
-
-// Add event listener to the modal background to close the modal
-document.getElementById("message-modal").addEventListener("click", (event) => {
-    if (event.target === document.getElementById("message-modal")) {
-        closeModal();
-    }
-});
-
-// Add event listener to the button
-document.getElementById("show-messages-btn").addEventListener("click", fetchAndDisplayMessages);
-
-</script>
+       <!-- Footer -->
+       <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="#">All Products</a></li>
+                    <li><a href="#">New Arrivals</a></li>
+                    <li><a href="#">Best Sellers</a></li>
+                    <li><a href="#">Sale Items</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Artisans</a></li>
+                    <li><a href="#">Sustainability</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Help</h4>
+                <ul>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-pinterest-p"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div class="payment-methods">
+                    <i class="fab fa-cc-visa"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-amex"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 Handmade Creations. All rights reserved.</p>
+            <div class="legal-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
