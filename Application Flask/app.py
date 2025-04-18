@@ -771,7 +771,6 @@ def add_product():
         conn.commit()
         conn.close()
 
-        flash("Product added successfully!", "success")
         return redirect(url_for("gestion_produits"))
 
     return render_template("add_product.html")
@@ -799,7 +798,6 @@ def update_product(product_id):
         conn.commit()
         conn.close()
 
-        flash("Product updated successfully!", "success")
         return redirect(url_for("gestion_produits"))
 
     return render_template("update_product.html", product=product)
@@ -814,7 +812,6 @@ def delete_product(product_id):
     conn.commit()
     conn.close()
 
-    flash("Product deleted successfully!", "danger")
     return redirect(url_for("gestion_produits"))
 
 
@@ -868,7 +865,6 @@ def add_enchere():
         conn.commit()
         conn.close()
 
-        flash("Auction created successfully!", "success")
         return redirect(url_for("gestion_encheres"))
 
     return render_template("add_enchere.html")
@@ -886,7 +882,6 @@ def update_enchere(enchere_id):
     ).fetchone()
 
     if not enchere:
-        flash("Auction not found!", "danger")
         return redirect(url_for("gestion_encheres"))
 
     if request.method == "POST":
@@ -909,7 +904,6 @@ def update_enchere(enchere_id):
         conn.commit()
         conn.close()
 
-        flash("Auction updated successfully!", "success")
         return redirect(url_for("gestion_encheres"))
 
     return render_template("update_enchere.html", enchere=enchere)
@@ -930,7 +924,6 @@ def delete_enchere(enchere_id):
     conn.commit()
     conn.close()
 
-    flash("Auction deleted successfully!", "danger")
     return redirect(url_for("gestion_encheres"))
 
 
@@ -1218,7 +1211,6 @@ def update_order_status(order_id):
     conn.commit()
     conn.close()
 
-    flash("Order status updated successfully!", "success")
     return redirect(url_for("admin_orders"))
 
 
@@ -1475,7 +1467,6 @@ def supprimer_enchere():
     user_id = session.get("user_id")
 
     if not enchere_id or not user_id:
-        flash("Erreur lors de la suppression.", "danger")
         return redirect(url_for("mes_encheres"))
 
     conn = sqlite3.connect("database.db")
@@ -1489,7 +1480,6 @@ def supprimer_enchere():
     conn.commit()
     conn.close()
 
-    flash("L'enchère a été supprimée avec succès.", "success")
     return redirect(url_for("mes_encheres"))
 
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='home_admin.css') }}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -26,20 +27,18 @@
                     </a>
                 </li>
 
-                <li class="has-submenu">
-                    <a href="#" class="submenu-toggle">
+                <li >
+                    <a href="{{ url_for('gestion_produits') }}">
                         <i class="fas fa-box-open"></i>
                         <span>Products</span>
-                        <i class="fas fa-chevron-down dropdown-icon"></i>
                     </a>
-                    <ul class="submenu">
-                        <li>
-                            <a href="{{ url_for('gestion_produits') }}">All Products</a>
-                        </li>
-                        <li><a href="#">Add New Product</a></li>
-                        <li><a href="#">Categories</a></li>
-                        <li><a href="#">Inventory</a></li>
-                    </ul>
+                </li>
+                
+                <li >
+                    <a href="{{ url_for('admin_orders') }}" >
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Orders</span>
+                    </a>
                 </li>
 
                 <li class="has-submenu">
@@ -50,9 +49,8 @@
                     </a>
                     <ul class="submenu">
                         <li>
-                            <a href="{{ url_for('gestion_encheres') }}">Active Auctions</a>
+                            <a href="{{ url_for('gestion_encheres') }}">Auctions Products</a>
                         </li>
-                        <li><a href="#">Schedule Auction</a></li>
                         <li>
                             <a href="{{ url_for('historique_encheres') }}">Auction History</a>
                         </li>
@@ -61,39 +59,13 @@
                       </li>                    </ul>
                 </li>
 
-                <li class="has-submenu">
-                    <a href="#" class="submenu-toggle">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Orders</span>
-                        <i class="fas fa-chevron-down dropdown-icon"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li><a href="{{ url_for('admin_orders') }}">All Orders</a></li>
-                        <li><a href="#">Pending Orders</a></li>
-                        <li><a href="#">Completed Orders</a></li>
-                        <li><a href="#">Shipping</a></li>
-                    </ul>
-                </li>
+
 
                 <li>
                     <a href="{{ url_for('admin_messages') }}">
                         <i class="fas fa-envelope"></i>
                         <span>Messages</span>
                         <span class="badge">{{ message_count }}</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        <i class="fas fa-users"></i>
-                        <span>Users</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Reports</span>
                     </a>
                 </li>
 
@@ -262,55 +234,9 @@
                         </div>
                     </div>
 
-                    <!-- Quick Stats Section -->
-                    <div class="content-card">
-                        <div class="card-header">
-                            <h2>Quick Stats</h2>
-                        </div>
-                        <div class="stats-chart">
-                            <div class="chart-placeholder">
-                                <img src="{{ url_for('static', filename='img/chart-placeholder.png') }}" alt="Sales Chart" />
-                            </div>
-                            <div class="chart-legend">
-                                <div class="legend-item">
-                                    <span class="color-dot" style="background-color: #f4acb7;"></span>
-                                    <span>Products</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="color-dot" style="background-color: #9d8189;"></span>
-                                    <span>Auctions</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="color-dot" style="background-color: #ffcad4;"></span>
-                                    <span>Orders</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
 
-                    <!-- Recent Activity Section -->
-                    <div class="content-card">
-                        <div class="card-header">
-                            <h2>Recent Activity</h2>
-                        </div>
-                        <div class="activity-list">
-                            {% for activity in recent_activities %}
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="fas fa-{{ activity.icon }}"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <p>{{ activity.message|safe }}</p>
-                                    <small>{{ activity.timestamp }}</small>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
+
 
     <script>
         // Toggle submenus

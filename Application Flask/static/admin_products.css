@@ -188,10 +188,16 @@ body {
 }
 
 /* ===== Main Content Styles ===== */
-.main-content {
-  margin-left: 250px;
+.main-content-area {
+  flex: 1;
   padding: 1.5rem 2rem;
   width: calc(100% - 250px);
+  max-width: 1400px; /* Adjust this as needed */
+  margin: 0 auto;
+}
+
+.main-content {
+  width: 100%;
   max-width: 100%;
 }
 

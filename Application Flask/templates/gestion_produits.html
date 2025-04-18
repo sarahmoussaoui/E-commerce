@@ -7,6 +7,8 @@
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='admin_products.css') }}" />
+      <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}" />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet" />
@@ -19,113 +21,82 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h2>Admin Panel</h2>
-        <button class="toggle-sidebar">
-          <i class="fas fa-bars"></i>
-        </button>
+          <h2>Admin Panel</h2>
+          <button class="toggle-sidebar">
+              <i class="fas fa-bars"></i>
+          </button>
       </div>
       <ul class="sidebar-menu">
-        <li>
-          <a href="{{ url_for('home_admin') }}">
-            <i class="fas fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-          </a>
-        </li>
+          <li >
+              <a href="{{ url_for('home_admin') }}">
+                  <i class="fas fa-tachometer-alt"></i>
+                  <span>Dashboard</span>
+              </a>
+          </li>
 
-        <li class="has-submenu">
-          <a href="#" class="submenu-toggle">
-            <i class="fas fa-box-open"></i>
-            <span>Products</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a href="{{ url_for('gestion_produits') }}">All Products</a>
-            </li>
-            <li><a href="#">Add New Product</a></li>
-            <li><a href="#">Categories</a></li>
-            <li><a href="#">Inventory</a></li>
-          </ul>
-        </li>
+          <li class="active">
+              <a href="{{ url_for('gestion_produits') }}">
+                  <i class="fas fa-box-open"></i>
+                  <span>Products</span>
+              </a>
+          </li>
+          
+          <li >
+              <a href="{{ url_for('admin_orders') }}" >
+                  <i class="fas fa-shopping-cart"></i>
+                  <span>Orders</span>
+              </a>
+          </li>
 
-        <li class="has-submenu active">
-          <a href="#" class="submenu-toggle">
-            <i class="fas fa-gavel"></i>
-            <span>Auctions</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </a>
-          <ul class="submenu">
-            <li>
-              <a href="{{ url_for('gestion_encheres') }}">Active Auctions</a>
-            </li>
-            <li><a href="#">Schedule Auction</a></li>
-            <li>
-              <a href="{{ url_for('historique_encheres') }}">Auction History</a>
-            </li>
-            <li><a href="#">Bid Management</a></li>
-          </ul>
-        </li>
+          <li class="has-submenu">
+              <a href="#" class="submenu-toggle">
+                  <i class="fas fa-gavel"></i>
+                  <span>Auctions</span>
+                  <i class="fas fa-chevron-down dropdown-icon"></i>
+              </a>
+              <ul class="submenu">
+                  <li>
+                      <a href="{{ url_for('gestion_encheres') }}">Auctions Products</a>
+                  </li>
+                  <li>
+                      <a href="{{ url_for('historique_encheres') }}">Auction History</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_for('auction_winners') }}">Auction Winners</a>
+                </li>                    </ul>
+          </li>
 
-        <li class="has-submenu">
-          <a href="#" class="submenu-toggle">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Orders</span>
-            <i class="fas fa-chevron-down dropdown-icon"></i>
-          </a>
-          <ul class="submenu">
-            <li><a href="{{ url_for('admin_orders') }}">All Orders</a></li>
-            <li><a href="#">Pending Orders</a></li>
-            <li><a href="#">Completed Orders</a></li>
-            <li><a href="#">Shipping</a></li>
-          </ul>
-        </li>
 
-        <li>
-          <a href="{{ url_for('admin_messages') }}">
-            <i class="fas fa-envelope"></i>
-            <span>Messages</span>
-            <span class="badge">{{ message_count }}</span>
-          </a>
-        </li>
 
-        <li>
-          <a href="#">
-            <i class="fas fa-users"></i>
-            <span>Users</span>
-          </a>
-        </li>
+          <li>
+              <a href="{{ url_for('admin_messages') }}">
+                  <i class="fas fa-envelope"></i>
+                  <span>Messages</span>
+                  <span class="badge">{{ message_count }}</span>
+              </a>
+          </li>
 
-        <li>
-          <a href="#">
-            <i class="fas fa-chart-line"></i>
-            <span>Reports</span>
-          </a>
-        </li>
-
-        <li>
-          <a href="#">
-            <i class="fas fa-cog"></i>
-            <span>Settings</span>
-          </a>
-        </li>
+          <li>
+              <a href="#">
+                  <i class="fas fa-cog"></i>
+                  <span>Settings</span>
+              </a>
+          </li>
       </ul>
       <div class="sidebar-footer">
-        <div class="user-profile">
-          <img
-            src="{{ url_for('static', filename='img/admin-avatar.jpg') }}"
-            alt="Admin"
-          />
-          <div class="user-info">
-            <h4>{{ current_user.FirstName }} {{ current_user.LastName }}</h4>
-            <small>Admin</small>
+          <div class="user-profile">
+              <img src="{{ url_for('static', filename='img/admin-avatar.jpg') }}" alt="Admin" />
+              <div class="user-info">
+                  <h4>{{ current_user.FirstName }} {{ current_user.LastName }}</h4>
+                  <small>Admin</small>
+              </div>
           </div>
-        </div>
-        <a href="{{ url_for('logout') }}" class="logout-btn">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Logout</span>
-        </a>
+          <a href="{{ url_for('logout') }}" class="logout-btn">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+          </a>
       </div>
-    </aside>
+  </aside>
 
     <main class="main-content">
       <div class="products-header">
@@ -209,6 +180,29 @@
           document.getElementById(productId).showModal();
         });
       });
+              // Toggle submenus
+              document.querySelectorAll(".submenu-toggle").forEach((item) => {
+                item.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const parent = this.parentElement;
+                    parent.classList.toggle("active");
+    
+                    // Rotate the dropdown icon
+                    const icon = this.querySelector(".dropdown-icon");
+                    if (parent.classList.contains("active")) {
+                        icon.classList.remove("fa-chevron-down");
+                        icon.classList.add("fa-chevron-up");
+                    } else {
+                        icon.classList.remove("fa-chevron-up");
+                        icon.classList.add("fa-chevron-down");
+                    }
+                });
+            });
+    
+            // Toggle sidebar (for mobile)
+            document.querySelector(".toggle-sidebar").addEventListener("click", function () {
+                document.querySelector(".sidebar").classList.toggle("collapsed");
+            });
     </script>
   </body>
 </html>
