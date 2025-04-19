@@ -91,14 +91,7 @@
                             {% endif %}
                         </div>
                         
-                        <div class="product-actions">
-                            <button class="quick-view" data-id="{{ product.id }}">
-                                <i class="material-icons">visibility</i> Quick View
-                            </button>
-                            <button class="add-to-cart" data-id="{{ product.id }}" {% if product.stock == 0 %}disabled{% endif %}>
-                                <i class="material-icons">add_shopping_cart</i> Add to Cart
-                            </button>
-                        </div>
+                        
                     </div>
                 </div>
                 {% endfor %}
