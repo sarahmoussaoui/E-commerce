@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Déclaration XML standard -->
+
+<application xmlns="http://wadl.dev.java.net/2009/02">
+<!-- Début de la définition de l'application WADL avec l'espace de noms par défaut -->
+
+  <resources base="http://example.com/api">
+  <!-- Racine des ressources de l'API : toutes les URLs commenceront par /api -->
+
+    <!-- Ressource principale /users (liste des utilisateurs ou ajout) -->
+    <resource path="/users">
+
+      <!-- Méthode GET : récupérer tous les utilisateurs -->
+      <method name="GET">
+        <response status="200">
+          <representation mediaType="application/json"/>
+          <!-- Réponse avec la liste des utilisateurs au format JSON -->
+        </response>
+      </method>
+
+      <!-- Méthode POST : ajouter un nouvel utilisateur -->
+      <method name="POST">
+        <request>
+          <representation mediaType="application/json"/>
+          <!-- Corps de la requête contenant les informations de l'utilisateur en JSON -->
+        </request>
+        <!-- Pas de réponse précisée ici, mais on attendrait un 201 Created -->
+      </method>
+
+    </resource>
+
+    <!-- Ressource individuelle /users/{id} (accès ou gestion d’un utilisateur spécifique) -->
+    <resource path="/users/{id}">
+      <!-- Le {id} est une variable représentant l'identifiant unique d'un utilisateur -->
+
+      <!-- Méthode GET : obtenir les détails d’un utilisateur -->
+      <method name="GET">
+        <response status="200">
+          <representation mediaType="application/json"/>
+          <!-- Retourne les informations de l'utilisateur ciblé -->
+        </response>
+      </method>
+
+      <!-- Méthode PUT : mise à jour des informations d’un utilisateur -->
+      <method name="PUT">
+        <request>
+          <representation mediaType="application/json"/>
+          <!-- Corps de la requête avec les nouvelles données utilisateur -->
+        </request>
+      </method>
+
+      <!-- Méthode DELETE : supprimer un utilisateur -->
+      <method name="DELETE">
+        <response status="204"/>
+        <!-- Aucune donnée retournée, mais succès si l'utilisateur est supprimé -->
+      </method>
+
+    </resource>
+
+  </resources>
+</application>

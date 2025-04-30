@@ -1,0 +1,12 @@
+exo 1 :
+  This WADL document describes a simple REST API with:
+  A base URL (/api)
+  A /users endpoint supporting GET and POST
+  A nested /users/{id} endpoint to get a user by ID
+
+
+Explication de la commande curl
+  -X POST : Spécifie que la méthode HTTP utilisée est POST.
+  http://example.com/api/users : URL du point de terminaison de l'API.
+  -H "Content-Type: application/json" : Indique que le corps de la requête est au format JSON.
+  -d @new_user.json : Envoie le contenu du fichier new_user.json comme corps de la requête.

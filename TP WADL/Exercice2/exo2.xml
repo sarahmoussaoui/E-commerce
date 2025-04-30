@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Déclaration XML de base -->
+
+<application xmlns="http://wadl.dev.java.net/2009/02"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- Début du document WADL
+     - Espace de noms principal : WADL
+     - xs : utilisé pour définir les types XML Schema -->
+
+  <resources base="http://example.com/api">
+  <!-- Déclaration de la base de l'API REST -->
+
+    <!-- /products -->
+    <resource path="products">
+    <!-- Ressource pour /products, liste ou ajout de produits -->
+
+      <!-- GET : liste des produits -->
+      <method name="GET">
+        <!-- Méthode GET pour récupérer tous les produits -->
+        <response>
+          <representation mediaType="application/json"/>
+          <!-- La réponse sera en JSON -->
+        </response>
+      </method>
+
+      <!-- POST : ajout d’un produit -->
+      <method name="POST">
+        <!-- Méthode POST pour ajouter un nouveau produit -->
+        <request>
+          <representation mediaType="application/json"/>
+          <!-- Le corps de la requête est en JSON -->
+        </request>
+        <response status="201">
+          <!-- Réponse en cas de succès : 201 Created -->
+          <representation mediaType="application/json"/>
+          <!-- La réponse peut contenir les détails du produit ajouté -->
+        </response>
+      </method>
+    </resource>
+
+    <!-- /products/{id} -->
+    <resource path="products/{id}">
+    <!-- Ressource pour un produit spécifique identifié par {id} -->
+
+      <param name="id" style="template" type="xs:string" required="true"/>
+      <!-- Définition du paramètre de chemin {id}, requis et de type string -->
+
+      <!-- GET : détails d’un produit -->
+      <method name="GET">
+        <!-- Méthode GET pour récupérer les détails d’un produit -->
+        <response>
+          <representation mediaType="application/json"/>
+          <!-- Réponse contenant les informations du produit en JSON -->
+        </response>
+      </method>
+
+      <!-- PUT : mise à jour d’un produit -->
+      <method name="PUT">
+        <!-- Méthode PUT pour modifier un produit existant -->
+        <request>
+          <representation mediaType="application/json"/>
+          <!-- Corps de la requête en JSON avec les données à mettre à jour -->
+        </request>
+        <response status="200">
+          <!-- Réponse : 200 OK si la mise à jour réussit -->
+          <representation mediaType="application/json"/>
+          <!-- Réponse contenant le produit mis à jour -->
+        </response>
+      </method>
+
+      <!-- DELETE : suppression d’un produit -->
+      <method name="DELETE">
+        <!-- Méthode DELETE pour supprimer un produit -->
+        <!-- Réponse : 204 No Content -->
+        <response status="204"/>
+        <!-- Pas de contenu retourné si suppression réussie -->
+      </method>
+
+    </resource>
+
+  </resources>
+</application>

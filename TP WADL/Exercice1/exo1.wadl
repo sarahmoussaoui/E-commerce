@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Root WADL document for describing RESTful web services -->
+
+<application xmlns="http://wadl.dev.java.net/2009/02"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- Define XML namespaces: 
+     - Default WADL namespace
+     - xs for XML Schema data types -->
+
+ <resources base="http://example.com/api/">
+   <!-- Base URI for the API: http://example.com/api/ -->
+
+   <!-- /users resource -->
+   <resource path="users">
+     <!-- Defines the /users endpoint -->
+
+     <!-- GET /users -->
+     <method name="GET">
+       <!-- Defines a GET method for /users -->
+       <response>
+         <representation mediaType="application/json"/>
+         <!-- Response is returned in JSON format -->
+       </response>
+     </method>
+
+     <!-- POST /users -->
+     <method name="POST">
+       <!-- Defines a POST method for /users -->
+       <request>
+         <representation mediaType="application/json">
+           <!-- Request body should be in JSON format -->
+           <param name="name" style="plain" type="xs:string" required="true"/>
+           <param name="email" style="plain" type="xs:string" required="true"/>
+           <!-- Two required fields: name and email as plain parameters -->
+         </representation>
+       </request>
+       <response>
+         <representation mediaType="application/json"/>
+         <!-- Response (likely confirmation or created object) in JSON -->
+       </response>
+     </method>
+
+     <!-- /users/{id} resource -->
+     <resource path="{id}">
+       <!-- Nested resource for /users/{id}, with dynamic path parameter -->
+
+       <param name="id" style="template" type="xs:int" required="true"/>
+       <!-- Path parameter 'id', required and of integer type -->
+
+       <method name="GET">
+         <!-- GET method to retrieve a user by ID -->
+         <response>
+           <representation mediaType="application/json"/>
+           <!-- Response will be in JSON format -->
+         </response>
+       </method>
+     </resource>
+
+   </resource>
+ </resources>
+</application>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Déclaration XML standard -->
+
+<application xmlns="http://wadl.dev.java.net/2009/02">
+<!-- Début du document WADL avec l’espace de noms officiel -->
+
+  <resources base="http://example.com/api">
+  <!-- Définition de la racine de l’API -->
+
+    <!-- Définition de la ressource /products -->
+    <resource path="/products">
+
+      <!-- Méthode GET pour récupérer la liste des produits -->
+      <method name="GET">
+        <response status="200">
+          <!-- Code de retour 200 OK si la récupération est réussie -->
+          <representation mediaType="application/json"/>
+          <!-- Le contenu de la réponse est au format JSON -->
+        </response>
+      </method>
+
+      <!-- Méthode POST pour ajouter un nouveau produit -->
+      <method name="POST">
+        <request>
+          <representation mediaType="application/json"/>
+          <!-- Le corps de la requête contient les données du produit en JSON -->
+        </request>
+        <!-- Pas de réponse définie ici, mais on peut imaginer un 201 Created -->
+      </method>
+
+    </resource>
+
+    <!-- Définition de la ressource /products/{id} -->
+    <resource path="/products/{id}">
+      <!-- Représente une ressource produit individuelle identifiée par son id -->
+
+      <!-- Méthode GET pour récupérer les détails d’un produit -->
+      <method name="GET">
+        <response status="200">
+          <representation mediaType="application/json"/>
+          <!-- La réponse contient les détails du produit -->
+        </response>
+      </method>
+
+      <!-- Méthode PUT pour mettre à jour un produit -->
+      <method name="PUT">
+        <request>
+          <representation mediaType="application/json"/>
+          <!-- Le corps de la requête contient les nouvelles données du produit -->
+        </request>
+      </method>
+
+      <!-- Méthode DELETE pour supprimer un produit -->
+      <method name="DELETE">
+        <response status="204"/>
+        <!-- Réponse vide, statut 204 No Content si suppression réussie -->
+      </method>
+    </resource>
+
+    <!-- Nouvelle ressource /categories -->
+    <resource path="/categories">
+      <!-- Gère la liste complète des catégories -->
+
+      <!-- Méthode GET pour récupérer toutes les catégories -->
+      <method name="GET">
+        <response status="200">
+          <representation mediaType="application/json"/>
+          <!-- La réponse est une liste de catégories au format JSON -->
+        </response>
+      </method>
+
+      <!-- Méthode POST pour créer une nouvelle catégorie -->
+      <method name="POST">
+        <request>
+          <representation mediaType="application/json"/>
+          <!-- Le corps de la requête contient les infos de la catégorie -->
+        </request>
+      </method>
+    </resource>
+
+    <!-- Ressource /categories/{id} pour une catégorie individuelle -->
+    <resource path="/categories/{id}">
+
+      <!-- Méthode GET pour les détails d’une catégorie spécifique -->
+      <method name="GET">
+        <response status="200">
+          <representation mediaType="application/json"/>
+        </response>
+      </method>
+
+      <!-- Méthode PUT pour mettre à jour une catégorie -->
+      <method name="PUT">
+        <request>
+          <representation mediaType="application/json"/>
+        </request>
+      </method>
+
+      <!-- Méthode DELETE pour supprimer une catégorie -->
+      <method name="DELETE">
+        <response status="204"/>
+      </method>
+
+    </resource>
+
+  </resources>
+</application>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Déclaration XML standard -->
+
+<application xmlns="http://wadl.dev.java.net/2009/02">
+<!-- Début du document WADL avec l’espace de noms officiel -->
+
+  <resources base="http://example.com/api">
+  <!-- Racine des ressources de l’API. Toutes les URLs commencent par /api -->
+
+    <!-- Ressource /products : permet d'interroger la liste des produits -->
+    <resource path="/products">
+
+      <!-- Méthode GET : récupérer les produits, éventuellement filtrés par prix -->
+      <method name="GET">
+
+        <request>
+          <!-- Paramètre optionnel "minPrice" passé en tant que paramètre de requête (query) -->
+          <param name="minPrice" style="query" type="xsd:decimal" required="false"/>
+          <!-- Ce paramètre permet de filtrer les produits dont le prix est supérieur ou égal à minPrice -->
+        </request>
+
+        <response status="200">
+          <!-- Réponse avec le code 200 OK si la requête est réussie -->
+          <representation mediaType="application/json"/>
+          <!-- La liste des produits est retournée au format JSON -->
+        </response>
+
+      </method>
+    </resource>
+
+  </resources>
+</application>
